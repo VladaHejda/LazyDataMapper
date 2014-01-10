@@ -24,7 +24,6 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 		$this->suggestor = \Mockery::mock('Shelter\ISuggestor')
 			->shouldReceive('getParamMap')
 			->andReturn($this->paramMap);
-		$this->holder = new Shelter\DataHolder($this->suggestor);
 	}
 
 
@@ -33,12 +32,14 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 	 */
 	public function testIsDataOnTypeNotSeparated()
 	{
+		$holder = new Shelter\DataHolder($this->suggestor);
+
 		$this->paramMap
 			->shouldReceive('isSeparatedByType')
 			->once()
 			->andReturn(FALSE);
 
-		$this->holder->isDataOnType('iWantType');
+		$holder->isDataOnType('iWantType');
 	}
 
 
@@ -47,6 +48,8 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 	 */
 	public function testIsDataOnTypeUnknownType()
 	{
+		$holder = new Shelter\DataHolder($this->suggestor);
+
 		$this->paramMap
 			->shouldReceive('isSeparatedByType')
 			->once()
@@ -57,7 +60,7 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 			->with('unknown')
 			->andReturn(FALSE);
 
-		$this->holder->isDataOnType('unknown');
+		$holder->isDataOnType('unknown');
 	}
 
 
@@ -66,12 +69,14 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 	 */
 	public function testGetParamsByTypeNotSeparated()
 	{
+		$holder = new Shelter\DataHolder($this->suggestor);
+
 		$this->paramMap
 			->shouldReceive('isSeparatedByType')
 			->once()
 			->andReturn(FALSE);
 
-		$this->holder->getParams('unknown');
+		$holder->getParams('unknown');
 	}
 
 
@@ -80,6 +85,8 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 	 */
 	public function testGetParamsUnknownType()
 	{
+		$holder = new Shelter\DataHolder($this->suggestor);
+
 		$this->paramMap
 			->shouldReceive('isSeparatedByType')
 			->once()
@@ -89,7 +96,7 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 			->once()
 			->andReturn(FALSE);
 
-		$this->holder->getParams('unknown');
+		$holder->getParams('unknown');
 	}
 
 
@@ -99,6 +106,8 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 	 */
 	public function testSetParamsNonexistent()
 	{
+		$holder = new Shelter\DataHolder($this->suggestor);
+
 		$this->suggestor
 			->shouldReceive()
 
@@ -108,7 +117,7 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 			->with(NULL)
 			->andReturn(array('name' => NULL));
 
-		$this->holder->setParams(array('age' => 25));
+		$holder->setParams(array('age' => 25));
 	}
 
 
@@ -117,13 +126,15 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 	 */
 	public function testSetParamsLikeType()
 	{
+		$holder = new Shelter\DataHolder($this->suggestor);
+
 		$this->paramMap
 			->shouldReceive('getMap')
 			->once()
 			->with(NULL)
 			->andReturn(array('skills' => array('power' => NULL)));
 
-		$this->holder->setParams(array('skills' => 'intelligence'));
+		$holder->setParams(array('skills' => 'intelligence'));
 	}
 
 
@@ -132,6 +143,8 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 	 */
 	public function testeGetUnknownDescendant()
 	{
-		$this->holder->getDescendant('World\Animal', 'pet_id');
+		$holder = new Shelter\DataHolder($this->suggestor);
+
+		$holder->getDescendant('World\Animal', 'pet_id');
 	}
 }

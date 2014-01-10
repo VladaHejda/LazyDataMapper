@@ -100,4 +100,10 @@ class EntityTest extends Shelter\Tests\TestCase
 
 		$this->accessor->save($this->entity);
 	}
+
+
+	public function testRemove()
+	{
+
+	}
 }

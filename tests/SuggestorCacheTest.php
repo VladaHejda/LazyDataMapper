@@ -26,9 +26,11 @@ class Test extends \Shelter\Tests\TestCase
 		$this->externalCache = \Mockery::mock('Shelter\IExternalCache');
 		$requestKey = \Mockery::mock('Shelter\IRequestKey')
 			->shouldReceive('getKey')
-			->andReturn('');
+			->andReturn('')
+			->getMock();
 
-		$this->cache = \Mockery::mock('Shelter\SuggestorCache[createSuggestor]', array($this->externalCache, $requestKey));
+		$this->cache = \Mockery::mock('Shelter\SuggestorCache[createSuggestor]', array($this->externalCache, $requestKey))
+			->shouldAllowMockingProtectedMethods();
 		$this->suggestor = \Mockery::mock('Shelter\ISuggestor');
 
 		$this->paramMap = \Mockery::mock('Shelter\IParamMap')

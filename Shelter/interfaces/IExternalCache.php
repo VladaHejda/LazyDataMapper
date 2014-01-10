@@ -18,7 +18,7 @@ interface IExternalCache
 
 	/**
 	 * @param string $key
-	 * @return mixed
+	 * @return mixed NULL when nothing cached.
 	 */
 	function load($key);
 }
