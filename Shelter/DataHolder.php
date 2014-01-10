@@ -46,12 +46,12 @@ class DataHolder implements IDataHolder
 				}
 				throw new Exception("You must set parameters for each id via two-dimensional array.");
 			}
-			foreach ($params as $id => $plainParams) {
-				$this->checkAgainstSuggestions(array_keys($plainParams), $suggestions);
+			foreach ($params as $id => $theParams) {
+				$this->checkAgainstSuggestions(array_keys($theParams), $suggestions);
 				if (!isset($this->params[$id])) {
 					$this->params[$id] = array();
 				}
-				$this->params[$id] = $plainParams + $this->params[$id];
+				$this->params[$id] = $theParams + $this->params[$id];
 			}
 		} else {
 			$this->checkAgainstSuggestions(array_keys($params), $suggestions);
@@ -71,14 +71,14 @@ class DataHolder implements IDataHolder
 		}
 
 		$map = $this->suggestor->getParamMap()->getMap($type);
-		foreach ($map as $paramName => & $value) {
-			if (array_key_exists($paramName, $this->params)) {
-				$value = $this->params[$paramName];
-			} else {
-				unset ($map[$paramName]);
+		if ($this->isContainer) {
+			$containerMap = array();
+			foreach ($this->params as $id => $params) {
+				$containerMap[$id] = $this->fillMap($map, $params);
 			}
+			return $containerMap;
 		}
-		return $map;
+		return $this->fillMap($map, $this->params);
 	}
 
 
@@ -88,6 +88,17 @@ class DataHolder implements IDataHolder
 	 */
 	public function isDataOnType($type)
 	{
+		$map = $this->suggestor->getParamMap()->getMap($type, FALSE);
+		if ($this->isContainer) {
+			foreach ($this->params as $params) {
+				$isDataOnType = (bool) array_intersect(array_keys($params), $map);
+				if ($isDataOnType) {
+					return TRUE;
+				}
+				return FALSE;
+			}
+		}
+		return (bool) array_intersect(array_keys($this->params), $map);
 	}
 
 
@@ -142,5 +153,18 @@ class DataHolder implements IDataHolder
 				throw new Exception("Parameter $paramName is unknown or is not suggested.");
 			}
 		}
+	}
+
+
+	private function fillMap(array $map, array $params)
+	{
+		foreach ($map as $paramName => & $value) {
+			if (array_key_exists($paramName, $params)) {
+				$value = $params[$paramName];
+			} else {
+				unset ($map[$paramName]);
+			}
+		}
+		return $map;
 	}
 }
