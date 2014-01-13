@@ -17,10 +17,10 @@ interface ISuggestorCache
 	 * Adds parameter name under one identifier.
 	 * @param string $identifier
 	 * @param string $paramName
-	 * @param IParamMap $map
+	 * @param string $entityClass
 	 * @return ISuggestor with one suggestion of cached parameter name
 	 */
-	function cacheParamName($identifier, $paramName, IParamMap $map);
+	function cacheParamName($identifier, $paramName, $entityClass);
 
 
 	/**
@@ -36,8 +36,8 @@ interface ISuggestorCache
 	/**
 	 * Gets all cached suggestions under one identifier.
 	 * @param string $identifier
-	 * @param IParamMap $map
+	 * @param string $entityClass
 	 * @return ISuggestor
 	 */
-	function getCached($identifier, IParamMap $map);
+	function getCached($identifier, $entityClass);
 }

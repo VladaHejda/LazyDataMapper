@@ -24,10 +24,9 @@ interface ISuggestor
 
 
 	/**
-	 * If has parent, provides parent's source parameter name.
-	 * @return string|null
+	 * @return string
 	 */
-	function getSourceParam();
+	function getIdentifier();
 
 
 	/**

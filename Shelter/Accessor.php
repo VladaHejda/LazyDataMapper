@@ -2,11 +2,14 @@
 
 namespace Shelter;
 
-abstract class Accessor implements IAccessor
+class Accessor implements IAccessor
 {
 
 	/** @var ISuggestorCache */
 	protected $cache;
+
+	/** @var IEntityServiceAccessor */
+	protected $serviceAccessor;
 
 	/** @var array */
 	private $loadedData = array();
@@ -14,10 +17,12 @@ abstract class Accessor implements IAccessor
 
 	/**
 	 * @param ISuggestorCache $cache
+	 * @param IEntityServiceAccessor $serviceAccessor
 	 */
-	public function __construct(ISuggestorCache $cache)
+	public function __construct(ISuggestorCache $cache, IEntityServiceAccessor $serviceAccessor)
 	{
 		$this->cache = $cache;
+		$this->serviceAccessor = $serviceAccessor;
 	}
 
 
@@ -37,14 +42,14 @@ abstract class Accessor implements IAccessor
 			$data = $loadedData;
 
 		} else {
-			$mapper = $this->getMapper($entityClass);
+			$mapper = $this->serviceAccessor->getMapper($entityClass);
 			if (!$mapper->exists($id)) {
 				return NULL;
 			}
 
-			if ($suggestor = $this->cache->getCached($identifier, $this->getParamMap($entityClass))) {
+			if ($suggestor = $this->cache->getCached($identifier, $entityClass)) {
 				$dataHolder = $this->loadDataHolderByMapper($entityClass, $id, $suggestor);
-				$this->saveDescendants($identifier, $dataHolder);
+				$this->saveDescendants($dataHolder);
 				$data = $dataHolder->getParams();
 
 			} else {
@@ -76,11 +81,11 @@ abstract class Accessor implements IAccessor
 		}
 
 		else {
-			$mapper = $this->getMapper($entityClass);
+			$mapper = $this->serviceAccessor->getMapper($entityClass);
 			$ids = $mapper->getIdsByRestrictions($restrictor);
 
 			if (!empty($ids)) {
-				$suggestor = $this->cache->getCached($identifier, $this->getParamMap($entityClass));
+				$suggestor = $this->cache->getCached($identifier, $entityClass);
 			}
 
 			if (empty($ids) || !$suggestor) {
@@ -91,7 +96,7 @@ abstract class Accessor implements IAccessor
 
 			} else {
 				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
-				$this->saveDescendants($identifier, $dataHolder);
+				$this->saveDescendants($dataHolder);
 				$data = $dataHolder->getParams();
 				$this->sortData($ids, $data); // sorts data by ids order (it would be ordered from restrictor
 
@@ -110,8 +115,8 @@ abstract class Accessor implements IAccessor
 	public function getParam(IEntity $entity, $paramName)
 	{
 		$entityClass = get_class($entity);
-		$suggestor = $this->cache->cacheParamName($entity->getIdentifier(), $paramName, $this->getParamMap($entityClass));
-		$dataHolder = $this->getMapper($entityClass)->getById($entity->getId(), $suggestor);
+		$suggestor = $this->cache->cacheParamName($entity->getIdentifier(), $paramName, $entityClass);
+		$dataHolder = $this->serviceAccessor->getMapper($entityClass)->getById($entity->getId(), $suggestor);
 		return array_shift($dataHolder->getParams());
 	}
 
@@ -130,11 +135,11 @@ abstract class Accessor implements IAccessor
 			$this->check($entityClass, NULL, $dataHolder);
 		}
 
-		$id = $this->getMapper($entityClass)->create($dataHolder);
+		$id = $this->serviceAccessor->getMapper($entityClass)->create($dataHolder);
 		$identifier = $this->composeIdentifier($entityClass, FALSE);
 
-		if ($suggestorCached = $this->cache->getCached($identifier, $this->getParamMap($entityClass))) {
-			$data += $this->getMapper($entityClass)->getById($id, $suggestorCached)->getParams();
+		if ($suggestorCached = $this->cache->getCached($identifier, $entityClass)) {
+			$data += $this->serviceAccessor->getMapper($entityClass)->getById($id, $suggestorCached)->getParams();
 		}
 
 		return $this->createEntity($entityClass, $id, $data, $identifier);
@@ -151,7 +156,7 @@ abstract class Accessor implements IAccessor
 		$dataHolder = $this->createDataHolder($entityClass, array_keys($data));
 		$dataHolder->setParams($data);
 		$this->check($entityClass, $entity, $dataHolder);
-		$this->getMapper($entityClass)->save($entity->getId(), $dataHolder);
+		$this->serviceAccessor->getMapper($entityClass)->save($entity->getId(), $dataHolder);
 	}
 
 
@@ -161,54 +166,7 @@ abstract class Accessor implements IAccessor
 	 */
 	public function remove($entityClass, $id)
 	{
-		$this->getMapper($entityClass)->remove($id);
-	}
-
-
-	/********************* services *********************/
-
-
-	/**
-	 * Apply solution to gain Entity ParamMap service based on Entity class name.
-	 * @param string $entityClass
-	 * @return IParamMap
-	 */
-	abstract protected function getParamMap($entityClass);
-
-
-	/**
-	 * Apply solution to gain Entity Mapper service based on Entity class name.
-	 * @param string $entityClass
-	 * @return IMapper
-	 */
-	abstract protected function getMapper($entityClass);
-
-
-	/**
-	 * Apply solution to gain Entity Checker service based on Entity class name.
-	 * When Entity has no checker, return NULL.
-	 * @param string $entityClass
-	 * @return IChecker|null
-	 */
-	abstract protected function getChecker($entityClass);
-
-
-	/********************* override following methods when using another naming conventions *********************/
-
-
-	/**
-	 * Makes plural from Entity class name.
-	 * @param string $entityClass
-	 * @return string
-	 */
-	protected function getEntityContainerClass($entityClass)
-	{
-		$len = strlen($entityClass);
-		if ('y' === $entityClass[$len-1]) {
-			$entityClass[$len-1] = 'i';
-			return $entityClass . 'es';
-		}
-		return $entityClass . 's';
+		$this->serviceAccessor->getMapper($entityClass)->remove($id);
 	}
 
 
@@ -252,7 +210,7 @@ abstract class Accessor implements IAccessor
 	 */
 	protected function createEntityContainer($entityClass, array $data, $identifier, IOperand $parent = NULL)
 	{
-		$containerClass = $this->getEntityContainerClass($entityClass);
+		$containerClass = $this->serviceAccessor->getEntityContainerClass($entityClass);
 		return new $containerClass($data, $identifier, $parent, $this);
 	}
 
@@ -264,7 +222,7 @@ abstract class Accessor implements IAccessor
 	 */
 	protected function createDataHolder($entityClass, array $paramNames)
 	{
-		$suggestor = new Suggestor($this->getParamMap($entityClass), $this->cache, $paramNames);
+		$suggestor = new Suggestor($this->serviceAccessor->getParamMap($entityClass), $this->cache, $paramNames);
 		return new DataHolder($suggestor);
 	}
 
@@ -282,7 +240,7 @@ abstract class Accessor implements IAccessor
 	private function loadDataHolderByMapper($entityClass, $id, ISuggestor $suggestor)
 	{
 		$m = is_array($id) ? 'getByIdsRange' : 'getById';
-		$dataHolder = $this->getMapper($entityClass)->$m($id, $suggestor);
+		$dataHolder = $this->serviceAccessor->getMapper($entityClass)->$m($id, $suggestor);
 
 		if (!$dataHolder instanceof IDataHolder) {
 			throw new Exception("Method $m() of mapper for $entityClass must return IDataHolder instance.");
@@ -310,11 +268,12 @@ abstract class Accessor implements IAccessor
 	// todo zde by nemusel nustně dostat sourceParam - holder ho zná. pokud opravim, opravit testy
 	// todo cachovat i data aktuálního? pak by se to teda nejmenoval saveDescendants ale saveData. a bylo by to k něčemu?
 	//      a cachovat paramy nebo celej holder? k čemu by byl holder?
-	private function saveDescendants($parentIdentifier, IDataHolder $dataHolder)
+	private function saveDescendants(IDataHolder $dataHolder)
 	{
-		foreach ($dataHolder as $descendantClass => $descendant) {
+		/** @var IDataHolder $descendant */
+		foreach ($dataHolder as $descendant) {
 
-			$sourceParam = $descendant->getSuggestor()->getSourceParam();
+			$identifier = $descendant->getSuggestor()->getIdentifier();
 
 			// tyto informace (isContainer, getSourceParam) by měl vědět už suggestor, do toho se dostanou keškou. nebo jsem to měl vymyšlený jinak?
 			// když se podívám do SuggestorCache tak metoda cacheDescendant skutečně přebírá sourceParam, takže ho zakešuje a když si pak Accessor
@@ -324,22 +283,10 @@ abstract class Accessor implements IAccessor
 			// todo a v tom případě ani Identifier nepotřebuje mít informaci zda jde o container... ale neni to celý moc clear.. :-X
 
 			if ($descendant->getSuggestor()->hasDescendants()) {
-				$descendantIdentifier = $this->composeIdentifier($descendantClass, (bool) $sourceParam, $parentIdentifier, $sourceParam);
-				$this->saveDescendants($descendantIdentifier, $descendant);
+				$this->saveDescendants($descendant);
 			}
 
-			if (!isset($this->loadedData[$parentIdentifier])) {
-				$this->loadedData[$parentIdentifier] = array();
-			}
-			if (NULL !== $sourceParam) {
-				if (!isset($this->loadedData[$parentIdentifier][$descendantClass])) {
-					$this->loadedData[$parentIdentifier][$descendantClass] = array();
-				}
-				$this->loadedData[$parentIdentifier][$descendantClass][$sourceParam] = $descendant->getParams();
-
-			} else {
-				$this->loadedData[$parentIdentifier][$descendantClass] = $descendant->getParams();
-			}
+			$this->loadedData[$identifier] = $descendant->getParams();
 		}
 	}
 
@@ -351,7 +298,7 @@ abstract class Accessor implements IAccessor
 
 	private function check($entityClass, $entity, IDataHolder $dataHolder)
 	{
-		$checker = $this->getChecker($entityClass);
+		$checker = $this->serviceAccessor->getChecker($entityClass);
 		if ($checker) {
 			$checker->check($entity, $dataHolder);
 		}

@@ -5,7 +5,13 @@ namespace Shelter;
 class Suggestor implements ISuggestor
 {
 
-	public function __construct(IParamMap $paramMap, ISuggestorCache $cache, array $suggestions, $identifier = NULL, $sourceParam = NULL, array $descendants = array())
+	/**
+	 * @param IParamMap $paramMap
+	 * @param ISuggestorCache $cache
+	 * @param array $suggestions
+	 * @param array $descendants entityClass => identifier
+	 */
+	public function __construct(IParamMap $paramMap, ISuggestorCache $cache, array $suggestions, $identifier = NULL, array $descendants = array())
 	{
 	}
 
@@ -29,6 +35,22 @@ class Suggestor implements ISuggestor
 
 
 	/**
+	 * @return string
+	 */
+	public function getIdentifier()
+	{
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function hasDescendants()
+	{
+	}
+
+
+	/**
 	 * @param string $name
 	 * @param string $sourceParam
 	 * @return bool
@@ -44,6 +66,14 @@ class Suggestor implements ISuggestor
 	 * @return self
 	 */
 	public function getDescendant($entityClass, $sourceParam = NULL)
+	{
+	}
+
+
+	/**
+	 * @return IParamMap
+	 */
+	public function getParamMap()
 	{
 	}
 }

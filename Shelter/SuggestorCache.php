@@ -11,25 +11,30 @@ class SuggestorCache implements ISuggestorCache
 	/** @var string */
 	protected $key;
 
+	/** @var IEntityServiceAccessor */
+	protected $serviceAccessor;
+
 
 	/**
 	 * @param IExternalCache $cache
 	 * @param IRequestKey $requestKey
+	 * @param IEntityServiceAccessor $serviceAccessor
 	 */
-	public function __construct(IExternalCache $cache, IRequestKey $requestKey)
+	public function __construct(IExternalCache $cache, IRequestKey $requestKey, IEntityServiceAccessor $serviceAccessor)
 	{
 		$this->externalCache = $cache;
 		$this->key = $requestKey->getKey() . ':';
+		$this->serviceAccessor = $serviceAccessor;
 	}
 
 
 	/**
 	 * @param string $identifier
 	 * @param string $paramName
-	 * @param IParamMap $map
+	 * @param string $entityClass
 	 * @return ISuggestor
 	 */
-	public function cacheParamName($identifier, $paramName, IParamMap $map)
+	public function cacheParamName($identifier, $paramName, $entityClass)
 	{
 		$key = $this->key . $identifier;
 		$cached = $this->externalCache->load($key);
@@ -44,6 +49,7 @@ class SuggestorCache implements ISuggestorCache
 			$cached[self::PARAM_NAMES][] = $paramName;
 			$this->externalCache->save($key, $cached);
 		}
+		$map = $this->serviceAccessor->getParamMap($entityClass);
 		return $this->createSuggestor($map, $identifier, array($paramName));
 	}
 
@@ -74,30 +80,30 @@ class SuggestorCache implements ISuggestorCache
 
 	/**
 	 * @param string $identifier
-	 * @param IParamMap $map
+	 * @param string $entityClass
 	 * @return ISuggestor
 	 */
-	public function getCached($identifier, IParamMap $map)
+	public function getCached($identifier, $entityClass)
 	{
-		$cached = $this->getCached($this->key . $identifier, $map);
+		$cached = $this->externalCache->load($this->key . $identifier);
 		if (NULL === $cached) {
 			return NULL;
 		}
 		$suggestions = isset($cached[self::PARAM_NAMES]) ? $cached[self::PARAM_NAMES] : array();
 		$descendants = isset($cached[self::DESCENDANTS]) ? $cached[self::DESCENDANTS] : array();
+		$map = $this->serviceAccessor->getParamMap($entityClass);
 		return $this->createSuggestor($map, $identifier, $suggestions, $descendants);
 	}
 
 
 	/**
 	 * @param IParamMap $paramMap
-	 * @param string $identifier
 	 * @param array $suggestions
 	 * @param array $descendants
 	 * @return ISuggestor
 	 */
 	protected function createSuggestor(IParamMap $paramMap, $identifier, array $suggestions, array $descendants = array())
 	{
-		// todo: return new Suggestor($paramMap, $this, $suggestions, $identifier, , $descendants);
+		return new Suggestor($paramMap, $this, $suggestions, $identifier, $descendants);
 	}
 }
