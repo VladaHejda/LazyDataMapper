@@ -106,9 +106,15 @@ class DataHolder implements IDataHolder
 	 * @param string $entityClass
 	 * @param string $sourceParam
 	 * @return self
+	 * TODO a zde je opět problém s kontejnerem! - ten potřebuje seznam ID, ovšem ty v kešce rozhodně nebudou
+	 *      vyplývá z toho ale že bude li potomek container, bude se tahat v dalšim požadavku a ne jako potomek
+	 *      tudíž odsud by měl vypadnout argument $sourceParam a brát to jen !container descendanty (vyjímka při containeru?)
+	 *      čimž se asi i hodně zjednoduší accessor a jeho ukládání dat
 	 */
 	public function getDescendant($entityClass, $sourceParam = NULL)
 	{
+		$suggestor = $this->suggestor->getDescendant($entityClass, $sourceParam);
+		return new self($suggestor);
 	}
 
 
@@ -133,6 +139,7 @@ class DataHolder implements IDataHolder
 
 	public function current()
 	{
+		$this->suggestor->seznamDescendantů(':-D');
 	}
 
 
