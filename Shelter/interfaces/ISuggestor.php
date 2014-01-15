@@ -37,11 +37,11 @@ interface ISuggestor
 
 
 	/**
-	 * @param string $name
+	 * @param string $entityClass
 	 * @param string $sourceParam
 	 * @return bool
 	 */
-	function hasDescendant($name, $sourceParam = NULL);
+	function hasDescendant($entityClass, &$sourceParam = NULL);
 
 
 	/**

@@ -64,17 +64,30 @@ class SuggestorCache implements ISuggestorCache
 	{
 		$key = $this->key . $identifier;
 		$cached = $this->externalCache->load($key);
+
 		if (NULL === $cached) {
 			$cached = array();
 		}
 		if (!isset($cached[self::DESCENDANTS])) {
 			$cached[self::DESCENDANTS] = array();
 		}
-
-		if (!isset($cached[self::DESCENDANTS][$descendantEntityClass])) {
-			$cached[self::DESCENDANTS][$descendantEntityClass] = $sourceParam;
-			$this->externalCache->save($key, $cached);
+		$cachedShortcut = & $cached[self::DESCENDANTS];
+		if (NULL === $sourceParam) {
+			if (array_key_exists($descendantEntityClass, $cachedShortcut)) {
+				return;
+			}
+			$cachedShortcut[$descendantEntityClass] = NULL;
+		} else {
+			if (!isset($cachedShortcut[$descendantEntityClass])) {
+				$cachedShortcut[$descendantEntityClass] = array();
+			}
+			$cachedShortcut = & $cachedShortcut[$descendantEntityClass];
+			if (in_array($sourceParam, $cachedShortcut)) {
+				return;
+			}
+			$cachedShortcut[] = $sourceParam;
 		}
+		$this->externalCache->save($key, $cached);
 	}
 
 
@@ -104,6 +117,6 @@ class SuggestorCache implements ISuggestorCache
 	 */
 	protected function createSuggestor(IParamMap $paramMap, $identifier, array $suggestions, array $descendants = array())
 	{
-		return new Suggestor($paramMap, $this, $suggestions, $identifier, $descendants);
+		return new Suggestor($paramMap, $this, $suggestions, $identifier,  $descendants);
 	}
 }

@@ -95,8 +95,8 @@ class DataHolder implements IDataHolder
 				if ($isDataOnType) {
 					return TRUE;
 				}
-				return FALSE;
 			}
+			return FALSE;
 		}
 		return (bool) array_intersect(array_keys($this->params), $map);
 	}
