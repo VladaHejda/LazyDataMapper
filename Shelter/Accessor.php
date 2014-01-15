@@ -98,7 +98,7 @@ class Accessor implements IAccessor
 				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
 				$this->saveDescendants($dataHolder);
 				$data = $dataHolder->getParams();
-				$this->sortData($ids, $data); // sorts data by ids order (it would be ordered from restrictor
+				$this->sortData($ids, $data);
 
 			}
 		}
@@ -291,8 +291,13 @@ class Accessor implements IAccessor
 	}
 
 
-	private function sortData()
+	private function sortData(array $ids, array $data)
 	{
+		$sorted = array();
+		foreach ($ids as $id) {
+			$sorted[$id] = isset($data[$id]) ? $data[$id] : array();
+		}
+		return $sorted;
 	}
 
 
