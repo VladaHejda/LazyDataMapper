@@ -37,4 +37,14 @@ interface IEntityServiceAccessor
 	 * @return string
 	 */
 	function getEntityContainerClass($entityClass);
+
+
+	/**
+	 * Compose identifier based on input arguments. It is arbitrary distinctive string key.
+	 * @param string $entityClass
+	 * @param string $parentIdentifier
+	 * @param string $sourceParam
+	 * @return string
+	 */
+	function composeIdentifier($entityClass, $parentIdentifier = NULL, $sourceParam = NULL);
 }

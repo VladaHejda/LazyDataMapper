@@ -19,4 +19,12 @@ abstract class EntityServiceAccessor implements IEntityServiceAccessor
 		}
 		return $entityClass . 's';
 	}
+
+
+	// todo použít v accessoru
+	public function composeIdentifier($entityClass, $parentIdentifier = NULL, $sourceParam = NULL)
+	{
+		$identifier = new Identifier($entityClass, (bool) $sourceParam, $parentIdentifier, $sourceParam);
+		return $identifier->composeIdentifier();
+	}
 }
