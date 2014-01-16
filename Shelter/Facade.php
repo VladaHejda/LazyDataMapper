@@ -38,7 +38,7 @@ abstract class Facade implements IFacade
 
 	/**
 	 * Apply mandatory arguments for new Entity.
-	 * @todo how to implement?
+	 * @todo how to implement? - array $data is one way, but method can be overridden in descendant and given as array to parent::create()
 	 * @param array $data
 	 * @return IEntity
 	 */

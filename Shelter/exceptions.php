@@ -10,6 +10,21 @@ class Exception extends \Exception
 }
 
 /**
+ * Exception thrown by Entity / EntityContainer.
+ */
+class EntityException extends \Exception
+{
+}
+
+/**
+ * When entity unwrapper (setter) need to return NULL, throws this exception.
+ * It's designed to protect saving NULL after forgotten return statement.
+ */
+class NullValueException extends \Exception
+{
+}
+
+/**
  * Exception that gathers several messages when it's suitable to provide more error messages together.
  */
 class MultiException extends Exception
@@ -47,6 +62,7 @@ class IntegrityException extends MultiException
 }
 
 /**
+ * todo viz IMapper - anotaci maxCount jsem zamejšlel jak??
  * Thrown when Restrictor limits are too weak and result is too long.
  */
 class TooManyItemsException extends \Exception

@@ -95,8 +95,8 @@ class DataHolder implements IDataHolder
 				if ($isDataOnType) {
 					return TRUE;
 				}
-				return FALSE;
 			}
+			return FALSE;
 		}
 		return (bool) array_intersect(array_keys($this->params), $map);
 	}
@@ -107,8 +107,10 @@ class DataHolder implements IDataHolder
 	 * @param string $sourceParam
 	 * @return self
 	 */
-	public function getDescendant($entityClass, $sourceParam = NULL)
+	public function getDescendant($entityClass, &$sourceParam = NULL)
 	{
+		$suggestor = $this->suggestor->getDescendant($entityClass, $sourceParam);
+		return $suggestor ? new self($suggestor) : NULL;
 	}
 
 
@@ -123,26 +125,31 @@ class DataHolder implements IDataHolder
 
 	public function rewind()
 	{
+		$this->suggestor->rewind();
 	}
 
 
 	public function valid()
 	{
+		return $this->suggestor->valid();
 	}
 
 
 	public function current()
 	{
+		return new self($this->suggestor->current());
 	}
 
 
 	public function key()
 	{
+		return $this->suggestor->key();
 	}
 
 
 	public function next()
 	{
+		$this->suggestor->next();
 	}
 
 
