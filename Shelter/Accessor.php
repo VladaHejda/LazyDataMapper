@@ -54,6 +54,7 @@ class Accessor implements IAccessor
 
 			} else {
 				// cachování descendanty by možná mohlo bejt třeba i v případě že paramNamy už byly zakešovány - descendant mohl bejt nějakej podmíneněj? je to tak???
+				// todo rewrite if (NULL !== $object) to just if ($object)
 				if (NULL !== $parent) {
 					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam);
 				}
@@ -75,32 +76,21 @@ class Accessor implements IAccessor
 	public function getByRestrictions($entityClass, IRestrictor $restrictor, IOperand $parent = NULL)
 	{
 		$identifier = $this->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
+		$mapper = $this->serviceAccessor->getMapper($entityClass);
+		$ids = $mapper->getIdsByRestrictions($restrictor);
 
-		if (NULL !== $parent && $loadedData = $this->getLoadedData($parent->getIdentifier(), $entityClass, NULL)) {
-			$data = $loadedData;
+		if (!empty($ids)) {
+			$suggestor = $this->cache->getCached($identifier, $entityClass);
 		}
 
-		else {
-			$mapper = $this->serviceAccessor->getMapper($entityClass);
-			$ids = $mapper->getIdsByRestrictions($restrictor);
+		if (empty($ids) || !$suggestor) {
+			$data = array();
 
-			if (!empty($ids)) {
-				$suggestor = $this->cache->getCached($identifier, $entityClass);
-			}
-
-			if (empty($ids) || !$suggestor) {
-				if (NULL !== $parent) {
-					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass);
-				}
-				$data = array();
-
-			} else {
-				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
-				$this->saveDescendants($dataHolder);
-				$data = $dataHolder->getParams();
-				$this->sortData($ids, $data);
-
-			}
+		} else {
+			$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
+			$this->saveDescendants($dataHolder);
+			$data = $dataHolder->getParams();
+			$this->sortData($ids, $data);
 		}
 
 		return $this->createEntityContainer($entityClass, $data, $identifier, $parent);

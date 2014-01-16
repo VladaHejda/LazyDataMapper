@@ -60,7 +60,7 @@ class SuggestorCache implements ISuggestorCache
 	 * @param string $sourceParam
 	 * @return void
 	 */
-	public function cacheDescendant($identifier, $descendantEntityClass, $sourceParam = NULL)
+	public function cacheDescendant($identifier, $descendantEntityClass, $sourceParam)
 	{
 		$key = $this->key . $identifier;
 		$cached = $this->externalCache->load($key);
@@ -72,21 +72,14 @@ class SuggestorCache implements ISuggestorCache
 			$cached[self::DESCENDANTS] = array();
 		}
 		$cachedShortcut = & $cached[self::DESCENDANTS];
-		if (NULL === $sourceParam) {
-			if (array_key_exists($descendantEntityClass, $cachedShortcut)) {
-				return;
-			}
-			$cachedShortcut[$descendantEntityClass] = NULL;
-		} else {
-			if (!isset($cachedShortcut[$descendantEntityClass])) {
-				$cachedShortcut[$descendantEntityClass] = array();
-			}
-			$cachedShortcut = & $cachedShortcut[$descendantEntityClass];
-			if (in_array($sourceParam, $cachedShortcut)) {
-				return;
-			}
-			$cachedShortcut[] = $sourceParam;
+		if (!isset($cachedShortcut[$descendantEntityClass])) {
+			$cachedShortcut[$descendantEntityClass] = array();
 		}
+		$cachedShortcut = & $cachedShortcut[$descendantEntityClass];
+		if (in_array($sourceParam, $cachedShortcut)) {
+			return;
+		}
+		$cachedShortcut[] = $sourceParam;
 		$this->externalCache->save($key, $cached);
 	}
 

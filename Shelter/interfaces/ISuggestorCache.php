@@ -30,14 +30,14 @@ interface ISuggestorCache
 	 * @param string $sourceParam
 	 * @return void
 	 */
-	function cacheDescendant($identifier, $descendantEntityClass, $sourceParam = NULL);
+	function cacheDescendant($identifier, $descendantEntityClass, $sourceParam);
 
 
 	/**
-	 * Gets all cached suggestions under one identifier.
+	 * Gets all cached suggestions under one identifier or NULL when nothing cached.
 	 * @param string $identifier
 	 * @param string $entityClass
-	 * @return ISuggestor
+	 * @return ISuggestor|NULL
 	 */
 	function getCached($identifier, $entityClass);
 }

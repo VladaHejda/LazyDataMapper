@@ -5,7 +5,7 @@ namespace Shelter;
 /**
  * Suggests parameter names and descendants to Mapper.
  */
-interface ISuggestor
+interface ISuggestor extends \Iterator
 {
 
 	/**
@@ -39,18 +39,10 @@ interface ISuggestor
 	/**
 	 * @param string $entityClass
 	 * @param string $sourceParam
-	 * @return bool
-	 */
-	function hasDescendant($entityClass, &$sourceParam = NULL);
-
-
-	/**
-	 * @param string $entityClass
-	 * @param string $sourceParam
 	 * @return self
 	 * @throws Exception on unknown descendant
 	 */
-	function getDescendant($entityClass, $sourceParam = NULL);
+	function getDescendant($entityClass, &$sourceParam = NULL);
 
 
 	/**

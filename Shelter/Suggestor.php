@@ -20,6 +20,12 @@ class Suggestor implements ISuggestor
 	/** @var array */
 	protected $descendants;
 
+	/** @var int */
+	private $pos = 0;
+
+	/** @var self */
+	private $currentDescendant;
+
 
 	/**
 	 * @param IParamMap $paramMap
@@ -85,49 +91,96 @@ class Suggestor implements ISuggestor
 	 */
 	public function hasDescendants()
 	{
-		return (bool) $this->descendants;
+		$this->rewind();
+		return $this->valid();
 	}
 
 
 	/**
 	 * @param string $entityClass
-	 * @param string $sourceParam reference is modified due to regular source parameter
-	 * @return bool
+	 * @param string $sourceParam if there is only one descendant of given class, source parameter can be omitted,
+	 *      then argument reference is set to regular source parameter
+	 * @return self|null returns NULL when descendant does not exist
 	 * @throws Exception
 	 */
-	public function hasDescendant($entityClass, &$sourceParam = NULL)
+	public function getDescendant($entityClass, &$sourceParam = NULL)
 	{
-		if (array_key_exists($entityClass, $this->descendants)) {
-			if (NULL === $this->descendants[$entityClass]) {
-				$sourceParam = NULL;
-				return TRUE;
-			} elseif (is_array($this->descendants[$entityClass])) {
-				if (in_array($sourceParam, $this->descendants[$entityClass])) {
-					return TRUE;
-				}
-			} else {
+		if (isset($this->descendants[$entityClass])) {
+			if (!is_array($this->descendants[$entityClass])) {
 				throw new Exception('Malformed cache. Clear it and try again.');
 			}
+
+			if (NULL === $sourceParam) {
+				if (count($this->descendants) > 1) {
+					throw new Exception("Descendant $entityClass is ambiguous.");
+				}
+				reset($this->descendants);
+				$sourceParam = key($this->descendants);
+			}
+
+			if (!in_array($sourceParam, $this->descendants[$entityClass])) {
+				return NULL;
+			}
+
+			return $this->loadDescendant($entityClass, $sourceParam);
 		}
-		return FALSE;
+		return NULL;
 	}
 
 
-	/**
-	 * @param string $entityClass
-	 * @param string $sourceParam
-	 * @return self
-	 * @throws Exception on unknown descendant
-	 */
-	public function getDescendant($entityClass, $sourceParam = NULL)
+	public function rewind()
 	{
-		if (!$this->hasDescendant($entityClass, $sourceParam)) {
-			throw new Exception("Descendant $entityClass does not exist.");
+		foreach ($this->descendants as &$descendant) {
+			if (!is_array($descendant)) {
+				throw new Exception('Malformed cache. Clear it and try again.');
+			}
+			reset($descendant);
+		}
+		reset($this->descendants);
+
+		$this->pos = 0;
+	}
+
+
+	public function valid()
+	{
+		++$this->pos;
+
+		if (FALSE === current($this->descendants)) {
+			return FALSE;
+		}
+		$entityClass = key($this->descendants);
+		$sourceParam = current($this->descendants[$entityClass]);
+
+		$this->currentDescendant = $this->loadDescendant($entityClass, $sourceParam);
+		if (!$this->currentDescendant) {
+			$this->next();
+			return $this->valid();
 		}
 
-		// todo použít serviceAccessor->composeIdentifier(), ovšem zase tu neni service accessor
-		$identifier = new Identifier($entityClass, (bool) $sourceParam, $this->identifier, $sourceParam);
-		return $this->cache->getCached($identifier->composeIdentifier(), $entityClass);
+		return TRUE;
+	}
+
+
+	public function current()
+	{
+		return $this->currentDescendant;
+	}
+
+
+	public function key()
+	{
+		return $this->pos;
+	}
+
+
+	public function next()
+	{
+		$entityClass = key($this->descendants);
+		next($this->descendants[$entityClass]);
+		if (FALSE === current($this->descendants[$entityClass])) {
+			next($this->descendants);
+		}
 	}
 
 
@@ -137,6 +190,15 @@ class Suggestor implements ISuggestor
 	public function getParamMap()
 	{
 		return $this->paramMap;
+	}
+
+
+	protected function loadDescendant($entityClass, $sourceParam)
+	{
+		// todo použít serviceAccessor->composeIdentifier(), ovšem zase tu neni service accessor
+		$identifier = new Identifier($entityClass, (bool) $sourceParam, $this->identifier, $sourceParam);
+
+		return $this->cache->getCached($identifier->composeIdentifier(), $entityClass);
 	}
 
 
