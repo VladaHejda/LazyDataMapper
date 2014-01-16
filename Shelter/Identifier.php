@@ -2,10 +2,6 @@
 
 namespace Shelter;
 
-/**
- * @todo if there will not be a way how to use own extended Identifier (though it would be a shame)
- *       it will be good if class will be declared as final
- */
 class Identifier implements IIdentifier
 {
 

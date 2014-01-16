@@ -96,6 +96,9 @@ class Suggestor implements ISuggestor
 	}
 
 
+	// todo hasDescendant($class, $source) - as well as into DataHolder (for better manipulation in Mappers)
+
+
 	/**
 	 * @param string $entityClass
 	 * @param string $sourceParam if there is only one descendant of given class, source parameter can be omitted,

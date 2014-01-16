@@ -255,22 +255,12 @@ class Accessor implements IAccessor
 	}
 
 
-	// todo zde by nemusel nustně dostat sourceParam - holder ho zná. pokud opravim, opravit testy
 	// todo cachovat i data aktuálního? pak by se to teda nejmenoval saveDescendants ale saveData. a bylo by to k něčemu?
-	//      a cachovat paramy nebo celej holder? k čemu by byl holder?
 	private function saveDescendants(IDataHolder $dataHolder)
 	{
 		/** @var IDataHolder $descendant */
 		foreach ($dataHolder as $descendant) {
-
 			$identifier = $descendant->getSuggestor()->getIdentifier();
-
-			// tyto informace (isContainer, getSourceParam) by měl vědět už suggestor, do toho se dostanou keškou. nebo jsem to měl vymyšlený jinak?
-			// když se podívám do SuggestorCache tak metoda cacheDescendant skutečně přebírá sourceParam, takže ho zakešuje a když si pak Accessor
-			// řekne o getCached, SuggestorCache mu musí vrátit i informaci o sourceParam, jenže tu suggestor o sobě nenabízí...
-			// ale všude koukám se pravděpodobně počítá s tím, že container nemá sourceParam.
-			// asi teda zatim vyrobim původní koncept - že container nemůže mít sourceParam (!upravit IdentifierTest), předělat pozdějc to kdyžtak pude
-			// todo a v tom případě ani Identifier nepotřebuje mít informaci zda jde o container... ale neni to celý moc clear.. :-X
 
 			if ($descendant->getSuggestor()->hasDescendants()) {
 				$this->saveDescendants($descendant);

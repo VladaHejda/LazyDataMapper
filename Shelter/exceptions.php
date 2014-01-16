@@ -47,6 +47,7 @@ class IntegrityException extends MultiException
 }
 
 /**
+ * todo viz IMapper - anotaci maxCount jsem zamejšlel jak??
  * Thrown when Restrictor limits are too weak and result is too long.
  */
 class TooManyItemsException extends \Exception
