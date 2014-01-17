@@ -74,6 +74,25 @@ abstract class ParamMap implements IParamMap
 
 
 	/**
+	 * @param string $paramName
+	 * @return bool
+	 */
+	public function hasParam($paramName)
+	{
+		if ($this->separatedByType) {
+			foreach ($this->map as $map) {
+				if (in_array($paramName, $map)) {
+					return TRUE;
+				}
+			}
+			return FALSE;
+		}
+
+		return in_array($paramName, $this->map);
+	}
+
+
+	/**
 	 * @param string $type
 	 * @return bool
 	 * @throws Exception

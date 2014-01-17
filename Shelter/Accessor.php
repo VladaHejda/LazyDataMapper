@@ -97,6 +97,13 @@ class Accessor implements IAccessor
 	}
 
 
+	public function hasParam(IEntity $entity, $paramName)
+	{
+		$entityClass = get_class($entity);
+		return $this->serviceAccessor->getParamMap($entityClass)->hasParam($paramName);
+	}
+
+
 	/**
 	 * @param IEntity $entity
 	 * @param string $paramName

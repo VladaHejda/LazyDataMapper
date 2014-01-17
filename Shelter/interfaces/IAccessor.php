@@ -50,6 +50,14 @@ interface IAccessor
 	/**
 	 * @param IEntity $entity
 	 * @param string $paramName
+	 * @return bool
+	 */
+	function hasParam(IEntity $entity, $paramName);
+
+
+	/**
+	 * @param IEntity $entity
+	 * @param string $paramName
 	 * @return string
 	 */
 	function getParam(IEntity $entity, $paramName);

@@ -9,7 +9,7 @@ abstract class Entity extends BaseEntity
 	protected $id;
 
 	/** @var string */
-	private $identifier;
+	protected $identifier;
 
 	/** @var IAccessor */
 	protected $accessor;
@@ -44,18 +44,9 @@ abstract class Entity extends BaseEntity
 	}
 
 
-	public function __get($paramName)
-	{
-		if ('id' === $paramName) {
-			return $this->id;
-		}
-		return parent::__get($paramName);
-	}
-
-
 	protected function hasLazy($paramName)
 	{
-		return $this->mapper->hasParam($paramName);
+		return $this->accessor->hasParam($this, $paramName);
 	}
 
 
@@ -65,25 +56,26 @@ abstract class Entity extends BaseEntity
 	}
 
 
-	protected function translateParamName($param)
+	protected function translateParamName($paramName)
 	{
 		// infinite loop protection
 		static $last;
-		if ($last === $param) {
-			return $param;
+		if ($last === $paramName) {
+			return $paramName;
 		}
-		$last = $param;
+		$last = $paramName;
 
-		if (!$this->mapper->hasParam($param) && !$this->hasWrapper($param)) {
-			return $this->translateParamNameUnderscore($param);
+		if (!$this->accessor->hasParam($this, $paramName) && !$this->hasWrapper($paramName)) {
+			return $this->translateParamNameUnderscore($paramName);
 		}
-		return $param;
+		return $paramName;
 	}
 
 
 	public function save()
 	{
-		if ($this->isChanged() && $this->mapper->save($this, $this->getChanges())) {
+		if ($this->isChanged()) {
+			$this->accessor->save($this);
 			$this->bakeChanges();
 		}
 	}

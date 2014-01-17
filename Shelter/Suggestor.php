@@ -210,7 +210,7 @@ class Suggestor implements ISuggestor
 		$map = $this->paramMap->getMap();
 		foreach ($suggestions as $paramName) {
 			if (!isset($map[$paramName])) {
-				throw new Exception("Parameter $paramName is unknown or is not suggested.");
+				throw new Exception("Parameter $paramName is unknown.");
 			}
 		}
 	}

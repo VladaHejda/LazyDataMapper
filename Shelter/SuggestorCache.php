@@ -45,12 +45,16 @@ class SuggestorCache implements ISuggestorCache
 		if (!isset($cached[self::PARAM_NAMES])) {
 			$cached[self::PARAM_NAMES] = array();
 		}
+
+		$map = $this->serviceAccessor->getParamMap($entityClass);
+		$suggestor = $this->createSuggestor($map, $identifier, array($paramName));
+
 		if (!in_array($paramName, $cached[self::PARAM_NAMES])) {
 			$cached[self::PARAM_NAMES][] = $paramName;
 			$this->externalCache->save($key, $cached);
 		}
-		$map = $this->serviceAccessor->getParamMap($entityClass);
-		return $this->createSuggestor($map, $identifier, array($paramName));
+
+		return $suggestor;
 	}
 
 

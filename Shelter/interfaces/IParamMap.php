@@ -26,6 +26,13 @@ interface IParamMap
 
 
 	/**
+	 * @param string $paramName
+	 * @return bool
+	 */
+	function hasParam($paramName);
+
+
+	/**
 	 * @param string $type
 	 * @return bool
 	 * @throws Exception if is not separated by type

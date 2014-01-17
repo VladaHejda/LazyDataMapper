@@ -10,7 +10,6 @@ abstract class BaseEntity implements IEntity
 		WRITE_UNDECLARED = 20,
 		WRITE_READONLY = 30;
 
-
 	/** @var array list of private param names */
 	protected $privateParams = array();
 
@@ -69,7 +68,9 @@ abstract class BaseEntity implements IEntity
 
 		// wrapper
 		if ($wrapper) {
-			if ($hasClear) $clear = $this->getClear($param);
+			if ($hasClear) {
+				$clear = $this->getClear($param);
+			}
 			$this->getting[] = $param;
 			$this->wrappedParams[$param] = $hasClear ? $this->$wrapper($clear) : $this->$wrapper();
 
