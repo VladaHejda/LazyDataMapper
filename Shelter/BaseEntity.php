@@ -556,7 +556,7 @@ abstract class BaseEntity implements IEntity
 
 				// possibly missing return in unwrapper
 				if ($value === NULL && $assigned) {
-					throw new EntityException(
+					throw new Exception(
 						"Unwrapper $unwrapper() has to return new value. "
 					  . "If new value is NULL, throw NullValueException instead."
 					);
