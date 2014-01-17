@@ -31,30 +31,79 @@ abstract class Entity extends BaseEntity
 	}
 
 
+	/**
+	 * @return int
+	 */
 	public function getId()
 	{
 		return $this->id;
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function getIdentifier()
 	{
 		return $this->identifier;
 	}
 
 
+	/**
+	 * @param string $paramName
+	 * @return bool
+	 */
 	protected function hasLazy($paramName)
 	{
 		return $this->accessor->hasParam($this, $paramName);
 	}
 
 
+	/**
+	 * @param string $paramName
+	 * @return string
+	 */
 	protected function lazyLoad($paramName)
 	{
 		return $this->accessor->getParam($this, $paramName);
 	}
 
 
+	/**
+	 * @return void
+	 */
+	public function save()
+	{
+		if ($this->isChanged()) {
+			$this->accessor->save($this);
+			$this->bakeChanges();
+		}
+	}
+
+
+	/**
+	 * @param string $entityClass
+	 * @param string|IRestrictor $sourceParamOrRestrictor
+	 * @param int|null $id id of Entity, when not accessible from source parameter
+	 * @return IOperand
+	 */
+	protected function getDescendant($entityClass, $sourceParamOrRestrictor, $id = NULL)
+	{
+		if ($sourceParamOrRestrictor instanceof IRestrictor) {
+			return $this->accessor->getByRestrictions($entityClass, $sourceParamOrRestrictor, $this);
+		} else {
+			if (NULL === $id) {
+				$id = $this->getClear($sourceParamOrRestrictor);
+			}
+			return $this->accessor->getById($entityClass, $id, $this, $sourceParamOrRestrictor);
+		}
+	}
+
+
+	/**
+	 * @param string $paramName
+	 * @return string
+	 */
 	protected function translateParamName($paramName)
 	{
 		// infinite loop protection
@@ -68,14 +117,5 @@ abstract class Entity extends BaseEntity
 			return $this->translateParamNameUnderscore($paramName);
 		}
 		return $paramName;
-	}
-
-
-	public function save()
-	{
-		if ($this->isChanged()) {
-			$this->accessor->save($this);
-			$this->bakeChanges();
-		}
 	}
 }

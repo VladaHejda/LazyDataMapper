@@ -36,6 +36,8 @@ class Accessor implements IAccessor
 	 */
 	public function getById($entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
 	{
+		// todo check when given parent, if sourceParam given too?
+
 		$identifier = $this->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
 		if (NULL !== $parent && $loadedData = $this->getLoadedData($parent->getIdentifier(), $entityClass, $sourceParam)) {

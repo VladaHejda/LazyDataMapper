@@ -23,9 +23,10 @@ interface IAccessor
 	/**
 	 * @param IRestrictor $restrictor
 	 * @param string $entityClass
+	 * @param IOperand $parent
 	 * @return IEntityContainer
 	 */
-	function getByRestrictions($entityClass, IRestrictor $restrictor);
+	function getByRestrictions($entityClass, IRestrictor $restrictor, IOperand $parent = NULL);
 
 
 	/**
