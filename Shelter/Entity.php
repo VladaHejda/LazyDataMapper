@@ -22,8 +22,8 @@ abstract class Entity extends BaseEntity
 	 * @param IOperand $parent
 	 * @param IAccessor $accessor
 	 */
-	public function __construct($id, array $params, $identifier, IOperand $parent = NULL, IAccessor $accessor){
-
+	public function __construct($id, array $params, $identifier, IOperand $parent = NULL, IAccessor $accessor)
+	{
 		$this->id = (int) $id;
 		$this->identifier = $identifier;
 		if ($accessor) $this->accessor = $accessor;
