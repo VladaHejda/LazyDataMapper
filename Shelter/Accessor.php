@@ -36,6 +36,8 @@ class Accessor implements IAccessor
 	 */
 	public function getById($entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
 	{
+		// todo check when given parent, if sourceParam given too?
+
 		$identifier = $this->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
 		if (NULL !== $parent && $loadedData = $this->getLoadedData($parent->getIdentifier(), $entityClass, $sourceParam)) {
@@ -62,7 +64,7 @@ class Accessor implements IAccessor
 			}
 		}
 
-		return $this->createEntity($entityClass, $id, $data, $identifier, $parent);
+		return $this->createEntity($entityClass, $id, $data, $identifier);
 	}
 
 
@@ -93,7 +95,14 @@ class Accessor implements IAccessor
 			$this->sortData($ids, $data);
 		}
 
-		return $this->createEntityContainer($entityClass, $data, $identifier, $parent);
+		return $this->createEntityContainer($entityClass, $data, $identifier);
+	}
+
+
+	public function hasParam(IEntity $entity, $paramName)
+	{
+		$entityClass = get_class($entity);
+		return $this->serviceAccessor->getParamMap($entityClass)->hasParam($paramName);
 	}
 
 
@@ -182,12 +191,11 @@ class Accessor implements IAccessor
 	 * @param int $id
 	 * @param array $data
 	 * @param string $identifier
-	 * @param IOperand $parent
 	 * @return IEntity
 	 */
-	protected function createEntity($entityClass, $id, array $data, $identifier, IOperand $parent = NULL)
+	protected function createEntity($entityClass, $id, array $data, $identifier)
 	{
-		return new $entityClass($id, $data, $identifier, $parent, $this);
+		return new $entityClass($id, $data, $identifier, $this);
 	}
 
 
@@ -195,13 +203,12 @@ class Accessor implements IAccessor
 	 * @param string $entityClass
 	 * @param array[] $data
 	 * @param string $identifier
-	 * @param IOperand $parent
 	 * @return IEntityContainer
 	 */
-	protected function createEntityContainer($entityClass, array $data, $identifier, IOperand $parent = NULL)
+	protected function createEntityContainer($entityClass, array $data, $identifier)
 	{
 		$containerClass = $this->serviceAccessor->getEntityContainerClass($entityClass);
-		return new $containerClass($data, $identifier, $parent, $this);
+		return new $containerClass($data, $identifier, $this);
 	}
 
 
