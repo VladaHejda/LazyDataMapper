@@ -33,10 +33,13 @@ class Accessor implements IAccessor
 	 * @param IOperand $parent
 	 * @param string $sourceParam
 	 * @return IEntity
+	 * @throws Exception
 	 */
 	public function getById($entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
 	{
-		// todo check when given parent, if sourceParam given too?
+		if (($parent && NULL === $sourceParam) || (NULL !== $sourceParam && !$parent)) {
+			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
+		}
 
 		$identifier = $this->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
