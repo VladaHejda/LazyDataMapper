@@ -2,8 +2,11 @@
 
 namespace Shelter;
 
-abstract class BaseEntityContainer implements \ArrayAccess, \Iterator, \Countable
+abstract class BaseEntityContainer implements IOperand, \ArrayAccess, \Iterator, \Countable
 {
+
+	/** @var int[] */
+	private $ids;
 
 	/** @var array[] */
 	private $data;
@@ -14,12 +17,12 @@ abstract class BaseEntityContainer implements \ArrayAccess, \Iterator, \Countabl
 	/** @var int iterator position */
 	private $position;
 
-	/** @var Entity last read Entity*/
+	/** @var IEntity last read Entity*/
 	private $currentEntity;
 
 
 	/**
-	 * @param array[] $data array of params of each Entity, indexed by id
+	 * @param array[] $data array of params of each Entity, indexed by id, order dependent
 	 * @throws Exception
 	 */
 	public function __construct(array $data)
@@ -37,17 +40,9 @@ abstract class BaseEntityContainer implements \ArrayAccess, \Iterator, \Countabl
 			}
 		}
 
-		$this->data = $data;
+		$this->ids = array_keys($data);
+		$this->data = array_values($data);
 	}
-
-
-	/**
-	 * Extend this method to modify created Entity.
-	 * @param int $index
-	 * @param array $params
-	 * @return Entity
-	 */
-	abstract protected function createEntity($index, array $params);
 
 
 	/**
@@ -76,7 +71,7 @@ abstract class BaseEntityContainer implements \ArrayAccess, \Iterator, \Countabl
 
 	/**
 	 * @param mixed
-	 * @return mixed|Entity
+	 * @return IEntity
 	 */
 	public function offsetGet($index)
 	{
@@ -149,7 +144,16 @@ abstract class BaseEntityContainer implements \ArrayAccess, \Iterator, \Countabl
 
 
 	/**
-	 * Returns array of each entity parameter value (better than iterate all Entity instances)
+	 * Creates Entity.
+	 * @param int $id
+	 * @param array $params
+	 * @return IEntity
+	 */
+	abstract protected function createEntity($id, array $params);
+
+
+	/**
+	 * Returns array of each entity parameter value (better than iterate all Entity instances).
 	 * @param string
 	 * @return array
 	 */
@@ -176,7 +180,7 @@ abstract class BaseEntityContainer implements \ArrayAccess, \Iterator, \Countabl
 
 	/**
 	 * @param int
-	 * @return Entity
+	 * @return IEntity
 	 * @throws Exception
 	 */
 	private function getEntity($index)
@@ -186,9 +190,9 @@ abstract class BaseEntityContainer implements \ArrayAccess, \Iterator, \Countabl
 		}
 
 		if ($this->currentOffset !== $index) { // intentionally !==
-			$this->currentEntity = $this->createEntity($index, $this->data[$index]);
+			$this->currentEntity = $this->createEntity($this->ids[$index], $this->data[$index]);
 
-			if (!$this->currentEntity instanceof Entity) {
+			if (!$this->currentEntity instanceof IEntity) {
 				throw new Exception(get_class($this) . "::createEntity() must return instance of Entity.");
 			}
 			$this->currentOffset = $index;

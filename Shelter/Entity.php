@@ -5,9 +5,6 @@ namespace Shelter;
 abstract class Entity extends BaseEntity
 {
 
-	/** @var int */
-	protected $id;
-
 	/** @var string */
 	protected $identifier;
 
@@ -23,20 +20,9 @@ abstract class Entity extends BaseEntity
 	 */
 	public function __construct($id, array $params, $identifier, IAccessor $accessor)
 	{
-		$this->id = (int) $id;
 		$this->identifier = $identifier;
-		if ($accessor) $this->accessor = $accessor;
-
-		parent::__construct($params);
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getId()
-	{
-		return $this->id;
+		$this->accessor = $accessor;
+		parent::__construct($id, $params);
 	}
 
 

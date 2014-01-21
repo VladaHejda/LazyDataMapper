@@ -10,6 +10,9 @@ abstract class BaseEntity implements IEntity
 		WRITE_UNDECLARED = 20,
 		WRITE_READONLY = 30;
 
+	/** @var int */
+	protected $id;
+
 	/** @var array list of private param names */
 	protected $privateParams = array();
 
@@ -32,9 +35,23 @@ abstract class BaseEntity implements IEntity
 	private static $IO = array();
 
 
-	public function __construct(array $params)
+	/**
+	 * @param int $id
+	 * @param array $params
+	 */
+	public function __construct($id, array $params)
 	{
+		$this->id = (int) $id;
 		$this->params = $params;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getId()
+	{
+		return $this->id;
 	}
 
 
