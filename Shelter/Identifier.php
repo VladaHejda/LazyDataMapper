@@ -2,11 +2,17 @@
 
 namespace Shelter;
 
+/**
+ * @todo possibly better to be static
+ */
 class Identifier implements IIdentifier
 {
 
 	/** @var int top level operand counter */
 	static protected $counter = array();
+
+	/** @var string */
+	protected $identifier;
 
 
 	/**
@@ -18,6 +24,11 @@ class Identifier implements IIdentifier
 	 */
 	public function __construct($entityClass, $isContainer = FALSE, $parentIdentifier = NULL, $sourceParam = NULL)
 	{
+		$identifier = $entityClass;
+		$identifier .= $isContainer ? '*' : '';
+		$identifier .= NULL !== $sourceParam ? "|$sourceParam" : '';
+		$identifier .= NULL !== $parentIdentifier ? ">$parentIdentifier" : '';
+		$this->identifier = $identifier;
 	}
 
 
@@ -26,5 +37,6 @@ class Identifier implements IIdentifier
 	 */
 	function composeIdentifier()
 	{
+		return $this->identifier;
 	}
 }
