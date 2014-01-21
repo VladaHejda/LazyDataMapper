@@ -31,6 +31,15 @@ interface IEntityServiceAccessor
 
 
 	/**
+	 * Apply solution to gain Entity classname based on Facade.
+	 * NOTICE that this method opposed to others returns just string classname, not the instance!
+	 * @param Facade $facade
+	 * @return string
+	 */
+	function getEntityClass(Facade $facade);
+
+
+	/**
 	 * Apply solution to gain Entity Container classname based on Entity class name.
 	 * NOTICE that this method opposed to others returns just string classname, not the instance!
 	 * @param string $entityClass

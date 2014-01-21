@@ -26,4 +26,10 @@ interface IFacade
 	 * @return IEntity
 	 */
 	function create();
+
+
+	/**
+	 * @param int $id
+	 */
+	function remove($id);
 }

@@ -6,6 +6,16 @@ abstract class EntityServiceAccessor implements IEntityServiceAccessor
 {
 
 	/**
+	 * @param Facade $facade
+	 * @return string
+	 */
+	public function getEntityClass(Facade $facade)
+	{
+		return substr(get_class($facade), 0, -6);
+	}
+
+
+	/**
 	 * Makes plural from Entity class name.
 	 * @param string $entityClass
 	 * @return string
