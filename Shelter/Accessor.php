@@ -44,8 +44,7 @@ class Accessor implements IAccessor
 			$data = $loadedData;
 
 		} else {
-			$mapper = $this->serviceAccessor->getMapper($entityClass);
-			if (!$mapper->exists($id)) {
+			if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
 				return NULL;
 			}
 
@@ -78,8 +77,7 @@ class Accessor implements IAccessor
 	public function getByRestrictions($entityClass, IRestrictor $restrictor, IOperand $parent = NULL)
 	{
 		$identifier = $this->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
-		$mapper = $this->serviceAccessor->getMapper($entityClass);
-		$ids = $mapper->getIdsByRestrictions($restrictor);
+		$ids = $this->serviceAccessor->getMapper($entityClass)->getIdsByRestrictions($restrictor);
 
 		if (!empty($ids)) {
 			$suggestor = $this->cache->getCached($identifier, $entityClass);
@@ -229,7 +227,7 @@ class Accessor implements IAccessor
 
 	/**
 	 * @param string $entityClass
-	 * @param int|int[] $id
+	 * @param int|int[] $id or ids
 	 * @param ISuggestor $suggestor
 	 * @return IDataHolder
 	 * @throws Exception
