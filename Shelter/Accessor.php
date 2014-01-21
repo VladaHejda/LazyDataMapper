@@ -40,7 +40,7 @@ class Accessor implements IAccessor
 
 		$identifier = $this->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
-		if (NULL !== $parent && $loadedData = $this->getLoadedData($parent->getIdentifier(), $entityClass, $sourceParam)) {
+		if ($parent && $loadedData = $this->getLoadedData($parent->getIdentifier(), $entityClass, $sourceParam)) {
 			$data = $loadedData;
 
 		} else {
@@ -54,9 +54,8 @@ class Accessor implements IAccessor
 				$data = $dataHolder->getParams();
 
 			} else {
-				// cachování descendanty by možná mohlo bejt třeba i v případě že paramNamy už byly zakešovány - descendant mohl bejt nějakej podmíneněj? je to tak???
-				// todo rewrite if (NULL !== $object) to just if ($object)
-				if (NULL !== $parent) {
+				// todo cachování descendanty by možná mohlo bejt třeba i v případě že paramNamy už byly zakešovány - descendant mohl bejt nějakej podmíneněj? je to tak???
+				if ($parent) {
 					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam);
 				}
 				$data = array();
