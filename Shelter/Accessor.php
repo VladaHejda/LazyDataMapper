@@ -57,7 +57,6 @@ class Accessor implements IAccessor
 				$data = $dataHolder->getParams();
 
 			} else {
-				// todo cachování descendanty by možná mohlo bejt třeba i v případě že paramNamy už byly zakešovány - descendant mohl bejt nějakej podmíneněj? je to tak???
 				if ($parent) {
 					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam);
 				}
