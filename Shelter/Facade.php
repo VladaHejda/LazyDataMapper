@@ -11,14 +11,14 @@ namespace Shelter;
 abstract class Facade implements IFacade
 {
 
+	/** @var string */
+	protected $entityClass;
+
 	/** @var IEntityServiceAccessor */
 	private $serviceAccessor;
 
 	/** @var IAccessor */
 	private $accessor;
-
-	/** @var string */
-	private $entityClass;
 
 
 	/**
