@@ -28,15 +28,17 @@ class Accessor implements IAccessor
 
 	/**
 	 * Do not call this method directly!
+	 * @param array|string $entityClass
 	 * @param int $id
-	 * @param string $entityClass
 	 * @param IOperand $parent
 	 * @param string $sourceParam
 	 * @return IEntity
 	 * @throws Exception
 	 */
-	public function getById($entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
+	final public function getById($entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
 	{
+		list($entityClass) = $this->extractEntityClasses($entityClass);
+
 		if (($parent && NULL === $sourceParam) || (NULL !== $sourceParam && !$parent)) {
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
@@ -70,13 +72,15 @@ class Accessor implements IAccessor
 
 	/**
 	 * Do not call this method directly!
+	 * @param array|string $entityClass
 	 * @param IRestrictor $restrictor
-	 * @param string $entityClass
 	 * @param IOperand $parent
 	 * @return IEntityContainer
 	 */
 	public function getByRestrictions($entityClass, IRestrictor $restrictor, IOperand $parent = NULL)
 	{
+		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
+
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $parent ? $parent->getIdentifier() : NULL);
 		$ids = $this->serviceAccessor->getMapper($entityClass)->getIdsByRestrictions($restrictor);
 
@@ -94,7 +98,7 @@ class Accessor implements IAccessor
 			$this->sortData($ids, $data);
 		}
 
-		return $this->createEntityContainer($this->serviceAccessor->getEntityContainerClass($entityClass), $data, $identifier);
+		return $this->createEntityContainer($entityContainerClass, $data, $identifier);
 	}
 
 
@@ -120,13 +124,15 @@ class Accessor implements IAccessor
 
 
 	/**
-	 * @param string $entityClass
+	 * @param array|string $entityClass
 	 * @param array $data
 	 * @param bool $check
 	 * @return IEntity
 	 */
 	public function create($entityClass, array $data, $check = TRUE)
 	{
+		list($entityClass) = $this->extractEntityClasses($entityClass);
+
 		$dataHolder = $this->createDataHolder($entityClass, array_keys($data));
 		$dataHolder->setParams($data);
 		if ($check) {
@@ -159,11 +165,12 @@ class Accessor implements IAccessor
 
 
 	/**
-	 * @param string $entityClass
+	 * @param array|string $entityClass
 	 * @param int $id
 	 */
 	public function remove($entityClass, $id)
 	{
+		list($entityClass) = $this->extractEntityClasses($entityClass);
 		$this->serviceAccessor->getMapper($entityClass)->remove($id);
 	}
 
@@ -278,5 +285,15 @@ class Accessor implements IAccessor
 		if ($checker) {
 			$checker->check($entity, $dataHolder);
 		}
+	}
+
+
+	/**
+	 * @param array|string $entityClass
+	 * @return array
+	 */
+	private function extractEntityClasses($entityClass)
+	{
+		return is_array($entityClass) ? $entityClass : array($entityClass, $this->serviceAccessor->getEntityContainerClass($entityClass));
 	}
 }

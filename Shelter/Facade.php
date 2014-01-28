@@ -4,33 +4,38 @@ namespace Shelter;
 
 /**
  * Outer cover for getting operands (Entity or EntityContainer).
- * Primary name entity-dependent descendant of this class like <Entity>Facade. If you
- * want use another naming convention, override self::$entityClass
- * or override IEntityServiceAccessor::getEntityClass().
+ * There are two ways of determining Entity / EntityContainer classname:
+ * - override property $entityClass in the descendant of this class due to the array pattern:
+ *   [<EntityClassname>, <EntityContainerClassname>]
+ * - apply solution in IEntityServiceAccessor::getEntityClass(). There is some default solution.
  */
 abstract class Facade implements IFacade
 {
 
-	/** @var string */
+	/** @var array|string */
 	protected $entityClass;
-
-	/** @var IEntityServiceAccessor */
-	private $serviceAccessor;
 
 	/** @var IAccessor */
 	private $accessor;
 
 
 	/**
-	 * @param IEntityServiceAccessor $serviceAccessor
 	 * @param IAccessor $accessor
+	 * @param IEntityServiceAccessor $serviceAccessor
+	 * @throws Exception
 	 */
-	public function __construct(IEntityServiceAccessor $serviceAccessor, IAccessor $accessor)
+	public function __construct(IAccessor $accessor, IEntityServiceAccessor $serviceAccessor = NULL)
 	{
-		$this->serviceAccessor = $serviceAccessor;
 		$this->accessor = $accessor;
 		if (NULL === $this->entityClass) {
+			if (!$serviceAccessor) {
+				$class = get_class($this);
+				throw new Exception($class . ": inject IEntityServiceAccessor or fill the $class::\$entityClass property.");
+			}
 			$this->entityClass = $serviceAccessor->getEntityClass($this);
+			if (NULL === $this->entityClass) {
+				throw new Exception(get_class($this) . ": IEntityServiceAccessor::getEntityClass() does not return entity classname.");
+			}
 		}
 	}
 
