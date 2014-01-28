@@ -11,8 +11,8 @@ interface IAccessor
 	/********************* interface for IFacade *********************/
 
 	/**
+	 * @param array|string $entityClass
 	 * @param int $id
-	 * @param string $entityClass
 	 * @param IOperand $parent
 	 * @param string $sourceParam
 	 * @return IEntity
@@ -21,8 +21,8 @@ interface IAccessor
 
 
 	/**
+	 * @param array|string $entityClass
 	 * @param IRestrictor $restrictor
-	 * @param string $entityClass
 	 * @param IOperand $parent
 	 * @return IEntityContainer
 	 */
@@ -30,7 +30,7 @@ interface IAccessor
 
 
 	/**
-	 * @param string $entityClass
+	 * @param array|string $entityClass
 	 * @param array $data
 	 * @param bool $check whether check created Entity by Checker.
 	 * @return IEntity
@@ -39,7 +39,7 @@ interface IAccessor
 
 
 	/**
-	 * @param string $entityClass
+	 * @param array|string $entityClass
 	 * @param int $id
 	 */
 	function remove($entityClass, $id);

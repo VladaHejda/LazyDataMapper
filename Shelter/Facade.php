@@ -4,17 +4,39 @@ namespace Shelter;
 
 /**
  * Outer cover for getting operands (Entity or EntityContainer).
- * Primary name entity-dependent descendant of this class like <Entity>Facade. If you
- * want use another naming convention, override method getEntityClass.
+ * There are two ways of determining Entity / EntityContainer classname:
+ * - override property $entityClass in the descendant of this class due to the array pattern:
+ *   [<EntityClassname>, <EntityContainerClassname>]
+ * - apply solution in IEntityServiceAccessor::getEntityClass(). There is some default solution.
  */
 abstract class Facade implements IFacade
 {
 
+	/** @var array|string */
+	protected $entityClass;
+
+	/** @var IAccessor */
+	private $accessor;
+
+
 	/**
 	 * @param IAccessor $accessor
+	 * @param IEntityServiceAccessor $serviceAccessor
+	 * @throws Exception
 	 */
-	public function __construct(IAccessor $accessor)
+	public function __construct(IAccessor $accessor, IEntityServiceAccessor $serviceAccessor = NULL)
 	{
+		$this->accessor = $accessor;
+		if (NULL === $this->entityClass) {
+			if (!$serviceAccessor) {
+				$class = get_class($this);
+				throw new Exception($class . ": inject IEntityServiceAccessor or fill the $class::\$entityClass property.");
+			}
+			$this->entityClass = $serviceAccessor->getEntityClass($this);
+			if (NULL === $this->entityClass) {
+				throw new Exception(get_class($this) . ": IEntityServiceAccessor::getEntityClass() does not return entity classname.");
+			}
+		}
 	}
 
 
@@ -24,6 +46,7 @@ abstract class Facade implements IFacade
 	 */
 	public function getById($id)
 	{
+		return $this->accessor->getById($this->entityClass, $id);
 	}
 
 
@@ -33,25 +56,27 @@ abstract class Facade implements IFacade
 	 */
 	public function getByRestrictions(IRestrictor $restrictor)
 	{
+		return $this->accessor->getByRestrictions($this->entityClass, $restrictor);
 	}
 
 
 	/**
-	 * Apply mandatory arguments for new Entity.
-	 * @todo how to implement? - array $data is one way, but method can be overridden in descendant and given as array to parent::create()
+	 * Recommended to override and apply mandatory arguments for new Entity.
 	 * @param array $data
+	 * @param bool $check
 	 * @return IEntity
 	 */
-	public function create(array $data = array())
+	public function create(array $data = array(), $check = TRUE)
 	{
+		return $this->accessor->create($this->entityClass, $data, $check);
 	}
 
 
 	/**
-	 * Returns Entity classname.
-	 * @return string
+	 * @param int $id
 	 */
-	protected function getEntityClass()
+	function remove($id)
 	{
+		$this->accessor->remove($this->entityClass, $id);
 	}
 }

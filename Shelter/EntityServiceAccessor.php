@@ -6,7 +6,23 @@ abstract class EntityServiceAccessor implements IEntityServiceAccessor
 {
 
 	/**
-	 * Makes plural from Entity class name.
+	 * Cut "Facade" from Facade classname.
+	 * @param Facade $facade
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getEntityClass(Facade $facade)
+	{
+		$facadeClass = get_class($facade);
+		if (strcasecmp(substr($facadeClass, -6), 'facade')) {
+			throw new Exception("Expected Facade with classname <EntityName>Facade. $facadeClass given.");
+		}
+		return substr($facadeClass, 0, -6);
+	}
+
+
+	/**
+	 * Makes plural from Entity classname.
 	 * @param string $entityClass
 	 * @return string
 	 */
@@ -21,10 +37,14 @@ abstract class EntityServiceAccessor implements IEntityServiceAccessor
 	}
 
 
-	// todo použít v accessoru
-	public function composeIdentifier($entityClass, $parentIdentifier = NULL, $sourceParam = NULL)
+	/**
+	 * @param string $entityClass
+	 * @param IIdentifier $parentIdentifier
+	 * @param string $sourceParam
+	 * @return IIdentifier
+	 */
+	public function composeIdentifier($entityClass, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
-		$identifier = new Identifier($entityClass, (bool) $sourceParam, $parentIdentifier, $sourceParam);
-		return $identifier->composeIdentifier();
+		return new Identifier($entityClass, (bool) $sourceParam, $parentIdentifier, $sourceParam);
 	}
 }

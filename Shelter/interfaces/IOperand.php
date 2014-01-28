@@ -6,13 +6,7 @@ interface IOperand
 {
 
 	/**
-	 * @return string
+	 * @return IIdentifier
 	 */
 	function getIdentifier();
-
-
-	/**
-	 * @return IOperand|NULL
-	 */
-	function getParent();
 }

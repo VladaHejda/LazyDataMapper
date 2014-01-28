@@ -24,7 +24,7 @@ interface ISuggestor extends \Iterator
 
 
 	/**
-	 * @return string
+	 * @return IIdentifier
 	 */
 	function getIdentifier();
 

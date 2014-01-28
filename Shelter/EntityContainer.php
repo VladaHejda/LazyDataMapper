@@ -2,14 +2,25 @@
 
 namespace Shelter;
 
-abstract class Container implements \ArrayAccess, \Iterator, \Countable
+abstract class BaseEntityContainer implements IEntityContainer, \ArrayAccess, \Iterator, \Countable
 {
+
+	// todo think about protected/private visibility
+
+	/** @var IIdentifier */
+	protected $identifier;
+
+	/** @var IAccessor */
+	protected $accessor;
+
+	/** @var int[] */
+	private $ids;
 
 	/** @var array[] */
 	private $data;
 
-	/** @var bool */
-	private $initialized = FALSE;
+	/** @var string */
+	private $entityClass;
 
 	/** @var int last read offset */
 	private $currentOffset;
@@ -17,20 +28,18 @@ abstract class Container implements \ArrayAccess, \Iterator, \Countable
 	/** @var int iterator position */
 	private $position;
 
-	/** @var Entity last read Entity*/
+	/** @var IEntity last read Entity*/
 	private $currentEntity;
 
 
-	public function x__construct(array $data, $identifier, IOperand $parent = NULL, IAccessor $accessor, $entityClass)
-	{
-	}
-
-
 	/**
-	 * @param array[] $data array of params of each Entity, indexed by id
+	 * @param array[] $data array of params of each Entity, indexed by id, order dependent
+	 * @param IIdentifier $identifier
+	 * @param IAccessor $accessor
+	 * @param string $entityClass
 	 * @throws Exception
 	 */
-	public function __construct(array $data)
+	public function __construct(array $data, IIdentifier $identifier, IAccessor $accessor, $entityClass)
 	{
 		foreach ($data as $params) {
 			if (!is_array($params)) {
@@ -41,209 +50,182 @@ abstract class Container implements \ArrayAccess, \Iterator, \Countable
 				$count = count($params);
 
 			} elseif (count($params) != $count) {
-				throw new Exception('Method ' . __CLASS__ .'::load() must return array of param arrays, one member of array has different count of params.');
+				throw new Exception(get_class($this) . ': One member of data nested array has different count of params.');
 			}
 		}
 
-		$this->data = $data;
+		$this->ids = array_keys($data);
+		$this->data = array_values($data);
 
-		$this->initialized = TRUE;
+		$this->identifier = $identifier;
+		$this->entityClass = $entityClass;
+		$this->accessor = $accessor;
 	}
 
 
-
-	/**
-	 * Implement loading array of params from data source.
-	 * @return array of params of each Entity
-	 */
-	protected function load(){
-
-		return array();
+	public function getIdentifier()
+	{
+		return $this->identifier;
 	}
-
-
-
-	/**
-	 * Extend this method to modify created Entity.
-	 * @param int $index
-	 * @param array $params
-	 * @return Entity
-	 */
-	abstract protected function createEntity($index, array $params);
-
 
 
 	/**
 	 * @param string
-	 * @throws \Nette\MemberAccessException
+	 * @throws Exception
 	 */
-	public function __get($var){
+	public function __get($param)
+	{
+		if (method_exists($this, $m = 'get' . ucfirst($param))) {
+			return $this->$m();
+		}
 
-		$this->checkInitialized();
-
-		if (method_exists($this, $m = 'get' . ucfirst($var))) return $this->$m();
-
-		throw new \Nette\MemberAccessException("Cannot read an undeclared property '$var'");
+		throw new Exception(get_class($this) . ": cannot read an undeclared property $param");
 	}
-
 
 
 	/**
 	 * @param $var
 	 * @return bool
 	 */
-	public function __isset($var){
-
-		$this->checkInitialized();
-
+	public function __isset($var)
+	{
 		return method_exists($this, "get$var){");
 	}
 
 
-
 	/**
 	 * @param mixed
-	 * @return mixed|Entity
+	 * @return IEntity
 	 */
-	public function offsetGet($index){
-
-		$this->checkInitialized();
-
+	public function offsetGet($index)
+	{
 		return $this->getEntity($index);
 	}
-
 
 
 	/**
 	 * @param mixed
 	 * @return bool
 	 */
-	public function offsetExists($index){
-
-		$this->checkInitialized();
-
+	public function offsetExists($index)
+	{
 		return isset($this->data[$index]);
 	}
 
 
+	/**
+	 * @throws \BadMethodCallException
+	 */
+	public function offsetSet($x, $y)
+	{
+		throw new \BadMethodCallException(__CLASS__ . " cannot be modified.");
+	}
+
 
 	/**
 	 * @throws \BadMethodCallException
 	 */
-	public function offsetSet($x, $y){
-
-		throw new \BadMethodCallException("Entity\\Container cannot be changed.");
+	public function offsetUnset($x)
+	{
+		throw new \BadMethodCallException(__CLASS__ . ": Entity cannot be removed.");
 	}
 
 
-
-	/**
-	 * @throws \BadMethodCallException
-	 */
-	public function offsetUnset($x){
-
-		throw new \BadMethodCallException("Entity cannot be removed.");
-	}
-
-
-
-	final public function rewind(){
-
-		$this->checkInitialized();
-
+	final public function rewind()
+	{
 		$this->position = 0;
 	}
 
 
-
-	final public function valid(){
-
+	final public function valid()
+	{
 		return isset($this->data[$this->position]);
 	}
 
 
-
-	final public function current(){
-
+	final public function current()
+	{
 		return $this[$this->position];
 	}
 
 
-
-	final public function next(){
-
+	final public function next()
+	{
 		++$this->position;
 	}
 
 
-
-	final public function key(){
-
+	final public function key()
+	{
 		return $this->position;
 	}
 
 
-
-	final public function count(){
-
+	final public function count()
+	{
 		return count($this->data);
 	}
 
 
+	/**
+	 * Creates Entity.
+	 * @param int $id
+	 * @param array $params
+	 * @return IEntity
+	 */
+	protected function createEntity($id, array $params)
+	{
+		$entityClass = $this->entityClass;
+		return new $entityClass($id, $params, $this->identifier, $this->accessor);
+	}
+
 
 	/**
-	 * Returns array of each entity parameter value (better than iterate all Entity instances)
+	 * Returns array of each entity parameter value (better than iterate all Entity instances).
 	 * @param string
 	 * @return array
 	 */
-	protected function getParams($paramName){
-
-		$this->checkInitialized();
-
-		if (!count($this)) return array();
-
-		if (isset($this->data[0][$paramName])) return array_map(function ($entityData) use ($paramName){
-
-			return $entityData[$paramName];
-		}, $this->data);
+	protected function getParams($paramName)
+	{
+		if (!count($this)) {
+			return array();
+		}
+		if (isset($this->data[0][$paramName])) {
+			$seeker = function ($entityData) use ($paramName) {
+				return $entityData[$paramName];
+			};
+			return array_map($seeker, $this->data);
+		}
 
 		// cause integration of param
 		$params = array();
-		foreach ($this as $index => $entity)
+		foreach ($this as $index => $entity) {
 			$params[] = $this->data[$index][$paramName] = $entity->$paramName;
+		}
 		return $params;
 	}
 
 
-
 	/**
 	 * @param int
-	 * @return Entity
-	 * @throws \Nette\MemberAccessException
+	 * @return IEntity
+	 * @throws Exception
 	 */
-	private function getEntity($index){
+	private function getEntity($index)
+	{
+		if (!isset($this->data[$index])) {
+			throw new Exception(get_class($this) . ": no Entity on index $index.");
+		}
 
-		if (!isset($this->data[$index]))
-			throw new \Nette\MemberAccessException("Entity\\Container has no Entity on index $index.");
+		if ($this->currentOffset !== $index) { // intentionally !==
+			$this->currentEntity = $this->createEntity($this->ids[$index], $this->data[$index]);
 
-		if ($this->currentOffset !== $index){ // intentionally !==
-
-			$this->currentEntity = $this->createEntity($index, $this->data[$index]);
-
-			if (!$this->currentEntity instanceof Entity)
-				throw new \Nette\MemberAccessException(get_class() . "::createEntity() must return instance of Nais\\Entity.");
-
+			if (!$this->currentEntity instanceof IEntity) {
+				throw new Exception(get_class($this) . "::createEntity() must return instance of Entity.");
+			}
 			$this->currentOffset = $index;
 		}
 
 		return $this->currentEntity;
-	}
-
-
-
-	private function checkInitialized(){
-
-		if (!$this->initialized)
-			throw new \Nette\InvalidStateException(get_class($this) . ": Object is not initialized, call parent::__construct().");
 	}
 }

@@ -31,6 +31,15 @@ interface IEntityServiceAccessor
 
 
 	/**
+	 * Apply solution to gain Entity classname based on Facade.
+	 * NOTICE that this method opposed to others returns just string classname, not the instance!
+	 * @param Facade $facade
+	 * @return string
+	 */
+	function getEntityClass(Facade $facade);
+
+
+	/**
 	 * Apply solution to gain Entity Container classname based on Entity class name.
 	 * NOTICE that this method opposed to others returns just string classname, not the instance!
 	 * @param string $entityClass
@@ -42,9 +51,9 @@ interface IEntityServiceAccessor
 	/**
 	 * Compose identifier based on input arguments. It is arbitrary distinctive string key.
 	 * @param string $entityClass
-	 * @param string $parentIdentifier
+	 * @param IIdentifier $parentIdentifier
 	 * @param string $sourceParam
-	 * @return string
+	 * @return IIdentifier
 	 */
-	function composeIdentifier($entityClass, $parentIdentifier = NULL, $sourceParam = NULL);
+	function composeIdentifier($entityClass, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL);
 }
