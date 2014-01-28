@@ -41,7 +41,7 @@ class Accessor implements IAccessor
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
 
-		$identifier = $this->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
 		if ($parent && $loadedData = $this->getLoadedData($parent->getIdentifier(), $entityClass, $sourceParam)) {
 			$data = $loadedData;
@@ -77,7 +77,7 @@ class Accessor implements IAccessor
 	 */
 	public function getByRestrictions($entityClass, IRestrictor $restrictor, IOperand $parent = NULL)
 	{
-		$identifier = $this->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $parent ? $parent->getIdentifier() : NULL);
 		$ids = $this->serviceAccessor->getMapper($entityClass)->getIdsByRestrictions($restrictor);
 
 		if (!empty($ids)) {
@@ -94,7 +94,7 @@ class Accessor implements IAccessor
 			$this->sortData($ids, $data);
 		}
 
-		return $this->createEntityContainer($entityClass, $data, $identifier);
+		return $this->createEntityContainer($this->serviceAccessor->getEntityContainerClass($entityClass), $data, $identifier);
 	}
 
 
@@ -134,7 +134,7 @@ class Accessor implements IAccessor
 		}
 
 		$id = $this->serviceAccessor->getMapper($entityClass)->create($dataHolder);
-		$identifier = $this->composeIdentifier($entityClass, FALSE);
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass);
 
 		if ($suggestorCached = $this->cache->getCached($identifier, $entityClass)) {
 			$data += $this->serviceAccessor->getMapper($entityClass)->getById($id, $suggestorCached)->getParams();
@@ -173,20 +173,6 @@ class Accessor implements IAccessor
 
 	/**
 	 * @param string $entityClass
-	 * @param bool $isContainer todo now is unnecessary
-	 * @param string $parentIdentifier
-	 * @param string $sourceParam
-	 * @return string
-	 */
-	protected function composeIdentifier($entityClass, $isContainer, $parentIdentifier = NULL, $sourceParam = NULL)
-	{
-		$identifier = new Identifier($entityClass, $isContainer, $parentIdentifier, $sourceParam);
-		return $identifier->composeIdentifier();
-	}
-
-
-	/**
-	 * @param string $entityClass
 	 * @param int $id
 	 * @param array $data
 	 * @param string $identifier
@@ -199,14 +185,13 @@ class Accessor implements IAccessor
 
 
 	/**
-	 * @param string $entityClass
+	 * @param string $containerClass
 	 * @param array[] $data
 	 * @param string $identifier
 	 * @return IEntityContainer
 	 */
-	protected function createEntityContainer($entityClass, array $data, $identifier)
+	protected function createEntityContainer($containerClass, array $data, $identifier)
 	{
-		$containerClass = $this->serviceAccessor->getEntityContainerClass($entityClass);
 		return new $containerClass($data, $identifier, $this);
 	}
 
