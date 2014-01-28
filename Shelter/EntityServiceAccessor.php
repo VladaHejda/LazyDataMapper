@@ -37,10 +37,14 @@ abstract class EntityServiceAccessor implements IEntityServiceAccessor
 	}
 
 
-	// todo return IIdentifier and call composeIdentifier only when is really needed?
-	public function composeIdentifier($entityClass, $parentIdentifier = NULL, $sourceParam = NULL)
+	/**
+	 * @param string $entityClass
+	 * @param IIdentifier $parentIdentifier
+	 * @param string $sourceParam
+	 * @return IIdentifier
+	 */
+	public function composeIdentifier($entityClass, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
-		$identifier = new Identifier($entityClass, (bool) $sourceParam, $parentIdentifier, $sourceParam);
-		return $identifier->composeIdentifier();
+		return new Identifier($entityClass, (bool) $sourceParam, $parentIdentifier, $sourceParam);
 	}
 }

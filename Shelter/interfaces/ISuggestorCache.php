@@ -15,29 +15,29 @@ interface ISuggestorCache
 
 	/**
 	 * Adds parameter name under one identifier.
-	 * @param string $identifier
+	 * @param IIdentifier $identifier
 	 * @param string $paramName
 	 * @param string $entityClass
 	 * @return ISuggestor with one suggestion of cached parameter name
 	 */
-	function cacheParamName($identifier, $paramName, $entityClass);
+	function cacheParamName(IIdentifier $identifier, $paramName, $entityClass);
 
 
 	/**
 	 * Adds descendant under one identifier.
-	 * @param string $identifier
+	 * @param IIdentifier $identifier
 	 * @param string $descendantEntityClass
 	 * @param string $sourceParam
 	 * @return void
 	 */
-	function cacheDescendant($identifier, $descendantEntityClass, $sourceParam);
+	function cacheDescendant(IIdentifier $identifier, $descendantEntityClass, $sourceParam);
 
 
 	/**
 	 * Gets all cached suggestions under one identifier or NULL when nothing cached.
-	 * @param string $identifier
+	 * @param IIdentifier $identifier
 	 * @param string $entityClass
 	 * @return ISuggestor|NULL
 	 */
-	function getCached($identifier, $entityClass);
+	function getCached(IIdentifier $identifier, $entityClass);
 }

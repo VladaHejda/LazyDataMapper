@@ -2,9 +2,6 @@
 
 namespace Shelter;
 
-/**
- * @todo possibly better to be static
- */
 class Identifier implements IIdentifier
 {
 
@@ -19,15 +16,15 @@ class Identifier implements IIdentifier
 	 * Computes output identifier based on inputs.
 	 * @param string $entityClass
 	 * @param bool $isContainer
-	 * @param string $parentIdentifier
+	 * @param IIdentifier $parentIdentifier
 	 * @param string $sourceParam
 	 */
-	public function __construct($entityClass, $isContainer = FALSE, $parentIdentifier = NULL, $sourceParam = NULL)
+	public function __construct($entityClass, $isContainer = FALSE,  IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
 		$identifier = $entityClass;
 		$identifier .= $isContainer ? '*' : '';
 		$identifier .= NULL !== $sourceParam ? "|$sourceParam" : '';
-		$identifier .= NULL !== $parentIdentifier ? ">$parentIdentifier" : '';
+		$identifier .= $parentIdentifier ? '>' . $parentIdentifier->composeIdentifier() : '';
 		$this->identifier = $identifier;
 	}
 

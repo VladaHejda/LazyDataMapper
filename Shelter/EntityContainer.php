@@ -7,7 +7,7 @@ abstract class BaseEntityContainer implements IEntityContainer, \ArrayAccess, \I
 
 	// todo think about protected/private visibility
 
-	/** @var string */
+	/** @var IIdentifier */
 	protected $identifier;
 
 	/** @var IAccessor */
@@ -34,12 +34,12 @@ abstract class BaseEntityContainer implements IEntityContainer, \ArrayAccess, \I
 
 	/**
 	 * @param array[] $data array of params of each Entity, indexed by id, order dependent
-	 * @param string $identifier
+	 * @param IIdentifier $identifier
 	 * @param IAccessor $accessor
 	 * @param string $entityClass
 	 * @throws Exception
 	 */
-	public function __construct(array $data, $identifier, IAccessor $accessor, $entityClass)
+	public function __construct(array $data, IIdentifier $identifier, IAccessor $accessor, $entityClass)
 	{
 		foreach ($data as $params) {
 			if (!is_array($params)) {

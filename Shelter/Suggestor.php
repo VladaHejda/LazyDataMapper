@@ -14,7 +14,7 @@ class Suggestor implements ISuggestor
 	/** @var array */
 	protected $suggestions;
 
-	/** @var string  */
+	/** @var IIdentifier  */
 	protected $identifier;
 
 	/** @var array */
@@ -31,10 +31,10 @@ class Suggestor implements ISuggestor
 	 * @param IParamMap $paramMap
 	 * @param ISuggestorCache $cache
 	 * @param array $suggestions
-	 * @param string $identifier
-	 * @param array $descendants entityClass => identifier
+	 * @param IIdentifier $identifier
+	 * @param array $descendants entityClass => IIdentifier
 	 */
-	public function __construct(IParamMap $paramMap, ISuggestorCache $cache, array $suggestions, $identifier = NULL, array $descendants = array())
+	public function __construct(IParamMap $paramMap, ISuggestorCache $cache, array $suggestions, IIdentifier $identifier = NULL, array $descendants = array())
 	{
 		$this->paramMap = $paramMap;
 		$this->cache = $cache;
@@ -78,7 +78,7 @@ class Suggestor implements ISuggestor
 
 
 	/**
-	 * @return string
+	 * @return IIdentifier
 	 */
 	public function getIdentifier()
 	{
@@ -117,15 +117,17 @@ class Suggestor implements ISuggestor
 				if (count($this->descendants) > 1) {
 					throw new Exception("Descendant $entityClass is ambiguous.");
 				}
-				reset($this->descendants);
+				$identifier = reset($this->descendants);
 				$sourceParam = key($this->descendants);
-			}
 
-			if (!in_array($sourceParam, $this->descendants[$entityClass])) {
+			} elseif (array_key_exists($sourceParam, $this->descendants[$entityClass])) {
+				$identifier = $this->descendants[$entityClass][$sourceParam];
+
+			} else {
 				return NULL;
 			}
 
-			return $this->loadDescendant($entityClass, $sourceParam);
+			return $this->loadDescendant($identifier, $entityClass);
 		}
 		return NULL;
 	}
@@ -153,9 +155,9 @@ class Suggestor implements ISuggestor
 			return FALSE;
 		}
 		$entityClass = key($this->descendants);
-		$sourceParam = current($this->descendants[$entityClass]);
+		$identifier = current($this->descendants[$entityClass]);
 
-		$this->currentDescendant = $this->loadDescendant($entityClass, $sourceParam);
+		$this->currentDescendant = $this->loadDescendant($identifier, $entityClass);
 		if (!$this->currentDescendant) {
 			$this->next();
 			return $this->valid();
@@ -196,12 +198,9 @@ class Suggestor implements ISuggestor
 	}
 
 
-	protected function loadDescendant($entityClass, $sourceParam)
+	protected function loadDescendant(IIdentifier $identifier, $entityClass)
 	{
-		// todo použít serviceAccessor->composeIdentifier(), ovšem zase tu neni service accessor
-		$identifier = new Identifier($entityClass, (bool) $sourceParam, $this->identifier, $sourceParam);
-
-		return $this->cache->getCached($identifier->composeIdentifier(), $entityClass);
+		return $this->cache->getCached($identifier, $entityClass);
 	}
 
 

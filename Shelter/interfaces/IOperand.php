@@ -6,7 +6,7 @@ interface IOperand
 {
 
 	/**
-	 * @return string
+	 * @return IIdentifier
 	 */
 	function getIdentifier();
 }

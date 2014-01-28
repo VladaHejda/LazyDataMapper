@@ -182,10 +182,10 @@ class Accessor implements IAccessor
 	 * @param string $entityClass
 	 * @param int $id
 	 * @param array $data
-	 * @param string $identifier
+	 * @param IIdentifier $identifier
 	 * @return IEntity
 	 */
-	protected function createEntity($entityClass, $id, array $data, $identifier)
+	protected function createEntity($entityClass, $id, array $data, IIdentifier $identifier)
 	{
 		return new $entityClass($id, $data, $identifier, $this);
 	}
@@ -194,10 +194,10 @@ class Accessor implements IAccessor
 	/**
 	 * @param string $containerClass
 	 * @param array[] $data
-	 * @param string $identifier
+	 * @param IIdentifier $identifier
 	 * @return IEntityContainer
 	 */
-	protected function createEntityContainer($containerClass, array $data, $identifier)
+	protected function createEntityContainer($containerClass, array $data, IIdentifier $identifier)
 	{
 		return new $containerClass($data, $identifier, $this);
 	}
@@ -237,8 +237,10 @@ class Accessor implements IAccessor
 	}
 
 
-	private function getLoadedData($parentIdentifier, $entityClass, $sourceParam)
+	private function getLoadedData(IIdentifier $parentIdentifier, $entityClass, $sourceParam)
 	{
+		$parentIdentifier = $parentIdentifier->composeIdentifier();
+
 		if (isset($this->loadedData[$parentIdentifier][$entityClass])) {
 			$loaded = $this->loadedData[$parentIdentifier][$entityClass];
 			if (is_array($loaded)) {
@@ -258,13 +260,12 @@ class Accessor implements IAccessor
 	{
 		/** @var IDataHolder $descendant */
 		foreach ($dataHolder as $descendant) {
-			$identifier = $descendant->getSuggestor()->getIdentifier();
-
 			if ($descendant->getSuggestor()->hasDescendants()) {
 				$this->saveDescendants($descendant);
 			}
 
-			$this->loadedData[$identifier] = $descendant->getParams();
+			$identifier = $descendant->getSuggestor()->getIdentifier();
+			$this->loadedData[$identifier->composeIdentifier()] = $descendant->getParams();
 		}
 	}
 

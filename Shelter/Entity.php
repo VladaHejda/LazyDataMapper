@@ -13,7 +13,7 @@ abstract class BaseEntity implements IEntity
 	/** @var int */
 	protected $id;
 
-	/** @var string */
+	/** @var IIdentifier */
 	protected $identifier;
 
 	/** @var IAccessor */
@@ -44,10 +44,10 @@ abstract class BaseEntity implements IEntity
 	/**
 	 * @param int $id
 	 * @param array $params
-	 * @param string $identifier
+	 * @param IIdentifier $identifier
 	 * @param IAccessor $accessor
 	 */
-	public function __construct($id, array $params, $identifier, IAccessor $accessor)
+	public function __construct($id, array $params, IIdentifier $identifier, IAccessor $accessor)
 	{
 		$this->id = (int) $id;
 		$this->params = $params;
@@ -57,7 +57,7 @@ abstract class BaseEntity implements IEntity
 
 
 	/**
-	 * @return string
+	 * @return IIdentifier
 	 */
 	public function getIdentifier()
 	{
