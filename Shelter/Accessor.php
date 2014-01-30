@@ -121,7 +121,7 @@ class Accessor implements IAccessor
 	{
 		$entityClass = get_class($entity);
 		$suggestor = $this->cache->cacheParamName($entity->getIdentifier(), $paramName, $entityClass);
-		$dataHolder = $this->serviceAccessor->getMapper($entityClass)->getById($entity->getId(), $suggestor);
+		$dataHolder = $this->loadDataHolderByMapper($entityClass, $entity->getId(), $suggestor);
 		return array_shift($dataHolder->getParams());
 	}
 
@@ -146,7 +146,7 @@ class Accessor implements IAccessor
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass);
 
 		if ($suggestorCached = $this->cache->getCached($identifier, $entityClass)) {
-			$data += $this->serviceAccessor->getMapper($entityClass)->getById($id, $suggestorCached)->getParams();
+			$data += $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached);
 		}
 
 		return $this->createEntity($entityClass, $id, $data, $identifier);
@@ -231,10 +231,11 @@ class Accessor implements IAccessor
 	private function loadDataHolderByMapper($entityClass, $id, ISuggestor $suggestor)
 	{
 		$m = is_array($id) ? 'getByIdsRange' : 'getById';
-		$dataHolder = $this->serviceAccessor->getMapper($entityClass)->$m($id, $suggestor);
+		$mapper = $this->serviceAccessor->getMapper($entityClass);
+		$dataHolder = $mapper->$m($id, $suggestor);
 
 		if (!$dataHolder instanceof IDataHolder) {
-			throw new Exception("Method $m() of mapper for $entityClass must return IDataHolder instance.");
+			throw new Exception(get_class($mapper) . "::$m() must return IDataHolder instance.");
 		}
 		return $dataHolder;
 	}

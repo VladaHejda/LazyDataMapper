@@ -6,7 +6,7 @@ class Identifier implements IIdentifier
 {
 
 	/** @var int top level operand counter */
-	static protected $counter = array();
+	static private $counter = array();
 
 	/** @var string */
 	protected $identifier;
@@ -24,7 +24,15 @@ class Identifier implements IIdentifier
 		$identifier = $entityClass;
 		$identifier .= $isContainer ? '*' : '';
 		$identifier .= NULL !== $sourceParam ? "|$sourceParam" : '';
-		$identifier .= $parentIdentifier ? '>' . $parentIdentifier->composeIdentifier() : '';
+		if ($parentIdentifier) {
+			$identifier .= '>' . $parentIdentifier->composeIdentifier();
+		} else {
+			$counterKey = $isContainer ? "$entityClass*" : $entityClass;
+			if (!isset(static::$counter[$counterKey])) {
+				static::$counter[$counterKey] = 0;
+			}
+			$identifier .= '#' . static::$counter[$counterKey]++;
+		}
 		$this->identifier = $identifier;
 	}
 

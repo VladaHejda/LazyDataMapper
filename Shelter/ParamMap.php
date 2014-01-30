@@ -35,7 +35,7 @@ abstract class ParamMap implements IParamMap
 	 */
 	public function getMap($type = NULL, $flip = TRUE)
 	{
-		if (NULl !== $type) {
+		if (NULl === $type) {
 			if ($flip) {
 				return $this->map;
 			}
