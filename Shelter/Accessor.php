@@ -2,6 +2,9 @@
 
 namespace Shelter;
 
+/**
+ * @todo make some methods final (this is pivotal class of model)
+ */
 class Accessor implements IAccessor
 {
 

@@ -4,6 +4,7 @@ namespace Shelter;
 
 /**
  * The main class leading all dependencies.
+ * @todo baseNamespace setting? It could be for example AppName\Entities - will be added during new instance creating, but not stored to cache
  */
 interface IAccessor
 {
