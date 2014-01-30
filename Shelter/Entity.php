@@ -2,7 +2,7 @@
 
 namespace Shelter;
 
-abstract class BaseEntity implements IEntity
+abstract class Entity implements IEntity
 {
 
 	/** exception codes */
