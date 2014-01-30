@@ -47,4 +47,15 @@ abstract class EntityServiceAccessor implements IEntityServiceAccessor
 	{
 		return new Identifier($entityClass, (bool) $sourceParam, $parentIdentifier, $sourceParam);
 	}
+
+
+	/**
+	 * By default there is no checker.
+	 * @param string $entityClass
+	 * @return IChecker|null
+	 */
+	public function getChecker($entityClass)
+	{
+		return NULL;
+	}
 }
