@@ -11,7 +11,6 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	}
 
 
-	// todo Gist it!
 	protected function mockArrayIterator(\Mockery\MockInterface $mock, array $items)
 	{
 		if ($mock instanceof \ArrayAccess) {
