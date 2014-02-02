@@ -22,7 +22,8 @@ abstract class EntityServiceAccessor implements IEntityServiceAccessor
 
 
 	/**
-	 * Makes plural from Entity classname.
+	 * Makes plural (basically) from Entity classname.
+	 * For better results see for example @link https://gist.github.com/VladaHejda/8775965
 	 * @param string $entityClass
 	 * @return string
 	 */
