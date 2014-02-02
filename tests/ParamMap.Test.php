@@ -4,18 +4,7 @@ namespace Shelter\Tests\ParamMap;
 
 use Shelter;
 
-class OneDimensionalParamMap extends Shelter\ParamMap
-{
-	protected $map = array('name', 'age');
-}
-
-class TwoDimensionalParamMap extends Shelter\ParamMap
-{
-	protected $map = array(
-		'personal' => array('name', 'age'),
-		'skill' => array('strength', 'intelligence'),
-	);
-}
+require_once __DIR__.'/prepared/ParamMaps.php';
 
 class Test extends Shelter\Tests\TestCase
 {
