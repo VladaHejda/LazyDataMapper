@@ -4,7 +4,7 @@ namespace Shelter\Tests\ParamMap;
 
 use Shelter;
 
-require_once __DIR__.'/prepared/ParamMaps.php';
+require_once __DIR__.'/prepared/ParamMap.php';
 
 class ExceptionsTest extends Shelter\Tests\TestCase
 {
