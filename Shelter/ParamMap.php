@@ -36,7 +36,7 @@ abstract class ParamMap implements IParamMap
 	public function getMap($type = NULL, $flip = TRUE)
 	{
 		if (NULl === $type) {
-			if ($flip) {
+			if (!$flip) {
 				return $this->map;
 			}
 			if (!$this->separatedByType) {
@@ -56,7 +56,7 @@ abstract class ParamMap implements IParamMap
 				throw new Exception(get_class($this).": unknown type $type.");
 			}
 
-			if ($flip) {
+			if (!$flip) {
 				return $this->map[$type];
 			}
 			return array_fill_keys($this->map[$type], NULL);

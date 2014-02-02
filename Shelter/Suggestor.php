@@ -51,7 +51,7 @@ class Suggestor implements ISuggestor
 	 */
 	public function isSuggestedType($type)
 	{
-		$map = $this->paramMap->getMap($type, TRUE);
+		$map = $this->paramMap->getMap($type, FALSE);
 		return (bool) array_intersect($this->suggestions, $map);
 	}
 
@@ -66,7 +66,7 @@ class Suggestor implements ISuggestor
 			return $this->suggestions;
 		}
 
-		$map = $this->paramMap->getMap($type, TRUE);
+		$map = $this->paramMap->getMap($type, FALSE);
 		$suggestions = array();
 		foreach ($map as $paramName) {
 			if (in_array($paramName, $this->suggestions)) {
@@ -208,7 +208,7 @@ class Suggestor implements ISuggestor
 	{
 		$map = $this->paramMap->getMap();
 		foreach ($suggestions as $paramName) {
-			if (!in_array($paramName, $map)) {
+			if (!array_key_exists($paramName, $map)) {
 				throw new Exception("Parameter $paramName is unknown.");
 			}
 		}
