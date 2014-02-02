@@ -16,13 +16,12 @@ class Test extends Shelter\Tests\TestCase
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->serviceAccessor = \Mockery::mock('Shelter\EntityServiceAccessor');
+		$this->serviceAccessor = \Mockery::mock('Shelter\EntityServiceAccessor[]');
 	}
 
 
 	public function testGetEntityContainerClass()
 	{
-		$this->markTestIncomplete();
 		$this->assertEquals('worlds', $this->serviceAccessor->getEntityContainerClass('world'));
 		$this->assertEquals('stories', $this->serviceAccessor->getEntityContainerClass('story'));
 	}
@@ -30,8 +29,7 @@ class Test extends Shelter\Tests\TestCase
 
 	public function testGetEntityClass()
 	{
-		$this->markTestIncomplete();
-		$facade = \Mockery::mock('Shelter\Tests\Facade\EmptyFacade');
+		$facade = new Shelter\Tests\Facade\EmptyFacade(\Mockery::mock('Shelter\IAccessor'));
 		$this->assertEquals('Shelter\Tests\Facade\Empty', $this->serviceAccessor->getEntityClass($facade));
 	}
 }
