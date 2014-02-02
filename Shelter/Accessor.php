@@ -231,6 +231,7 @@ class Accessor implements IAccessor
 	private function loadDataHolderByMapper($entityClass, $id, ISuggestor $suggestor)
 	{
 		$m = is_array($id) ? 'getByIdsRange' : 'getById';
+		// todo and what about to check if serviceAccessor returns Mapper/ParamMap??
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		$dataHolder = $mapper->$m($id, $suggestor);
 
