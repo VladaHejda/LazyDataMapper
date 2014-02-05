@@ -11,6 +11,24 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 	}
 
 
+	protected function assertException(callable $callback, $expectedException = 'Exception', $expectedCode = NULL, $expectedMessage = NULL)
+	{
+		try {
+			$callback();
+		} catch (\Exception $e) {
+			$this->assertInstanceOf($expectedException, $e);
+			if (NULL !== $expectedCode) {
+				$this->assertEquals($expectedCode, $e->getCode());
+			}
+			if (NULL !== $expectedMessage) {
+				$this->assertContains($expectedMessage, $e->getMessage());
+			}
+			return;
+		}
+		$this->fail('Failed asserting that exception is thrown.');
+	}
+
+
 	protected function mockArrayIterator(\Mockery\MockInterface $mock, array $items)
 	{
 		if ($mock instanceof \ArrayAccess) {

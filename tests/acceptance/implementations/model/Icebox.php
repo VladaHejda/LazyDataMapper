@@ -7,21 +7,42 @@ use Shelter;
 class Icebox extends Shelter\Entity
 {
 
+	protected $privateParams = ['repairs'];
+
+
 	protected function getFood($food)
 	{
 		return explode('|', $food);
 	}
 
 
-	protected function getCapacity($capacity)
+	protected function getFreezer($freezer)
 	{
-		return (int) $capacity;
+		return (bool) $freezer;
 	}
 
 
 	public function hasFreezer()
 	{
-		return (bool) $this->freezer;
+		return $this->freezer;
+	}
+
+
+	protected function getCapacity($capacity, $unit = 'l')
+	{
+		$capacity = (int) $capacity;
+		switch ($unit) {
+			case 'l':
+				return $capacity;
+			case 'ml':
+				return $capacity *1000;
+		}
+	}
+
+
+	protected function getDescription()
+	{
+		return ucfirst($this->color) . " icebox, $this->capacity l.";
 	}
 }
 
@@ -47,7 +68,7 @@ class IceboxParamMap extends Shelter\ParamMap
 {
 
 	protected $map = array(
-		'color', 'capacity', 'freezer', 'food',
+		'color', 'capacity', 'freezer', 'food', 'repairs'
 	);
 }
 
@@ -55,17 +76,10 @@ class IceboxParamMap extends Shelter\ParamMap
 class IceboxMapper implements Shelter\IMapper
 {
 
-	public static $calledCounter = array(
-		'getById' => 0,
-	);
-
-	/** @var Shelter\ISuggestor */
-	public static $lastSuggestor;
-
 	private $data = array(
-		2 => array('color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg',),
-		4 => array('color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter',),
-		5 => array('color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '',),
+		2 => array('color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2',),
+		4 => array('color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0',),
+		5 => array('color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '', 'repairs' => '4',),
 	);
 
 
@@ -77,9 +91,6 @@ class IceboxMapper implements Shelter\IMapper
 
 	public function getById($id, Shelter\ISuggestor $suggestor)
 	{
-		++self::$calledCounter['getById'];
-		self::$lastSuggestor = $suggestor;
-
 		$holder = new Shelter\DataHolder($suggestor);
 		$data = array_intersect_key($this->data[$id] ,array_flip($suggestor->getParamNames()));
 		$holder->setParams($data);
