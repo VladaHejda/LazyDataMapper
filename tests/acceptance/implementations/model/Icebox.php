@@ -12,6 +12,9 @@ class Icebox extends Shelter\Entity
 
 	protected function getFood($food)
 	{
+		if (empty($food)) {
+			return [];
+		}
 		return explode('|', $food);
 	}
 
@@ -76,6 +79,11 @@ class IceboxParamMap extends Shelter\ParamMap
 class IceboxMapper implements Shelter\IMapper
 {
 
+	public static $calledGetById = 0;
+
+	/** @var Shelter\ISuggestor */
+	public static $lastSuggestor;
+
 	private $data = array(
 		2 => array('color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2',),
 		4 => array('color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0',),
@@ -91,6 +99,10 @@ class IceboxMapper implements Shelter\IMapper
 
 	public function getById($id, Shelter\ISuggestor $suggestor)
 	{
+		// analytics
+		++self::$calledGetById;
+		self::$lastSuggestor = $suggestor;
+
 		$holder = new Shelter\DataHolder($suggestor);
 		$data = array_intersect_key($this->data[$id] ,array_flip($suggestor->getParamNames()));
 		$holder->setParams($data);

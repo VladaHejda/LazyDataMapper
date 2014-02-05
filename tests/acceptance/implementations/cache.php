@@ -5,7 +5,7 @@ namespace Shelter\Tests\Cache;
 class SimpleCache implements \Shelter\IExternalCache
 {
 
-	private $cache = array();
+	public $cache = array();
 
 
 	public function save($key, $data)
