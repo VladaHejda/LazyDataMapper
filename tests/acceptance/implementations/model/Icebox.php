@@ -26,6 +26,19 @@ class Icebox extends Shelter\Entity
 }
 
 
+class Iceboxes extends Shelter\EntityContainer
+{}
+
+
+class IceboxRestrictor implements Shelter\IRestrictor
+{
+
+	public function getRestrictions()
+	{
+	}
+}
+
+
 class IceboxFacade extends Shelter\Facade
 {}
 
