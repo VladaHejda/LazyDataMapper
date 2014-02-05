@@ -70,9 +70,7 @@ class IceboxFacade extends Shelter\Facade
 class IceboxParamMap extends Shelter\ParamMap
 {
 
-	protected $map = array(
-		'color', 'capacity', 'freezer', 'food', 'repairs'
-	);
+	protected $map = ['color', 'capacity', 'freezer', 'food', 'repairs', ];
 }
 
 
@@ -84,11 +82,11 @@ class IceboxMapper implements Shelter\IMapper
 	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
 
-	private $data = array(
-		2 => array('color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2',),
-		4 => array('color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0',),
-		5 => array('color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '', 'repairs' => '4',),
-	);
+	private $data = [
+		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2',],
+		4 => ['color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0',],
+		5 => ['color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '', 'repairs' => '4',],
+	];
 
 
 	public function exists($id)
@@ -132,12 +130,12 @@ class IceboxServiceAccessor extends Shelter\EntityServiceAccessor
 
 	public function __construct()
 	{
-		$this->paramMaps = array(
+		$this->paramMaps = [
 			__NAMESPACE__.'\Icebox' => new IceboxParamMap,
-		);
-		$this->mappers = array(
+		];
+		$this->mappers = [
 			__NAMESPACE__.'\Icebox' => new IceboxMapper,
-		);
+		];
 	}
 
 
