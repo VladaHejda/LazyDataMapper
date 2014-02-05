@@ -2,7 +2,7 @@
 
 namespace Shelter;
 
-abstract class EntityContainer implements IEntityContainer, \ArrayAccess, \Iterator, \Countable
+abstract class EntityContainer implements IEntityContainer
 {
 
 	// todo think about protected/private visibility
