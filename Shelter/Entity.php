@@ -5,11 +5,6 @@ namespace Shelter;
 abstract class Entity implements IEntity
 {
 
-	/** exception codes */
-	const READ_UNDECLARED = 10,
-		WRITE_UNDECLARED = 20,
-		WRITE_READONLY = 30;
-
 	/** @var int */
 	protected $id;
 
@@ -99,7 +94,7 @@ abstract class Entity implements IEntity
 
 		// undeclared / private param
 		if ((!$wrapper && !$hasClear) || $this->isPrivate($param)) {
-			throw new EntityException(get_class($this) . ": Cannot read an undeclared parameter $param.", self::READ_UNDECLARED);
+			throw new EntityException(get_class($this) . ": Cannot read an undeclared parameter $param.", EntityException::READ_UNDECLARED);
 		}
 
 		// wrapper
@@ -183,7 +178,7 @@ abstract class Entity implements IEntity
 			return !$this->hasUnwrapper($param);
 		}
 
-		throw new EntityException(get_class($this) . ": Cannot read an undeclared parameter $param.", self::READ_UNDECLARED);
+		throw new EntityException(get_class($this) . ": Cannot read an undeclared parameter $param.", EntityException::READ_UNDECLARED);
 	}
 
 
@@ -223,7 +218,7 @@ abstract class Entity implements IEntity
 
 		// undeclared param
 		if (!$hasClear && !$this->hasWrapper($param)) {
-			throw new EntityException(get_class($this) . ": Cannot read an undeclared parameter $param.", self::READ_UNDECLARED);
+			throw new EntityException(get_class($this) . ": Cannot read an undeclared parameter $param.", EntityException::READ_UNDECLARED);
 		}
 
 		// no any change
@@ -324,8 +319,8 @@ abstract class Entity implements IEntity
 			}
 			catch (EntityException $e){
 
-				if (self::READ_UNDECLARED === $e->getCode()) {
-					throw new EntityException(get_class($this) . ": Cannot write to an undeclared parameter $param.'", self::WRITE_UNDECLARED);
+				if (EntityException::READ_UNDECLARED === $e->getCode()) {
+					throw new EntityException(get_class($this) . ": Cannot write to an undeclared parameter $param.'", EntityException::WRITE_UNDECLARED);
 				} else {
 					throw $e;
 				}
@@ -403,7 +398,7 @@ abstract class Entity implements IEntity
 
 		// undeclared param
 		if (!$hasClear) {
-			throw new EntityException(get_class($this) . ": Cannot read an undeclared clear parameter $param'.", self::READ_UNDECLARED);
+			throw new EntityException(get_class($this) . ": Cannot read an undeclared clear parameter $param'.", EntityException::READ_UNDECLARED);
 		}
 
 		if ($isLazy) {
@@ -496,7 +491,7 @@ abstract class Entity implements IEntity
 	 * To implement it, call this method in translateParamName().
 	 * @param string $paramName
 	 * @return string
-	 * todo this violates SRP
+	 * todo this violates SRP + fails when database columns ARE inCamelCase !!!
 	 */
 	final protected function translateParamNameUnderscore($paramName)
 	{
@@ -601,16 +596,16 @@ abstract class Entity implements IEntity
 			if (!$hasClear) {
 				// fictive read-only param
 				if ($this->hasWrapper($param)) {
-					throw new EntityException(get_class($this)  . ": Cannot write to a read-only parameter $param.", self::WRITE_READONLY);
+					throw new EntityException(get_class($this)  . ": Cannot write to a read-only parameter $param.", EntityException::WRITE_READONLY);
 				}
 
 				// undeclared param
-				throw new EntityException(get_class($this)  . ": Cannot write to an undeclared parameter $param.", self::WRITE_UNDECLARED);
+				throw new EntityException(get_class($this)  . ": Cannot write to an undeclared parameter $param.", EntityException::WRITE_UNDECLARED);
 			}
 
 			// read-only param
 			else if ($checkImmutable) {
-				throw new EntityException(get_class($this) . ": Cannot write to a read-only parameter $param.", self::WRITE_READONLY);
+				throw new EntityException(get_class($this) . ": Cannot write to a read-only parameter $param.", EntityException::WRITE_READONLY);
 			}
 
 			$unwrapper = FALSE;
@@ -618,7 +613,7 @@ abstract class Entity implements IEntity
 
 		// private param
 		if ($checkImmutable && $this->isPrivate($param)) {
-			throw new EntityException(get_class($this) . ": Cannot write to an undeclared parameter $param.", self::WRITE_UNDECLARED);
+			throw new EntityException(get_class($this) . ": Cannot write to an undeclared parameter $param.", EntityException::WRITE_UNDECLARED);
 		}
 
 		// fictive param

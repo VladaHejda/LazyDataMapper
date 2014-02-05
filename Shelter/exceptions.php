@@ -14,6 +14,10 @@ class Exception extends \Exception
  */
 class EntityException extends \Exception
 {
+	/** exception codes */
+	const READ_UNDECLARED = 10,
+		WRITE_UNDECLARED = 20,
+		WRITE_READONLY = 30;
 }
 
 /**
