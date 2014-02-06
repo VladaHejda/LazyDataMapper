@@ -4,7 +4,7 @@ namespace Shelter\Tests;
 
 use Shelter;
 
-require_once __DIR__ . '/defaultMapper.php';
+require_once __DIR__ . '/default.php';
 
 class Icebox extends Shelter\Entity
 {
@@ -87,13 +87,8 @@ class IceboxMapper extends defaultMapper
 }
 
 
-class IceboxServiceAccessor extends Shelter\EntityServiceAccessor
+class IceboxServiceAccessor extends defaultServiceAccessor
 {
-
-	private $paramMaps;
-
-	private $mappers;
-
 
 	public function __construct()
 	{
@@ -103,17 +98,5 @@ class IceboxServiceAccessor extends Shelter\EntityServiceAccessor
 		$this->mappers = [
 			__NAMESPACE__.'\Icebox' => new IceboxMapper,
 		];
-	}
-
-
-	public function getParamMap($entityClass)
-	{
-		return $this->paramMaps[$entityClass];
-	}
-
-
-	public function getMapper($entityClass)
-	{
-		return $this->mappers[$entityClass];
 	}
 }

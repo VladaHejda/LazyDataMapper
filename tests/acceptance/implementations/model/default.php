@@ -4,7 +4,7 @@ namespace Shelter\Tests;
 
 use Shelter;
 
-class defaultMapper implements Shelter\IMapper
+abstract class defaultMapper implements Shelter\IMapper
 {
 
 	public static $calledGetById = 0;
@@ -44,4 +44,30 @@ class defaultMapper implements Shelter\IMapper
 	public function create(Shelter\IDataHolder $holder){}
 
 	public function remove($id){}
+}
+
+abstract class defaultServiceAccessor extends Shelter\EntityServiceAccessor
+{
+
+	protected $paramMaps;
+
+	protected $mappers;
+
+
+	/**
+	 * Set paramMaps and mappers.
+	 */
+	abstract public function __construct();
+
+
+	public function getParamMap($entityClass)
+	{
+		return $this->paramMaps[$entityClass];
+	}
+
+
+	public function getMapper($entityClass)
+	{
+		return $this->mappers[$entityClass];
+	}
 }
