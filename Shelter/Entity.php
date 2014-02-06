@@ -359,6 +359,7 @@ abstract class Entity implements IEntity
 	 * @param string|IRestrictor $sourceParamOrRestrictor
 	 * @param int|null $id id of Entity, when not accessible from source parameter
 	 * @return IOperand
+	 * @todo maybe when getter directly gets descendant and sourceParam is the same, sourceParam argument should be omitted?
 	 */
 	protected function getDescendant($entityClass, $sourceParamOrRestrictor, $id = NULL)
 	{
