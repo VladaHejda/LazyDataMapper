@@ -4,6 +4,8 @@ namespace Shelter\Tests;
 
 use Shelter;
 
+require_once __DIR__ . '/defaultMapper.php';
+
 class Icebox extends Shelter\Entity
 {
 
@@ -74,49 +76,14 @@ class IceboxParamMap extends Shelter\ParamMap
 }
 
 
-class IceboxMapper implements Shelter\IMapper
+class IceboxMapper extends defaultMapper
 {
 
-	public static $calledGetById = 0;
-
-	/** @var Shelter\ISuggestor */
-	public static $lastSuggestor;
-
-	private $data = [
-		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2',],
-		4 => ['color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0',],
-		5 => ['color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '', 'repairs' => '4',],
+	protected $data = [
+		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2', ],
+		4 => ['color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0', ],
+		5 => ['color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '', 'repairs' => '4', ],
 	];
-
-
-	public function exists($id)
-	{
-		return isset($this->data[$id]);
-	}
-
-
-	public function getById($id, Shelter\ISuggestor $suggestor)
-	{
-		// analytics
-		++self::$calledGetById;
-		self::$lastSuggestor = $suggestor;
-
-		$holder = new Shelter\DataHolder($suggestor);
-		$data = array_intersect_key($this->data[$id] ,array_flip($suggestor->getParamNames()));
-		$holder->setParams($data);
-		return $holder;
-	}
-
-
-	public function getIdsByRestrictions(Shelter\IRestrictor $restrictor){}
-
-	public function getByIdsRange(array $ids, Shelter\ISuggestor $suggestor){}
-
-	public function save($id, Shelter\IDataHolder $holder){}
-
-	public function create(Shelter\IDataHolder $holder){}
-
-	public function remove($id){}
 }
 
 
