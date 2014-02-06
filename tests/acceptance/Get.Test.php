@@ -20,6 +20,8 @@ class Test extends Shelter\Tests\TestCase
 		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
 
+		$this->assertNull($facade->getById(99));
+
 		$icebox = $facade->getById(2);
 
 		$this->assertEquals('black', $icebox->color);

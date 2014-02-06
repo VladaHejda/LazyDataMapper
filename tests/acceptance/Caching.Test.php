@@ -71,4 +71,20 @@ class Test extends Shelter\Tests\TestCase
 		// tests if new suggestion cached
 		$this->assertEquals(['color', 'food', 'capacity'], reset($cache->cache[$newKey]));
 	}
+
+
+	public function testGetNonexistent()
+	{
+		IceboxMapper::$calledGetById = 0;
+
+		$requestKey = new Shelter\RequestKey;
+		$cache = new Tests\Cache\SimpleCache;
+		$serviceAccessor = new Tests\IceboxServiceAccessor;
+		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
+		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+
+		$this->assertNull($facade->getById(99));
+		$this->assertEquals(0, IceboxMapper::$calledGetById);
+	}
 }
