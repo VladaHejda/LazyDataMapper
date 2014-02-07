@@ -63,9 +63,10 @@ class DescendantsTest extends Shelter\Tests\TestCase
 		// tests suggestions
 		$this->assertEquals(['icebox', 'area'], KitchenMapper::$lastSuggestor->getParamNames());
 		$this->assertTrue(KitchenMapper::$lastSuggestor->hasDescendants());
+		$this->assertTrue(KitchenMapper::$lastSuggestor->hasDescendant('Shelter\Tests\Icebox', $source));
+		$this->assertEquals('icebox', $source);
 		$descendant = KitchenMapper::$lastSuggestor->getDescendant('Shelter\Tests\Icebox', $source);
 		$this->assertInstanceOf('Shelter\ISuggestor', $descendant);
-		$this->assertEquals('icebox', $source);
 		$this->assertEquals(['capacity'], $descendant->getParamNames());
 	}
 }

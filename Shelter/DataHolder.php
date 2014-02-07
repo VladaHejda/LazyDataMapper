@@ -8,6 +8,9 @@ class DataHolder implements IDataHolder
 	/** @var array */
 	protected $params = array();
 
+	/** @var array */
+	protected $descendants = array();
+
 	/** @var ISuggestor */
 	protected $suggestor;
 
@@ -105,12 +108,23 @@ class DataHolder implements IDataHolder
 	/**
 	 * @param string $entityClass
 	 * @param string $sourceParam
-	 * @return self
+	 * @return self|null
 	 */
 	public function getDescendant($entityClass, &$sourceParam = NULL)
 	{
+		if (!$this->suggestor->hasDescendant($entityClass, $sourceParam)) {
+			return NULL;
+		}
+
+		$key = $this->suggestor->getDescendantIdentifier($entityClass, $sourceParam)->getKey();
+		if (isset($this->descendants[$key])) {
+			return $this->descendants[$key];
+		}
+
 		$suggestor = $this->suggestor->getDescendant($entityClass, $sourceParam);
-		return $suggestor ? new self($suggestor) : NULL;
+		$descendantHolder = new self($suggestor);
+		$this->descendants[$key] = $descendantHolder;
+		return $descendantHolder;
 	}
 
 
@@ -137,7 +151,12 @@ class DataHolder implements IDataHolder
 
 	public function current()
 	{
-		return new self($this->suggestor->current());
+		$suggestor = $this->suggestor->current();
+		$key = $suggestor->getIdentifier()->getKey();
+		if (isset($this->descendants[$key])) {
+			return $this->descendants[$key];
+		}
+		return $this->descendants[$key] = new self($suggestor);
 	}
 
 

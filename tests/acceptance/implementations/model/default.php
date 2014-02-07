@@ -17,12 +17,12 @@ abstract class defaultMapper implements Shelter\IMapper
 	public static $lastSuggestor;
 
 	/** @var array */
-	protected $data;
+	public static $data;
 
 
 	public function exists($id)
 	{
-		return isset($this->data[$id]);
+		return isset(static::$data[$id]);
 	}
 
 
@@ -33,7 +33,7 @@ abstract class defaultMapper implements Shelter\IMapper
 		static::$lastSuggestor = $suggestor;
 
 		$holder = new Shelter\DataHolder($suggestor);
-		$data = array_intersect_key($this->data[$id] ,array_flip($suggestor->getParamNames()));
+		$data = array_intersect_key(static::$data[$id] ,array_flip($suggestor->getParamNames()));
 		$holder->setParams($data);
 		return $holder;
 	}

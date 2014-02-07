@@ -32,7 +32,7 @@ class CarMapper extends defaultMapper
 	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
 
-	protected $data = [
+	public static $data = [
 		1 => ['brand' => 'Seat', 'color' => 'red', 'volume' => 1.8, 'fuel' => 'diesel', ],
 		2 => ['brand' => 'BMW', 'color' => 'black', 'volume' => 3, 'fuel' => 'gas', ],
 	];

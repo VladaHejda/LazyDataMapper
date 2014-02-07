@@ -9,12 +9,14 @@ class ServiceAccessor extends \Shelter\EntityServiceAccessor
 		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxParamMap',
 		'Shelter\Tests\Kitchen' => 'Shelter\Tests\KitchenParamMap',
 		'Shelter\Tests\Car' => 'Shelter\Tests\CarParamMap',
+		'Shelter\Tests\House' => 'Shelter\Tests\HouseParamMap',
 	];
 
 	protected $mappers = [
 		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxMapper',
 		'Shelter\Tests\Kitchen' => 'Shelter\Tests\KitchenMapper',
 		'Shelter\Tests\Car' => 'Shelter\Tests\CarMapper',
+		'Shelter\Tests\House' => 'Shelter\Tests\HouseMapper',
 	];
 
 

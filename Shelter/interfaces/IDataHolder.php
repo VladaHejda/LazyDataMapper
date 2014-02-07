@@ -33,8 +33,7 @@ interface IDataHolder extends \Iterator
 	/**
 	 * @param string $entityClass
 	 * @param string $sourceParam
-	 * @return self
-	 * @throws Exception on empty or undefined descendant
+	 * @return self|NULL
 	 */
 	function getDescendant($entityClass, &$sourceParam = NULL);
 

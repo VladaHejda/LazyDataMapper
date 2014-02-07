@@ -40,10 +40,26 @@ interface ISuggestor extends \Iterator
 	/**
 	 * @param string $entityClass
 	 * @param string $sourceParam
-	 * @return self
-	 * @throws Exception on unknown descendant
+	 * @return bool
+	 */
+	function hasDescendant($entityClass, &$sourceParam = NULL);
+
+
+	/**
+	 * @param string $entityClass
+	 * @param string $sourceParam
+	 * @return self|null
 	 */
 	function getDescendant($entityClass, &$sourceParam = NULL);
+
+
+	/**
+	 * @param string $entityClass
+	 * @param string $sourceParam
+	 * @return IIdentifier
+	 * @throws Exception when descendant does not exist
+	 */
+	function getDescendantIdentifier($entityClass, $sourceParam);
 
 
 	/**

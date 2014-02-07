@@ -36,7 +36,7 @@ class KitchenMapper extends defaultMapper
 	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
 
-	protected $data = [
+	public static $data = [
 		1 => ['icebox' => '2', 'area' => 22, ],
 		2 => ['icebox' => '5', 'area' => 54, ],
 	];

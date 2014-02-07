@@ -85,7 +85,7 @@ class IceboxMapper extends defaultMapper
 	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
 
-	protected $data = [
+	public static $data = [
 		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2', ],
 		4 => ['color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0', ],
 		5 => ['color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '', 'repairs' => '4', ],

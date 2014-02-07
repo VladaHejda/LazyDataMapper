@@ -48,8 +48,8 @@ class Accessor implements IAccessor
 
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
-		if ($parent && $loadedData = $this->getLoadedData($parent->getIdentifier(), $entityClass, $sourceParam)) {
-			$data = $loadedData;
+		if ($parent && $data = $this->getLoadedData($identifier)) {
+			// $data set
 
 		} else {
 			if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
@@ -242,21 +242,10 @@ class Accessor implements IAccessor
 	}
 
 
-	private function getLoadedData(IIdentifier $parentIdentifier, $entityClass, $sourceParam)
+	private function getLoadedData(IIdentifier $identifier)
 	{
-		$parentIdentifier = $parentIdentifier->getKey();
-
-		if (isset($this->loadedData[$parentIdentifier][$entityClass])) {
-			$loaded = $this->loadedData[$parentIdentifier][$entityClass];
-			if (is_array($loaded)) {
-				if (isset($loaded[$sourceParam])) {
-					return $loaded[$sourceParam];
-				}
-			} else {
-				return $loaded[$entityClass];
-			}
-		}
-		return FALSE;
+		$key = $identifier->getKey();
+		return isset($this->loadedData[$key]) ? $this->loadedData[$key] : FALSE;
 	}
 
 
