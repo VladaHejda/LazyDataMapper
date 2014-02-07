@@ -40,5 +40,7 @@ class Test extends Shelter\Tests\TestCase
 			$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
 			$this->assertEquals($expected[$icebox->getId()], $icebox->food);
 		}
+
+		$this->assertEquals(80, $iceboxes->capacity);
 	}
 }

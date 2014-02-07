@@ -34,6 +34,7 @@ class Test extends Shelter\Tests\TestCase
 		$this->assertTrue(45 === $icebox->capacity('l'));
 		$this->assertTrue(45000 === $icebox->capacity('ml'));
 		$this->assertEquals('Black icebox, 45 l.', $icebox->description);
+		$this->assertTrue($icebox->repaired);
 
 		return $icebox;
 	}

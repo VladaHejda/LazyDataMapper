@@ -50,11 +50,27 @@ class Icebox extends Shelter\Entity
 	{
 		return ucfirst($this->color) . " icebox, $this->capacity l.";
 	}
+
+
+	protected function getRepaired()
+	{
+		return (bool) $this->getClear('repairs');
+	}
 }
 
 
 class Iceboxes extends Shelter\EntityContainer
-{}
+{
+
+	protected function getCapacity()
+	{
+		$total = 0;
+		foreach ($this->getParams('capacity') as $capacity) {
+			$total += $capacity;
+		}
+		return $total;
+	}
+}
 
 
 class IceboxFacade extends Shelter\Facade
