@@ -8,5 +8,5 @@ interface IIdentifier
 	/**
 	 * @return string
 	 */
-	function composeIdentifier();
+	function getKey();
 }

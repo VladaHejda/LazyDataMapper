@@ -244,7 +244,7 @@ class Accessor implements IAccessor
 
 	private function getLoadedData(IIdentifier $parentIdentifier, $entityClass, $sourceParam)
 	{
-		$parentIdentifier = $parentIdentifier->composeIdentifier();
+		$parentIdentifier = $parentIdentifier->getKey();
 
 		if (isset($this->loadedData[$parentIdentifier][$entityClass])) {
 			$loaded = $this->loadedData[$parentIdentifier][$entityClass];
@@ -270,7 +270,7 @@ class Accessor implements IAccessor
 			}
 
 			$identifier = $descendant->getSuggestor()->getIdentifier();
-			$this->loadedData[$identifier->composeIdentifier()] = $descendant->getParams();
+			$this->loadedData[$identifier->getKey()] = $descendant->getParams();
 		}
 	}
 

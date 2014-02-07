@@ -25,7 +25,7 @@ class Identifier implements IIdentifier
 		$identifier .= $isContainer ? '*' : '';
 		$identifier .= NULL !== $sourceParam ? "|$sourceParam" : '';
 		if ($parentIdentifier) {
-			$identifier .= '>' . $parentIdentifier->composeIdentifier();
+			$identifier .= '>' . $parentIdentifier->getKey();
 		} else {
 			$counterKey = $isContainer ? "$entityClass*" : $entityClass;
 			if (!isset(static::$counter[$counterKey])) {
@@ -40,7 +40,7 @@ class Identifier implements IIdentifier
 	/**
 	 * @return string
 	 */
-	function composeIdentifier()
+	function getKey()
 	{
 		return $this->identifier;
 	}

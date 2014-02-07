@@ -36,7 +36,7 @@ class SuggestorCache implements ISuggestorCache
 	 */
 	public function cacheParamName(IIdentifier $identifier, $paramName, $entityClass)
 	{
-		$key = $this->key . $identifier->composeIdentifier();
+		$key = $this->key . $identifier->getKey();
 		$cached = $this->externalCache->load($key);
 		if (NULL === $cached) {
 			$cached = array();
@@ -66,7 +66,7 @@ class SuggestorCache implements ISuggestorCache
 	 */
 	public function cacheDescendant(IIdentifier $identifier, $descendantEntityClass, $sourceParam)
 	{
-		$key = $this->key . $identifier->composeIdentifier();
+		$key = $this->key . $identifier->getKey();
 		$cached = $this->externalCache->load($key);
 
 		if (NULL === $cached) {
@@ -95,7 +95,7 @@ class SuggestorCache implements ISuggestorCache
 	 */
 	public function getCached(IIdentifier $identifier, $entityClass)
 	{
-		$cached = $this->externalCache->load($this->key . $identifier->composeIdentifier());
+		$cached = $this->externalCache->load($this->key . $identifier->getKey());
 		if (NULL === $cached) {
 			return NULL;
 		}
