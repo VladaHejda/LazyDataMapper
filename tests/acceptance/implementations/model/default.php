@@ -7,14 +7,12 @@ use Shelter;
 abstract class defaultMapper implements Shelter\IMapper
 {
 
-	/** inherit $calledGetById counter to get per Mapper results */
+	/** inherit these static vars to get per Mapper results */
 	public static $calledGetById = 0;
-
-	/**
-	 * inherit $lastSuggestor to get per Mapper results
-	 * @var Shelter\ISuggestor
-	 */
+	public static $calledGetByRestrictions = 0;
+	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
+
 
 	/** @var array */
 	public static $data;
@@ -33,15 +31,29 @@ abstract class defaultMapper implements Shelter\IMapper
 		static::$lastSuggestor = $suggestor;
 
 		$holder = new Shelter\DataHolder($suggestor);
-		$data = array_intersect_key(static::$data[$id] ,array_flip($suggestor->getParamNames()));
+		$data = array_intersect_key(static::$data[$id], array_flip($suggestor->getParamNames()));
 		$holder->setParams($data);
 		return $holder;
 	}
 
 
-	public function getIdsByRestrictions(Shelter\IRestrictor $restrictor){}
+	public function getByIdsRange(array $ids, Shelter\ISuggestor $suggestor)
+	{
+		++static::$calledGetByRestrictions;
+		static::$lastSuggestor = $suggestor;
 
-	public function getByIdsRange(array $ids, Shelter\ISuggestor $suggestor){}
+		$suggestions = array_flip($suggestor->getParamNames());
+		$holder = new Shelter\DataHolder($suggestor);
+		foreach ($ids as $id) {
+			$data = array_intersect_key(static::$data[$id], $suggestions);
+			$holder->setParams([$id => $data]);
+		}
+
+		return $holder;
+	}
+
+
+	public function getIdsByRestrictions(Shelter\IRestrictor $restrictor){}
 
 	public function save($id, Shelter\IDataHolder $holder){}
 

@@ -76,23 +76,28 @@ class Accessor implements IAccessor
 	/**
 	 * Do not call this method directly!
 	 * @param array|string $entityClass
-	 * @param IRestrictor $restrictor
+	 * @param IRestrictor|int[] $restrictor
 	 * @param IOperand $parent
 	 * @return IEntityContainer
+	 * @throws Exception on wrong restrictions
 	 */
-	public function getByRestrictions($entityClass, IRestrictor $restrictor, IOperand $parent = NULL)
+	public function getByRestrictions($entityClass, $restrictor, IOperand $parent = NULL)
 	{
+		if (!$restrictor instanceof IRestrictor && !is_array($restrictor)) {
+			throw new Exception('Expected instance of IRestrictor or an array.');
+		}
+
 		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
 
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
-		$ids = $this->serviceAccessor->getMapper($entityClass)->getIdsByRestrictions($restrictor);
+		$ids = is_array($restrictor) ? $restrictor : $this->serviceAccessor->getMapper($entityClass)->getIdsByRestrictions($restrictor);
 
 		if (!empty($ids)) {
 			$suggestor = $this->cache->getCached($identifier, $entityClass);
 		}
 
 		if (empty($ids) || !$suggestor) {
-			$data = array();
+			$data = array_fill_keys($ids, array());
 
 		} else {
 			$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
@@ -101,7 +106,7 @@ class Accessor implements IAccessor
 			$this->sortData($ids, $data);
 		}
 
-		return $this->createEntityContainer($entityContainerClass, $data, $identifier);
+		return $this->createEntityContainer($entityContainerClass, $data, $identifier, $entityClass);
 	}
 
 
@@ -198,11 +203,12 @@ class Accessor implements IAccessor
 	 * @param string $containerClass
 	 * @param array[] $data
 	 * @param IIdentifier $identifier
+	 * @param string $entityClass
 	 * @return IEntityContainer
 	 */
-	protected function createEntityContainer($containerClass, array $data, IIdentifier $identifier)
+	protected function createEntityContainer($containerClass, array $data, IIdentifier $identifier, $entityClass)
 	{
-		return new $containerClass($data, $identifier, $this);
+		return new $containerClass($data, $identifier, $this, $entityClass);
 	}
 
 

@@ -16,10 +16,10 @@ interface IFacade
 
 
 	/**
-	 * @param IRestrictor $restrictor
+	 * @param IRestrictor|int[] $restrictor
 	 * @return IEntityContainer
 	 */
-	function getByRestrictions(IRestrictor $restrictor);
+	function getByRestrictions($restrictor);
 
 
 	/**

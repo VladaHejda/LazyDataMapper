@@ -23,11 +23,11 @@ interface IAccessor
 
 	/**
 	 * @param array|string $entityClass
-	 * @param IRestrictor $restrictor
+	 * @param IRestrictor|int[] $restrictor
 	 * @param IOperand $parent
 	 * @return IEntityContainer
 	 */
-	function getByRestrictions($entityClass, IRestrictor $restrictor, IOperand $parent = NULL);
+	function getByRestrictions($entityClass, $restrictor, IOperand $parent = NULL);
 
 
 	/**
