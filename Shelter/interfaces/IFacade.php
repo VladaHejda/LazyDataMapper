@@ -16,10 +16,17 @@ interface IFacade
 
 
 	/**
-	 * @param IRestrictor|int[] $restrictor
+	 * @param int[] $ids
 	 * @return IEntityContainer
 	 */
-	function getByRestrictions($restrictor);
+	public function getByIdsRange(array $ids);
+
+
+	/**
+	 * @param IRestrictor $restrictor
+	 * @return IEntityContainer
+	 */
+	function getByRestrictions(IRestrictor $restrictor);
 
 
 	/**

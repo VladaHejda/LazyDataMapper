@@ -20,7 +20,7 @@ class Test extends Shelter\Tests\TestCase
 		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
 
-		$iceboxes = $facade->getByRestrictions([2, 5, 8]);
+		$iceboxes = $facade->getByIdsRange([2, 5, 8]);
 
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $iceboxes[0]);
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $iceboxes[1]);

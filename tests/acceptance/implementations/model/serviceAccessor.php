@@ -5,6 +5,15 @@ namespace Shelter\Tests;
 class ServiceAccessor extends \Shelter\EntityServiceAccessor
 {
 
+	private static $self;
+
+
+	public function __construct()
+	{
+		self::$self = $this;
+	}
+
+
 	protected $paramMaps = [
 		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxParamMap',
 		'Shelter\Tests\Kitchen' => 'Shelter\Tests\KitchenParamMap',
@@ -31,5 +40,20 @@ class ServiceAccessor extends \Shelter\EntityServiceAccessor
 	{
 		$serviceClass = $this->mappers[$entityClass];
 		return new $serviceClass;
+	}
+
+
+	public static function resetStatics()
+	{
+		$staticVars = ['calledGetById', 'calledGetByRestrictions'];
+
+		foreach (self::$self->mappers as $mapper) {
+			if (!class_exists($mapper)) {
+				continue;
+			}
+			foreach ($staticVars as $static) {
+				$mapper::$$static = 0;
+			}
+		}
 	}
 }

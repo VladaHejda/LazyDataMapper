@@ -51,10 +51,20 @@ abstract class Facade implements IFacade
 
 
 	/**
-	 * @param IRestrictor|int[] $restrictor
+	 * @param int[] $ids
 	 * @return IEntityContainer
 	 */
-	public function getByRestrictions($restrictor)
+	public function getByIdsRange(array $ids)
+	{
+		return $this->accessor->getByRestrictions($this->entityClass, $ids);
+	}
+
+
+	/**
+	 * @param IRestrictor $restrictor
+	 * @return IEntityContainer
+	 */
+	public function getByRestrictions(IRestrictor $restrictor)
 	{
 		return $this->accessor->getByRestrictions($this->entityClass, $restrictor);
 	}
