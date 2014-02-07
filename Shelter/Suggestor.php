@@ -206,9 +206,8 @@ class Suggestor implements ISuggestor
 
 	private function checkAgainstParamMap(array $suggestions)
 	{
-		$map = $this->paramMap->getMap();
 		foreach ($suggestions as $paramName) {
-			if (!array_key_exists($paramName, $map)) {
+			if (!$this->paramMap->hasParam($paramName)) {
 				throw new Exception("Parameter $paramName is unknown.");
 			}
 		}
