@@ -7,9 +7,13 @@ use Shelter;
 abstract class defaultMapper implements Shelter\IMapper
 {
 
+	/** inherit $calledGetById counter to get per Mapper results */
 	public static $calledGetById = 0;
 
-	/** @var Shelter\ISuggestor */
+	/**
+	 * inherit $lastSuggestor to get per Mapper results
+	 * @var Shelter\ISuggestor
+	 */
 	public static $lastSuggestor;
 
 	/** @var array */
@@ -25,8 +29,8 @@ abstract class defaultMapper implements Shelter\IMapper
 	public function getById($id, Shelter\ISuggestor $suggestor)
 	{
 		// analytics
-		++self::$calledGetById;
-		self::$lastSuggestor = $suggestor;
+		++static::$calledGetById;
+		static::$lastSuggestor = $suggestor;
 
 		$holder = new Shelter\DataHolder($suggestor);
 		$data = array_intersect_key($this->data[$id] ,array_flip($suggestor->getParamNames()));
@@ -44,30 +48,4 @@ abstract class defaultMapper implements Shelter\IMapper
 	public function create(Shelter\IDataHolder $holder){}
 
 	public function remove($id){}
-}
-
-abstract class defaultServiceAccessor extends Shelter\EntityServiceAccessor
-{
-
-	protected $paramMaps;
-
-	protected $mappers;
-
-
-	/**
-	 * Set paramMaps and mappers.
-	 */
-	abstract public function __construct();
-
-
-	public function getParamMap($entityClass)
-	{
-		return $this->paramMaps[$entityClass];
-	}
-
-
-	public function getMapper($entityClass)
-	{
-		return $this->mappers[$entityClass];
-	}
 }

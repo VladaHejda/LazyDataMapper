@@ -114,11 +114,11 @@ class Suggestor implements ISuggestor
 			}
 
 			if (NULL === $sourceParam) {
-				if (count($this->descendants) > 1) {
+				if (count($this->descendants[$entityClass]) > 1) {
 					throw new Exception("Descendant $entityClass is ambiguous.");
 				}
-				$identifier = reset($this->descendants);
-				$sourceParam = key($this->descendants);
+				$identifier = reset($this->descendants[$entityClass]);
+				$sourceParam = key($this->descendants[$entityClass]);
 
 			} elseif (array_key_exists($sourceParam, $this->descendants[$entityClass])) {
 				$identifier = $this->descendants[$entityClass][$sourceParam];

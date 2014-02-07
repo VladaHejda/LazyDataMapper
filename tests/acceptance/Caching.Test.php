@@ -1,6 +1,6 @@
 <?php
 
-namespace Shelter\Tests\Get;
+namespace Shelter\Tests\Caching;
 
 use Shelter,
 	Shelter\Tests,
@@ -16,7 +16,7 @@ class Test extends Shelter\Tests\TestCase
 	{
 		$requestKey = new Shelter\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
-		$serviceAccessor = new Tests\IceboxServiceAccessor;
+		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
@@ -79,7 +79,7 @@ class Test extends Shelter\Tests\TestCase
 
 		$requestKey = new Shelter\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
-		$serviceAccessor = new Tests\IceboxServiceAccessor;
+		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);

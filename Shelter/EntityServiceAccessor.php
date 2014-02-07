@@ -40,13 +40,14 @@ abstract class EntityServiceAccessor implements IEntityServiceAccessor
 
 	/**
 	 * @param string $entityClass
+	 * @param bool $isContainer
 	 * @param IIdentifier $parentIdentifier
 	 * @param string $sourceParam
 	 * @return IIdentifier
 	 */
-	public function composeIdentifier($entityClass, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	public function composeIdentifier($entityClass, $isContainer = FALSE, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
-		return new Identifier($entityClass, (bool) $sourceParam, $parentIdentifier, $sourceParam);
+		return new Identifier($entityClass, $isContainer, $parentIdentifier, $sourceParam);
 	}
 
 

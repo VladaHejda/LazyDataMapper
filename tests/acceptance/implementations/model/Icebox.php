@@ -5,6 +5,7 @@ namespace Shelter\Tests;
 use Shelter;
 
 require_once __DIR__ . '/default.php';
+require_once __DIR__ . '/serviceAccessor.php';
 
 class Icebox extends Shelter\Entity
 {
@@ -79,24 +80,14 @@ class IceboxParamMap extends Shelter\ParamMap
 class IceboxMapper extends defaultMapper
 {
 
+	public static $calledGetById = 0;
+
+	/** @var Shelter\ISuggestor */
+	public static $lastSuggestor;
+
 	protected $data = [
 		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2', ],
 		4 => ['color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0', ],
 		5 => ['color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '', 'repairs' => '4', ],
 	];
-}
-
-
-class IceboxServiceAccessor extends defaultServiceAccessor
-{
-
-	public function __construct()
-	{
-		$this->paramMaps = [
-			__NAMESPACE__.'\Icebox' => new IceboxParamMap,
-		];
-		$this->mappers = [
-			__NAMESPACE__.'\Icebox' => new IceboxMapper,
-		];
-	}
 }

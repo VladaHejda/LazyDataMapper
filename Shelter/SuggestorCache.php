@@ -101,9 +101,9 @@ class SuggestorCache implements ISuggestorCache
 		}
 		$suggestions = isset($cached[self::PARAM_NAMES]) ? $cached[self::PARAM_NAMES] : array();
 		$descendants = isset($cached[self::DESCENDANTS]) ? $cached[self::DESCENDANTS] : array();
-		foreach ($descendants as $entityClass => &$descendant) {
+		foreach ($descendants as $descendantClass => &$descendant) {
 			foreach ($descendant as $sourceParam => &$ref) {
-				$ref = $this->serviceAccessor->composeIdentifier($entityClass, $identifier, $sourceParam);
+				$ref = $this->serviceAccessor->composeIdentifier($descendantClass, FALSE, $identifier, $sourceParam);
 			}
 		}
 		$map = $this->serviceAccessor->getParamMap($entityClass);

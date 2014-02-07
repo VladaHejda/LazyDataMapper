@@ -46,7 +46,7 @@ class Accessor implements IAccessor
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
 
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
 		if ($parent && $loadedData = $this->getLoadedData($parent->getIdentifier(), $entityClass, $sourceParam)) {
 			$data = $loadedData;
@@ -84,7 +84,7 @@ class Accessor implements IAccessor
 	{
 		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
 
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $parent ? $parent->getIdentifier() : NULL);
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
 		$ids = $this->serviceAccessor->getMapper($entityClass)->getIdsByRestrictions($restrictor);
 
 		if (!empty($ids)) {
