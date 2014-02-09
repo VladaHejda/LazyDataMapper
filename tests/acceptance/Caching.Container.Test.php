@@ -28,7 +28,8 @@ class ContainerTest extends Shelter\Tests\TestCase
 		$this->assertEquals(['egg', 'butter'], $iceboxes[0]->food);
 		$this->assertEquals(['jam'], $iceboxes[1]->food);
 
-		// checks getByIdsRange called count
+		// checks calls count
+		$this->assertEquals(0, IceboxMapper::$calledGetByRestrictions);
 		$this->assertEquals(4, IceboxMapper::$calledGetById);
 
 		// tests if suggestions cached
@@ -44,8 +45,30 @@ class ContainerTest extends Shelter\Tests\TestCase
 	 */
 	public function testCaching(array $services)
 	{
-		$this->markTestIncomplete();
-
 		list($cache, $facade) = $services;
+		IceboxMapper::$calledGetById = 0;
+
+		// force cache
+		$originalKey = $newKey = key($cache->cache);
+		$newKey[strlen($newKey) -1] = 1;
+		$cache->cache[$newKey] = $cache->cache[$originalKey];
+
+		$iceboxes = $facade->getByIdsRange([5, 4]);
+
+		$this->assertEquals('silver', $iceboxes[0]->color);
+		$this->assertEquals('white', $iceboxes[1]->color);
+		$this->assertEquals([], $iceboxes[0]->food);
+		$this->assertEquals(['egg', 'butter'], $iceboxes[1]->food);
+
+		// tests if getById called only once with right suggestions
+		$this->assertEquals(1, IceboxMapper::$calledGetByRestrictions);
+		$this->assertEquals(0, IceboxMapper::$calledGetById);
+
+		// tries get new data
+		$this->assertTrue($iceboxes[0]->freezer);
+
+		// tests if new suggestion cached
+		$this->assertEquals(['color', 'food', 'freezer'], reset($cache->cache[$newKey]));
+
 	}
 }
