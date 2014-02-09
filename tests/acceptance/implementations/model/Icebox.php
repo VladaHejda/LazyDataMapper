@@ -56,6 +56,48 @@ class Icebox extends Shelter\Entity
 	{
 		return (bool) $this->getClear('repairs');
 	}
+
+
+	protected function setColor($color)
+	{
+		return (string) $color;
+	}
+
+
+	protected function setCapacity($capacity)
+	{
+		return (int) $capacity;
+	}
+
+
+	protected function setUpgradeColor($material)
+	{
+		$this->color = "$material $this->color";
+	}
+
+
+	protected function setUpgrade($level)
+	{
+		$this->capacity *= $level;
+		$this->upgradeColor = 'metallic';
+	}
+
+
+	public function addRepair()
+	{
+		$this->setReadOnlyOrPrivate('repairs', (int) $this->getClear('repairs') +1);
+		return $this->getClear('repairs');
+	}
+
+
+	public function addFood($food)
+	{
+		$foods = $this->getClear('food');
+		if (!empty($foods)) {
+			$foods .= '|';
+		}
+		$this->setReadOnlyOrPrivate('food', $foods . $food);
+	}
 }
 
 
@@ -93,8 +135,8 @@ class IceboxMapper extends defaultMapper
 	public static $calledGetById = 0;
 	public static $calledGetByRestrictions = 0;
 
-	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
+	public static $lastHolder;
 
 	public static $data = [
 		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2', ],

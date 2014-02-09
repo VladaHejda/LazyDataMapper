@@ -12,6 +12,8 @@ abstract class defaultMapper implements Shelter\IMapper
 	public static $calledGetByRestrictions = 0;
 	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
+	/** @var Shelter\IDataHolder */
+	public static $lastHolder;
 
 
 	/** @var array */
@@ -55,7 +57,13 @@ abstract class defaultMapper implements Shelter\IMapper
 
 	public function getIdsByRestrictions(Shelter\IRestrictor $restrictor){}
 
-	public function save($id, Shelter\IDataHolder $holder){}
+
+	public function save($id, Shelter\IDataHolder $holder)
+	{
+		static::$lastHolder = $holder;
+		static::$data[$id] = array_merge(static::$data[$id], $holder->getParams());
+	}
+
 
 	public function create(Shelter\IDataHolder $holder){}
 
