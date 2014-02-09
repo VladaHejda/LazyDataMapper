@@ -33,7 +33,6 @@ class KitchenMapper extends defaultMapper
 
 	public static $calledGetById = 0;
 
-	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
 
 	public static $data = [

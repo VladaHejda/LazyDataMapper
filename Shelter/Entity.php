@@ -17,6 +17,9 @@ abstract class Entity implements IEntity
 	/** @var array list of private param names */
 	protected $privateParams = array();
 
+	/** @var bool give TRUE to activate paramNames translation, see self::translate() */
+	protected $translate = FALSE;
+
 	/** @var array */
 	private $params;
 
@@ -466,37 +469,19 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * Translates input param. That means one param can have multiple representations. See translateParamNameUnderscore().
+	 * Translates input param. That means one param can have multiple representations.
 	 * Extend this method to implement translation.
+	 * For example if you put this code into method:
+	 * <code>
+	 *      return strtolower(preg_replace('~[A-Z]~', '_$0', $paramName));
+	 * </code>
+	 * it will be given underscores before capitals in param name, e.g. "serialNumber" becomes "serial_number".
 	 * @param string $paramName
 	 * @return string
 	 */
-	protected function translateParamName($paramName)
+	protected function translate($paramName)
 	{
-		// infinite loop protection
-		static $last;
-		if ($last === $paramName) {
-			return $paramName;
-		}
-		$last = $paramName;
-
-		if (!$this->accessor->hasParam($this, $paramName) && !$this->hasWrapper($paramName)) {
-			return $this->translateParamNameUnderscore($paramName);
-		}
 		return $paramName;
-	}
-
-
-	/**
-	 * Gives underscores before capitals in param name, e.g. "serialNumber" becomes "serial_number".
-	 * To implement it, call this method in translateParamName().
-	 * @param string $paramName
-	 * @return string
-	 * todo this violates SRP + fails when database columns ARE inCamelCase !!!
-	 */
-	final protected function translateParamNameUnderscore($paramName)
-	{
-		return strtolower(preg_replace('~[A-Z]~', '_$0', $paramName));
 	}
 
 
@@ -689,5 +674,25 @@ abstract class Entity implements IEntity
 				$this->invalidDependent($dependentParam);
 			}
 		}
+	}
+
+
+	private function translateParamName($paramName)
+	{
+		if (!$this->translate) {
+			return $paramName;
+		}
+
+		// infinite loop protection
+		static $last;
+		if ($last === $paramName) {
+			return $paramName;
+		}
+		$last = $paramName;
+
+		if (!$this->accessor->hasParam($this, $paramName) && !$this->hasWrapper($paramName)) {
+			return $this->translate($paramName);
+		}
+		return $paramName;
 	}
 }
