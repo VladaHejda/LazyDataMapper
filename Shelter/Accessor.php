@@ -80,6 +80,8 @@ class Accessor implements IAccessor
 	 * @param IOperand $parent
 	 * @return IEntityContainer
 	 * @throws Exception on wrong restrictions
+	 * @todo pokud dostane pole s idčkama, neproběhne kontrola jejich existence (což předtim nemuseal proběhnout taky)
+	 *       případnej container pak může místo entity vrátit NULL, což by neměl. Kontrolovat existenci idéček?
 	 */
 	public function getByRestrictions($entityClass, $restrictor, IOperand $parent = NULL)
 	{
