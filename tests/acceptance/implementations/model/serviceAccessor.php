@@ -5,22 +5,6 @@ namespace Shelter\Tests;
 class ServiceAccessor extends \Shelter\EntityServiceAccessor
 {
 
-	public function __construct()
-	{
-		// reset static vars
-		$staticVars = ['calledGetById', 'calledGetByRestrictions'];
-
-		foreach ($this->mappers as $mapper) {
-			if (!class_exists($mapper)) {
-				continue;
-			}
-			foreach ($staticVars as $static) {
-				$mapper::$$static = 0;
-			}
-		}
-	}
-
-
 	protected $paramMaps = [
 		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxParamMap',
 		'Shelter\Tests\Kitchen' => 'Shelter\Tests\KitchenParamMap',
@@ -38,14 +22,20 @@ class ServiceAccessor extends \Shelter\EntityServiceAccessor
 
 	public function getParamMap($entityClass)
 	{
-		$serviceClass = $this->paramMaps[$entityClass];
-		return new $serviceClass;
+		if (is_string($this->paramMaps[$entityClass])) {
+			$serviceClass = $this->paramMaps[$entityClass];
+			$this->paramMaps[$entityClass] = new $serviceClass;
+		}
+		return $this->paramMaps[$entityClass];
 	}
 
 
 	public function getMapper($entityClass)
 	{
-		$serviceClass = $this->mappers[$entityClass];
-		return new $serviceClass;
+		if (is_string($this->mappers[$entityClass])) {
+			$serviceClass = $this->mappers[$entityClass];
+			$this->mappers[$entityClass] = new $serviceClass;
+		}
+		return $this->mappers[$entityClass];
 	}
 }

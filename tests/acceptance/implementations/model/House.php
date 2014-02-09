@@ -38,7 +38,9 @@ class HouseMapper extends defaultMapper
 
 	public static $lastSuggestor;
 
-	public static $data = [
+	public static $data;
+
+	public static $staticData = [
 		3 => ['no' => 115, 'street' => "King's road", 'kitchen' => 1, ],
 		4 => ['no' => 240, 'street' => 'Oak', 'kitchen' => 2, ],
 	];

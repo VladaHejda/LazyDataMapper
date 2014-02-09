@@ -31,7 +31,9 @@ class CarMapper extends defaultMapper
 
 	public static $lastSuggestor;
 
-	public static $data = [
+	public static $data;
+
+	public static $staticData = [
 		1 => ['brand' => 'Seat', 'color' => 'red', 'volume' => 1.8, 'fuel' => 'diesel', ],
 		2 => ['brand' => 'BMW', 'color' => 'black', 'volume' => 3, 'fuel' => 'gas', ],
 	];

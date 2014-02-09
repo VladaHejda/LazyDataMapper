@@ -7,17 +7,33 @@ use Shelter;
 abstract class defaultMapper implements Shelter\IMapper
 {
 
-	/** inherit these static vars to get per Mapper results */
-	public static $calledGetById = 0;
-	public static $calledGetByRestrictions = 0;
+	/** Inherit these static vars to get per Mapper results: */
+
+	/** calls counters */
+	public static $calledGetById, $calledGetByRestrictions;
+
 	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
+
 	/** @var Shelter\IDataHolder */
 	public static $lastHolder;
 
+	/** @var array */
+	public static $staticData;
 
 	/** @var array */
 	public static $data;
+
+
+	public function __construct()
+	{
+		// reset modified data
+		static::$data = static::$staticData;
+
+		// reset counters
+		static::$calledGetById = 0;
+		static::$calledGetByRestrictions = 0;
+	}
 
 
 	public function exists($id)

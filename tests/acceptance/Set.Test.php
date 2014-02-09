@@ -11,9 +11,12 @@ require_once __DIR__ . '/implementations/model/Icebox.php';
 class Test extends Shelter\Tests\TestCase
 {
 
+	/** @var Tests\IceboxFacade */
+	private static $facade;
+
+
 	public function testSet()
 	{
-		// TODO reset static data at tearDown!
 		// todo am I testing all dependencies if there is wrapper & unwrapper of fictive parameter?
 
 		$requestKey = new Shelter\RequestKey;
@@ -22,6 +25,7 @@ class Test extends Shelter\Tests\TestCase
 		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		self::$facade = $facade;
 
 		$icebox = $facade->getById(4);
 
@@ -131,14 +135,7 @@ class Test extends Shelter\Tests\TestCase
 	 */
 	public function testSuccessfullySaved()
 	{
-		$requestKey = new Shelter\RequestKey;
-		$cache = new Tests\Cache\SimpleCache;
-		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
-
-		$icebox = $facade->getById(4);
+		$icebox = self::$facade->getById(4);
 
 		$this->assertEquals('brown', $icebox->color);
 
