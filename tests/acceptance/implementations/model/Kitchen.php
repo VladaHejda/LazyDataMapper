@@ -35,7 +35,9 @@ class KitchenMapper extends defaultMapper
 
 	public static $lastSuggestor;
 
-	public static $data = [
+	public static $data;
+
+	public static $staticData = [
 		1 => ['icebox' => '2', 'area' => 22, ],
 		2 => ['icebox' => '5', 'area' => 54, ],
 	];

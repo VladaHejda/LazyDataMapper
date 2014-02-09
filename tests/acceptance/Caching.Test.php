@@ -12,6 +12,10 @@ require_once __DIR__ . '/implementations/model/Icebox.php';
 class Test extends Shelter\Tests\TestCase
 {
 
+	/** @var Tests\IceboxFacade */
+	private static $facade;
+
+
 	public function testFirstGet()
 	{
 		$requestKey = new Shelter\RequestKey;
@@ -20,6 +24,7 @@ class Test extends Shelter\Tests\TestCase
 		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		self::$facade = $facade;
 
 		$icebox = $facade->getById(4);
 
@@ -77,14 +82,7 @@ class Test extends Shelter\Tests\TestCase
 	{
 		IceboxMapper::$calledGetById = 0;
 
-		$requestKey = new Shelter\RequestKey;
-		$cache = new Tests\Cache\SimpleCache;
-		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
-
-		$this->assertNull($facade->getById(99));
+		$this->assertNull(self::$facade->getById(99));
 		$this->assertEquals(0, IceboxMapper::$calledGetById);
 	}
 }
