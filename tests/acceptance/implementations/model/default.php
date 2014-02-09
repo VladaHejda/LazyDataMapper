@@ -43,7 +43,7 @@ abstract class defaultMapper implements Shelter\IMapper
 		static::$lastSuggestor = $suggestor;
 
 		$suggestions = array_flip($suggestor->getParamNames());
-		$holder = new Shelter\DataHolder($suggestor);
+		$holder = new Shelter\DataHolder($suggestor, $ids);
 		foreach ($ids as $id) {
 			$data = array_intersect_key(static::$data[$id], $suggestions);
 			$holder->setParams([$id => $data]);
