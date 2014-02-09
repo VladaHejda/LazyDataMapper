@@ -491,8 +491,9 @@ abstract class Entity implements IEntity
 	 * @param string|bool $wrapper name of method or FALSE when no method
 	 * @return bool
 	 */
-	final protected function hasWrapper($param, &$wrapper = FALSE)
+	final protected function hasWrapper($param, &$wrapper = NULL)
 	{
+		$wrapper = FALSE;
 		$param[0] = strtolower($param[0]);
 		$param = $this->translateParamName($param);
 
@@ -511,8 +512,9 @@ abstract class Entity implements IEntity
 	 * @param string|bool $unwrapper name of method or FALSE when no method
 	 * @return bool
 	 */
-	final protected function hasUnwrapper($param, &$unwrapper = FALSE)
+	final protected function hasUnwrapper($param, &$unwrapper = NULL)
 	{
+		$unwrapper = FALSE;
 		$param[0] = strtolower($param[0]);
 		$param = $this->translateParamName($param);
 
@@ -576,30 +578,31 @@ abstract class Entity implements IEntity
 		$param = $this->translateParamName($param);
 
 		$hasClear = $this->hasClear($param, $isLazy);
+		$this->hasUnwrapper($param, $unwrapper);
 
-		// immutable
-		if (!$this->hasUnwrapper($param, $unwrapper)) {
-			if (!$hasClear) {
-				// fictive read-only param
-				if ($this->hasWrapper($param)) {
-					throw new EntityException(get_class($this)  . ": Cannot write to a read-only parameter $param.", EntityException::WRITE_READONLY);
-				}
+		$exception = FALSE;
 
-				// undeclared param
-				throw new EntityException(get_class($this)  . ": Cannot write to an undeclared parameter $param.", EntityException::WRITE_UNDECLARED);
+		if ($hasClear && !$unwrapper && $checkImmutable) {
+			$exception = $this->isPrivate($param) ? EntityException::WRITE_UNDECLARED : EntityException::WRITE_READONLY;
+
+		} elseif ($unwrapper && $this->isPrivate($param) && $checkImmutable) {
+			$exception = EntityException::WRITE_UNDECLARED;
+
+		} elseif (!$hasClear && !$unwrapper) {
+			if (!$this->hasWrapper($param)) {
+				$exception = EntityException::WRITE_UNDECLARED;
+
+			} elseif ($this->isPrivate($param)) {
+				$exception = EntityException::WRITE_UNDECLARED;
+
+			} else {
+				$exception = EntityException::WRITE_READONLY;
 			}
-
-			// read-only param
-			else if ($checkImmutable) {
-				throw new EntityException(get_class($this) . ": Cannot write to a read-only parameter $param.", EntityException::WRITE_READONLY);
-			}
-
-			$unwrapper = FALSE;
 		}
 
-		// private param
-		if ($checkImmutable && $this->isPrivate($param)) {
-			throw new EntityException(get_class($this) . ": Cannot write to an undeclared parameter $param.", EntityException::WRITE_UNDECLARED);
+		if (FALSE !== $exception) {
+			$kind = $exception === EntityException::WRITE_READONLY ? 'a read-only' : 'an undeclared';
+			throw new EntityException(get_class($this)  . ": Cannot write to $kind parameter $param.", $exception);
 		}
 
 		// fictive param

@@ -157,8 +157,6 @@ class Test extends Shelter\Tests\TestCase
 			'Shelter\EntityException', Shelter\EntityException::WRITE_UNDECLARED
 		);
 
-		$this->markTestIncomplete();
-
 		// private
 		$this->assertException(
 			function() use ($icebox) { $icebox->repairs = ''; },
