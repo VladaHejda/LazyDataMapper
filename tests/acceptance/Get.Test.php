@@ -13,8 +13,6 @@ class Test extends Shelter\Tests\TestCase
 
 	public function testGet()
 	{
-		// todo make deep wrapper tests
-
 		$requestKey = new Shelter\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
@@ -30,12 +28,12 @@ class Test extends Shelter\Tests\TestCase
 		$this->assertEquals('black', $icebox->color);
 		$this->assertEquals(['beef steak', 'milk', 'egg'], $icebox->food);
 		$this->assertTrue(FALSE === $icebox->freezer);
-		$this->assertTrue(FALSE === $icebox->hasFreezer());
 		$this->assertTrue(45 === $icebox->capacity);
 		$this->assertTrue(45 === $icebox->capacity());
 		$this->assertTrue(45 === $icebox->capacity('l'));
-		$this->assertTrue(45000 === $icebox->capacity('ml'));
+		$this->assertTrue(0 === $icebox->freezerCapacity);
 		$this->assertEquals('Black icebox, 45 l.', $icebox->description);
+		$this->assertEquals('<p>Black icebox, 45 l.</p>', $icebox->taggedDescription);
 		$this->assertTrue($icebox->repaired);
 
 		return $icebox;

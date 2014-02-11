@@ -28,12 +28,6 @@ class Icebox extends Shelter\Entity
 	}
 
 
-	public function hasFreezer()
-	{
-		return $this->freezer;
-	}
-
-
 	protected function getCapacity($capacity, $unit = 'l')
 	{
 		$capacity = (int) $capacity;
@@ -46,9 +40,30 @@ class Icebox extends Shelter\Entity
 	}
 
 
+	protected function getFreezerCapacity($unit = 'l')
+	{
+		if (!$this->freezer) {
+			return 0;
+		}
+		$capacity = (int) $this->getClear('freezer');
+		switch ($unit) {
+			case 'l':
+				return $capacity;
+			case 'ml':
+				return $capacity *1000;
+		}
+	}
+
+
 	protected function getDescription()
 	{
 		return ucfirst($this->color) . " icebox, $this->capacity l.";
+	}
+
+
+	protected function getTaggedDescription()
+	{
+		return "<p>$this->description</p>";
 	}
 
 
@@ -70,16 +85,13 @@ class Icebox extends Shelter\Entity
 	}
 
 
-	protected function setUpgradeColor($material)
+	protected function setFreezerCapacity($capacity)
 	{
-		$this->color = "$material $this->color";
-	}
-
-
-	protected function setUpgrade($level)
-	{
-		$this->capacity *= $level;
-		$this->upgradeColor = 'metallic';
+		$capacity = (int) $capacity;
+		if (!$capacity) {
+			$capacity = '';
+		}
+		$this->setReadOnlyOrPrivate('freezer', $capacity);
 	}
 
 
@@ -141,9 +153,9 @@ class IceboxMapper extends defaultMapper
 	public static $data;
 
 	public static $staticData = [
-		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '0', 'food' => 'beef steak|milk|egg', 'repairs' => '2', ],
-		4 => ['color' => 'white', 'capacity' => '20', 'freezer' => '1', 'food' => 'egg|butter', 'repairs' => '0', ],
-		5 => ['color' => 'silver', 'capacity' => '25', 'freezer' => '1', 'food' => '', 'repairs' => '4', ],
-		8 => ['color' => 'blue', 'capacity' => '10', 'freezer' => '0', 'food' => 'jam', 'repairs' => '1', ],
+		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '', 'food' => 'beef steak|milk|egg', 'repairs' => '2', ],
+		4 => ['color' => 'white', 'capacity' => '20', 'freezer' => '', 'food' => 'egg|butter', 'repairs' => '0', ],
+		5 => ['color' => 'silver', 'capacity' => '25', 'freezer' => '7', 'food' => '', 'repairs' => '4', ],
+		8 => ['color' => 'blue', 'capacity' => '10', 'freezer' => '5', 'food' => 'jam', 'repairs' => '1', ],
 	];
 }

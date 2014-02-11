@@ -17,8 +17,6 @@ class Test extends Shelter\Tests\TestCase
 
 	public function testSet()
 	{
-		// todo am I testing all dependencies if there is wrapper & unwrapper of fictive parameter?
-
 		$requestKey = new Shelter\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
@@ -29,6 +27,7 @@ class Test extends Shelter\Tests\TestCase
 
 		$icebox = $facade->getById(4);
 
+		$this->assertEquals('white', $icebox->color);
 		$icebox->color = 'yellow';
 		$this->assertEquals('yellow', $icebox->color);
 		$this->assertTrue($icebox->isChanged());
@@ -73,9 +72,11 @@ class Test extends Shelter\Tests\TestCase
 	 */
 	public function testUnwrapper(Tests\Icebox $icebox)
 	{
-		$icebox->upgrade = 2;
-		$this->assertEquals(40, $icebox->capacity);
-		$this->assertEquals('metallic white', $icebox->color);
+		$this->assertFalse($icebox->freezer);
+		$this->assertEquals(0, $icebox->freezerCapacity);
+		$icebox->freezerCapacity = 4;
+		$this->assertTrue($icebox->freezer);
+		$this->assertEquals(4, $icebox->freezerCapacity);
 
 		return $icebox;
 	}
