@@ -52,12 +52,6 @@ class Test extends Shelter\Tests\TestCase
 	public function testCaching(array $services)
 	{
 		list($cache, $facade) = $services;
-		IceboxMapper::$calledGetById = 0;
-
-		// force cache
-		$originalKey = $newKey = key($cache->cache);
-		$newKey[strlen($newKey) -1] = 1;
-		$cache->cache[$newKey] = $cache->cache[$originalKey];
 
 		$icebox = $facade->getById(5);
 
@@ -74,14 +68,12 @@ class Test extends Shelter\Tests\TestCase
 		$this->assertEquals(['capacity'], IceboxMapper::$lastSuggestor->getParamNames());
 
 		// tests if new suggestion cached
-		$this->assertEquals(['color', 'food', 'capacity'], reset($cache->cache[$newKey]));
+		$this->assertEquals(['color', 'food', 'capacity'], reset(reset($cache->cache)));
 	}
 
 
 	public function testGetNonexistent()
 	{
-		IceboxMapper::$calledGetById = 0;
-
 		$this->assertNull(self::$facade->getById(99));
 		$this->assertEquals(0, IceboxMapper::$calledGetById);
 	}

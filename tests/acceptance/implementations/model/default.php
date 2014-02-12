@@ -19,10 +19,10 @@ abstract class defaultMapper implements Shelter\IMapper
 	public static $lastHolder;
 
 	/** @var array */
-	public static $staticData = [];
+	public static $data;
 
 	/** @var array */
-	public static $data;
+	public static $staticData = [];
 
 	/** @var array */
 	public static $default = [];
@@ -32,8 +32,11 @@ abstract class defaultMapper implements Shelter\IMapper
 	{
 		// reset modified data
 		static::$data = static::$staticData;
+	}
 
-		// reset counters
+
+	public static function resetCounters()
+	{
 		static::$calledGetById = 0;
 		static::$calledGetByRestrictions = 0;
 	}

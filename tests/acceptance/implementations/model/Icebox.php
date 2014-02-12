@@ -147,6 +147,7 @@ class IceboxMapper extends defaultMapper
 	public static $calledGetById = 0;
 	public static $calledGetByRestrictions = 0;
 
+	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
 	public static $lastHolder;
 

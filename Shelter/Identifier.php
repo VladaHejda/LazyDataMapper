@@ -6,7 +6,7 @@ class Identifier implements IIdentifier
 {
 
 	/** @var int top level operand counter */
-	static private $counter = array();
+	static protected $counter = array();
 
 	/** @var string */
 	protected $identifier;

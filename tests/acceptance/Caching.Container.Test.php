@@ -46,12 +46,6 @@ class ContainerTest extends Shelter\Tests\TestCase
 	public function testCaching(array $services)
 	{
 		list($cache, $facade) = $services;
-		IceboxMapper::$calledGetById = 0;
-
-		// force cache
-		$originalKey = $newKey = key($cache->cache);
-		$newKey[strlen($newKey) -1] = 1;
-		$cache->cache[$newKey] = $cache->cache[$originalKey];
 
 		$iceboxes = $facade->getByIdsRange([5, 4]);
 
@@ -68,7 +62,6 @@ class ContainerTest extends Shelter\Tests\TestCase
 		$this->assertTrue($iceboxes[0]->freezer);
 
 		// tests if new suggestion cached
-		$this->assertEquals(['color', 'food', 'freezer'], reset($cache->cache[$newKey]));
-
+		$this->assertEquals(['color', 'food', 'freezer'], reset(reset($cache->cache)));
 	}
 }

@@ -2,28 +2,57 @@
 
 namespace Shelter\Tests;
 
-class ServiceAccessor extends \Shelter\EntityServiceAccessor
+use Shelter;
+
+class ResettableIdentifier extends Shelter\Identifier
 {
 
-	protected $paramMaps = [
+	static protected $counter = array();
+
+
+	public static function resetCounter()
+	{
+		static::$counter = array();
+	}
+}
+
+
+class ServiceAccessor extends Shelter\EntityServiceAccessor
+{
+
+	protected static $paramMapsList = [
 		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxParamMap',
 		'Shelter\Tests\Kitchen' => 'Shelter\Tests\KitchenParamMap',
 		'Shelter\Tests\Car' => 'Shelter\Tests\CarParamMap',
 		'Shelter\Tests\House' => 'Shelter\Tests\HouseParamMap',
 	];
 
-	protected $mappers = [
+	protected static $mappersList = [
 		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxMapper',
 		'Shelter\Tests\Kitchen' => 'Shelter\Tests\KitchenMapper',
 		'Shelter\Tests\Car' => 'Shelter\Tests\CarMapper',
 		'Shelter\Tests\House' => 'Shelter\Tests\HouseMapper',
 	];
 
+	protected $paramMaps = [];
+
+	protected $mappers = [];
+
+
+	public static function resetCounters()
+	{
+		foreach (static::$mappersList as $mapper) {
+			if (class_exists($mapper)) {
+				call_user_func("$mapper::resetCounters");
+			}
+		}
+	}
+
 
 	public function getParamMap($entityClass)
 	{
-		if (is_string($this->paramMaps[$entityClass])) {
-			$serviceClass = $this->paramMaps[$entityClass];
+		if (!isset($this->paramMaps[$entityClass])) {
+			$serviceClass = static::$paramMapsList[$entityClass];
 			$this->paramMaps[$entityClass] = new $serviceClass;
 		}
 		return $this->paramMaps[$entityClass];
@@ -32,10 +61,16 @@ class ServiceAccessor extends \Shelter\EntityServiceAccessor
 
 	public function getMapper($entityClass)
 	{
-		if (is_string($this->mappers[$entityClass])) {
-			$serviceClass = $this->mappers[$entityClass];
+		if (!isset($this->mappers[$entityClass])) {
+			$serviceClass = static::$mappersList[$entityClass];
 			$this->mappers[$entityClass] = new $serviceClass;
 		}
 		return $this->mappers[$entityClass];
+	}
+
+
+	public function composeIdentifier($entityClass, $isContainer = FALSE, Shelter\IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	{
+		return new ResettableIdentifier($entityClass, $isContainer, $parentIdentifier, $sourceParam);
 	}
 }

@@ -30,26 +30,15 @@ class DescendantsTest extends Shelter\Tests\TestCase
 
 		$this->assertEquals(45, $kitchen->icebox->capacity);
 
-		return [$cache, $facade];
+		return $facade;
 	}
 
 
 	/**
 	 * @depends testFirstGet
 	 */
-	public function testCaching(array $services)
+	public function testCaching(Tests\KitchenFacade $facade)
 	{
-		list($cache, $facade) = $services;
-		KitchenMapper::$calledGetById = 0;
-		IceboxMapper::$calledGetById = 0;
-
-		// force cache
-		foreach ($cache->cache as $originalKey => $cached) {
-			$newKey = $originalKey;
-			$newKey[strlen($newKey) -1] = 1;
-			$cache->cache[$newKey] = $cached;
-		}
-
 		$kitchen = $facade->getById(2);
 
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $kitchen->icebox);

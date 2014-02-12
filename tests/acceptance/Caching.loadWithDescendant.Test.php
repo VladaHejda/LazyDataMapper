@@ -29,26 +29,15 @@ class LoadWithDescendantTest extends Shelter\Tests\TestCase
 		$this->assertInstanceOf('Shelter\Tests\Kitchen', $house->kitchen);
 		$this->assertEquals(22, $house->kitchen->area);
 
-		return [$cache, $facade];
+		return $facade;
 	}
 
 
 	/**
 	 * @depends testFirstGet
 	 */
-	public function testCaching(array $services)
+	public function testCaching(Tests\HouseFacade $facade)
 	{
-		list($cache, $facade) = $services;
-		HouseMapper::$calledGetById = 0;
-		KitchenMapper::$calledGetById = 0;
-
-		// force cache
-		foreach ($cache->cache as $originalKey => $cached) {
-			$newKey = $originalKey;
-			$newKey[strlen($newKey) -1] = 1;
-			$cache->cache[$newKey] = $cached;
-		}
-
 		$house = $facade->getById(4);
 
 		$this->assertEquals('Oak', $house->street);
