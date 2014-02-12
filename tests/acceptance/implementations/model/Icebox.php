@@ -149,6 +149,8 @@ class IceboxMapper extends defaultMapper
 
 	/** @var Shelter\ISuggestor */
 	public static $lastSuggestor;
+
+	/** @var Shelter\IDataHolder */
 	public static $lastHolder;
 
 	public static $data;
