@@ -8,6 +8,8 @@ use Shelter,
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
+// todo když se setuje hodnota tak se asi nekešuje že se má tahat z db - tzn když se bude setovat, bude to tahat každou setnutou zvláť?
+//      - testovat called počty i zde!
 class Test extends Shelter\Tests\TestCase
 {
 
