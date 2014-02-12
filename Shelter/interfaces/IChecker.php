@@ -13,6 +13,7 @@ interface IChecker
 	 * @param IDataHolder $holder
 	 * @return void
 	 * @throws IntegrityException
+	 * todo co když checker (při sejvu, create entitu nedostane) entitu změní!?
 	 */
-	function check(IEntity $entity, IDataHolder $holder);
+	function check($entity, IDataHolder $holder);
 }
