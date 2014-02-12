@@ -169,7 +169,7 @@ class Accessor implements IAccessor
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass);
 
 		if ($suggestorCached = $this->cache->getCached($identifier, $entityClass)) {
-			$data += $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached);
+			$data += $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached)->getParams();
 		}
 
 		return $this->createEntity($entityClass, $id, $data, $identifier);

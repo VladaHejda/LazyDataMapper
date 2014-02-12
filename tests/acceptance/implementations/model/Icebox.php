@@ -151,6 +151,7 @@ class IceboxMapper extends defaultMapper
 	public static $lastHolder;
 
 	public static $data;
+	public static $default = ['color' => '', 'capacity' => '0', 'freezer' => '', 'food' => '', 'repairs' => '0', ];
 
 	public static $staticData = [
 		2 => ['color' => 'black', 'capacity' => '45', 'freezer' => '', 'food' => 'beef steak|milk|egg', 'repairs' => '2', ],

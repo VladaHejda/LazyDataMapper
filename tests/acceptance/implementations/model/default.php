@@ -19,10 +19,13 @@ abstract class defaultMapper implements Shelter\IMapper
 	public static $lastHolder;
 
 	/** @var array */
-	public static $staticData;
+	public static $staticData = [];
 
 	/** @var array */
 	public static $data;
+
+	/** @var array */
+	public static $default = [];
 
 
 	public function __construct()
@@ -81,7 +84,13 @@ abstract class defaultMapper implements Shelter\IMapper
 	}
 
 
-	public function create(Shelter\IDataHolder $holder){}
+	public function create(Shelter\IDataHolder $holder)
+	{
+		static::$data[] = array_merge(static::$default, $holder->getParams());
+		end(static::$data);
+		return key(static::$data);
+	}
+
 
 	public function remove($id){}
 }
