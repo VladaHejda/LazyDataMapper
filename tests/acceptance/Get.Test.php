@@ -36,6 +36,9 @@ class Test extends Shelter\Tests\TestCase
 		$this->assertEquals('<p>Black icebox, 45 l.</p>', $icebox->taggedDescription);
 		$this->assertTrue($icebox->repaired);
 
+		$this->assertTrue($icebox->isReadOnly('food'));
+		$this->assertFalse($icebox->isReadOnly('color'));
+
 		return $icebox;
 	}
 
