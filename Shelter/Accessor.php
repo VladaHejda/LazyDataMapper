@@ -92,7 +92,18 @@ class Accessor implements IAccessor
 		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
 
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
-		$ids = is_array($restrictor) ? $restrictor : $this->serviceAccessor->getMapper($entityClass)->getIdsByRestrictions($restrictor);
+
+		if (is_array($restrictor)) {
+			$ids = $restrictor;
+		} else {
+			$mapper = $this->serviceAccessor->getMapper($entityClass);
+			$ids = $mapper->getIdsByRestrictions($restrictor);
+			if (NULL === $ids) {
+				$ids = array();
+			} elseif (!is_array($ids)) {
+				throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
+			}
+		}
 
 		if (!empty($ids)) {
 			$suggestor = $this->cache->getCached($identifier, $entityClass);
@@ -138,6 +149,7 @@ class Accessor implements IAccessor
 	 * @param array $data
 	 * @param bool $check
 	 * @return IEntity
+	 * @throws Exception
 	 */
 	public function create($entityClass, array $data, $check = TRUE)
 	{
@@ -149,7 +161,11 @@ class Accessor implements IAccessor
 			$this->check($entityClass, NULL, $dataHolder);
 		}
 
-		$id = $this->serviceAccessor->getMapper($entityClass)->create($dataHolder);
+		$mapper = $this->serviceAccessor->getMapper($entityClass);
+		$id = $mapper->create($dataHolder);
+		if (!is_int($id)) {
+			throw new Exception(get_class($mapper) . '::create() must return integer id.');
+		}
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass);
 
 		if ($suggestorCached = $this->cache->getCached($identifier, $entityClass)) {
@@ -239,7 +255,6 @@ class Accessor implements IAccessor
 	private function loadDataHolderByMapper($entityClass, $id, ISuggestor $suggestor)
 	{
 		$m = is_array($id) ? 'getByIdsRange' : 'getById';
-		// todo and what about to check if serviceAccessor returns Mapper/ParamMap??
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		$dataHolder = $mapper->$m($id, $suggestor);
 

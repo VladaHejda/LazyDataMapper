@@ -28,7 +28,7 @@ interface IMapper
 
 	/**
 	 * Get ids of matching entities.
-	 * @maxCount 100
+	 * @maxCount 100 todo solve this
 	 * @param IRestrictor $restrictor
 	 * @return int[]|NULL array of ids passing restrictions, when nothing pass, return NULL or empty array
 	 * @throws TooManyItemsException when count exceeds maxCount annotation limit
@@ -65,6 +65,7 @@ interface IMapper
 	/**
 	 * Removes entity.
 	 * @param int $id
+	 * @return void
 	 */
 	function remove($id);
 }
