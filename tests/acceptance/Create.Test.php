@@ -12,7 +12,7 @@ require_once __DIR__ . '/implementations/model/Icebox.php';
 class Test extends Shelter\Tests\TestCase
 {
 
-	public function testCreate()
+	protected function createServices()
 	{
 		$requestKey = new Shelter\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
@@ -20,8 +20,15 @@ class Test extends Shelter\Tests\TestCase
 		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		return [$cache, $facade];
+	}
 
-		$icebox = $facade->create();
+
+	public function testCreate()
+	{
+		list(, $facade) = $this->createServices();
+
+		$icebox = $facade->create([], FALSE);
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
 		$icebox = $facade->getById($icebox->getId());
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
@@ -32,20 +39,48 @@ class Test extends Shelter\Tests\TestCase
 
 	public function testCreateWithData()
 	{
-		$requestKey = new Shelter\RequestKey;
-		$cache = new Tests\Cache\SimpleCache;
-		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		list($cache, $facade) = $this->createServices();
 
-		$icebox = $facade->create(['color' => 'yellow', 'repairs' => '6', ]);
+		$icebox = $facade->create(['color' => 'yellow', 'repairs' => '6', ], FALSE);
+
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
 		$this->assertEquals('yellow', $icebox->color);
 		$this->assertTrue($icebox->repaired);
 		$this->assertEquals(0, $icebox->capacity);
 		$this->assertEquals([], $icebox->food);
 
-		$this->markTestIncomplete('Test cache - create one more and check count of calling getById.');
+		$this->assertEquals(2, IceboxMapper::$calledGetById);
+		$this->assertEquals(['capacity', 'food'], reset(reset($cache->cache)));
+
+		return [$cache, $facade];
+	}
+
+
+	/**
+	 * @depends testCreateWithData
+	 */
+	public function testCaching(array $services)
+	{
+		list($cache, $facade) = $services;
+
+		$icebox = $facade->create(['color' => 'pink', 'capacity' => '37', ], FALSE);
+
+		$this->assertEquals('pink', $icebox->color);
+		$this->assertEquals(37, $icebox->capacity);
+		$this->assertEquals([], $icebox->food);
+
+		$this->assertEquals(1, IceboxMapper::$calledGetById);
+
+		$this->assertFalse($icebox->repaired);
+		$this->assertEquals(2, IceboxMapper::$calledGetById);
+		$this->assertEquals(['capacity', 'food', 'repairs'], reset(reset($cache->cache)));
+	}
+
+
+	public function testCreateAndCheck()
+	{
+		list($cache, $facade) = $this->createServices();
+
+		$this->markTestIncomplete();
 	}
 }

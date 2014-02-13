@@ -169,6 +169,8 @@ class Accessor implements IAccessor
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass);
 
 		if ($suggestorCached = $this->cache->getCached($identifier, $entityClass)) {
+			// todo if there is a conflict in input data and cached data, it is not necessary to get these data from cache
+			//      so then should be this data removed form suggestor, but how? - create new suggestor or add method to set/remove suggestions ?
 			$data += $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached)->getParams();
 		}
 
@@ -300,7 +302,7 @@ class Accessor implements IAccessor
 	private function check($entityClass, $entity, IDataHolder $dataHolder)
 	{
 		$checker = $this->serviceAccessor->getChecker($entityClass);
-		if ($checker) {
+		if ($checker instanceof IChecker) {
 			$checker->check($entity, $dataHolder);
 		}
 	}
