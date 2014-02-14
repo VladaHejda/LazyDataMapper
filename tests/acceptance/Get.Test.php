@@ -13,6 +13,8 @@ class Test extends Shelter\Tests\TestCase
 
 	public function testGet()
 	{
+		// todo test isset
+
 		$requestKey = new Shelter\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
