@@ -5,7 +5,7 @@ namespace Shelter\Tests;
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
 
-	public function setUp()
+	protected function setUp()
 	{
 		parent::setUp();
 		ResettableIdentifier::resetCounter();
