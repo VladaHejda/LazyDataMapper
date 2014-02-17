@@ -34,9 +34,15 @@ class ServiceAccessor extends Shelter\EntityServiceAccessor
 		'Shelter\Tests\House' => 'Shelter\Tests\HouseMapper',
 	];
 
+	protected static $checkersList = [
+		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxChecker',
+	];
+
 	protected $paramMaps = [];
 
 	protected $mappers = [];
+
+	protected $checkers = [];
 
 
 	public static function resetCounters()
@@ -66,6 +72,20 @@ class ServiceAccessor extends Shelter\EntityServiceAccessor
 			$this->mappers[$entityClass] = new $serviceClass;
 		}
 		return $this->mappers[$entityClass];
+	}
+
+
+	public function getChecker($entityClass)
+	{
+		if (!isset(static::$checkersList[$entityClass])) {
+			return NULL;
+		}
+
+		if (!isset($this->checkers[$entityClass])) {
+			$serviceClass = static::$checkersList[$entityClass];
+			$this->checkers[$entityClass] = new $serviceClass;
+		}
+		return $this->checkers[$entityClass];
 	}
 
 

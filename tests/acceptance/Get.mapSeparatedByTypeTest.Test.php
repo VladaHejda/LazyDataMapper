@@ -9,7 +9,7 @@ use Shelter,
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 
-class MapSeparatedByTypeTest extends Shelter\Tests\TestCase
+class MapSeparatedByTypeTest extends Shelter\Tests\AcceptanceTestCase
 {
 
 	public function testGet()

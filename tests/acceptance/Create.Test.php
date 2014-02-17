@@ -9,7 +9,7 @@ use Shelter,
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class Test extends Shelter\Tests\TestCase
+class Test extends Shelter\Tests\AcceptanceTestCase
 {
 
 	protected function createServices()
@@ -28,7 +28,7 @@ class Test extends Shelter\Tests\TestCase
 	{
 		list(, $facade) = $this->createServices();
 
-		$icebox = $facade->create([], FALSE);
+		$icebox = $facade->create([]);
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
 		$icebox = $facade->getById($icebox->getId());
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
@@ -41,7 +41,7 @@ class Test extends Shelter\Tests\TestCase
 	{
 		list($cache, $facade) = $this->createServices();
 
-		$icebox = $facade->create(['color' => 'yellow', 'repairs' => '6', ], FALSE);
+		$icebox = $facade->create(['color' => 'yellow', 'repairs' => '6', ]);
 
 		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
 		$this->assertEquals('yellow', $icebox->color);
@@ -63,9 +63,9 @@ class Test extends Shelter\Tests\TestCase
 	{
 		list($cache, $facade) = $services;
 
-		$icebox = $facade->create(['color' => 'pink', 'capacity' => '37', ], FALSE);
+		$icebox = $facade->create(['color' => 'brown', 'capacity' => '37', ]);
 
-		$this->assertEquals('pink', $icebox->color);
+		$this->assertEquals('brown', $icebox->color);
 		$this->assertEquals(37, $icebox->capacity);
 		$this->assertEquals([], $icebox->food);
 
@@ -74,13 +74,5 @@ class Test extends Shelter\Tests\TestCase
 		$this->assertFalse($icebox->repaired);
 		$this->assertEquals(2, IceboxMapper::$calledGetById);
 		$this->assertEquals(['capacity', 'food', 'repairs'], reset(reset($cache->cache)));
-	}
-
-
-	public function testCreateAndCheck()
-	{
-		list($cache, $facade) = $this->createServices();
-
-		$this->markTestIncomplete();
 	}
 }

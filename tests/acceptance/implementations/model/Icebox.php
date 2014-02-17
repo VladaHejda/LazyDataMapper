@@ -141,6 +141,35 @@ class IceboxParamMap extends Shelter\ParamMap
 }
 
 
+class IceboxChecker extends Shelter\Checker
+{
+
+	protected function checkUpdate(Shelter\IEntity $icebox)
+	{
+		$this->checkRequired(['color']);
+		$this->addCheck('integrity');
+	}
+
+
+	protected function checkCreate(Shelter\IDataHolder $holder)
+	{
+		$this->addCheck('integrity');
+
+		if ($holder->color == 'nice') {
+			$this->addError('Nice is not a color!');
+		}
+	}
+
+
+	protected function checkIntegrity(Shelter\IDataEnvelope $subject)
+	{
+		if (count($subject->food) > 4 && $subject->capacity < 20) {
+			$this->addError("Not enough space in icebox.");
+		}
+	}
+}
+
+
 class IceboxMapper extends defaultMapper
 {
 

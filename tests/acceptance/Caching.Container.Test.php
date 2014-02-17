@@ -9,7 +9,7 @@ use Shelter,
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class ContainerTest extends Shelter\Tests\TestCase
+class ContainerTest extends Shelter\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()

@@ -11,7 +11,7 @@ require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Kitchen.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class DescendantsTest extends Shelter\Tests\TestCase
+class DescendantsTest extends Shelter\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()

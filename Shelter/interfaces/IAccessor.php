@@ -33,10 +33,9 @@ interface IAccessor
 	/**
 	 * @param array|string $entityClass
 	 * @param array $data
-	 * @param bool $check whether check created Entity by Checker.
 	 * @return IEntity
 	 */
-	function create($entityClass, array $data, $check = TRUE);
+	function create($entityClass, array $data);
 
 
 	/**

@@ -147,18 +147,18 @@ class Accessor implements IAccessor
 	/**
 	 * @param array|string $entityClass
 	 * @param array $data
-	 * @param bool $check
+	 * @param bool $throwFirst
 	 * @return IEntity
 	 * @throws Exception
 	 */
-	public function create($entityClass, array $data, $check = TRUE)
+	public function create($entityClass, array $data, $throwFirst = TRUE)
 	{
 		list($entityClass) = $this->extractEntityClasses($entityClass);
 
 		$dataHolder = $this->createDataHolder($entityClass, array_keys($data));
 		$dataHolder->setParams($data);
-		if ($check) {
-			$this->check($entityClass, NULL, $dataHolder);
+		if ($checker = $this->getChecker($entityClass)) {
+			$checker->check($dataHolder, $throwFirst);
 		}
 
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
@@ -180,14 +180,19 @@ class Accessor implements IAccessor
 
 	/**
 	 * @param IEntity $entity
+	 * @param bool $throwFirst
 	 */
-	public function save(IEntity $entity)
+	public function save(IEntity $entity, $throwFirst = FALSE)
 	{
 		$entityClass = get_class($entity);
+		if ($checker = $this->getChecker($entityClass)) {
+			$checker->check($entity, $throwFirst);
+		}
+
 		$data = $entity->getChanges();
 		$dataHolder = $this->createDataHolder($entityClass, array_keys($data));
 		$dataHolder->setParams($data);
-		$this->check($entityClass, $entity, $dataHolder);
+
 		$this->serviceAccessor->getMapper($entityClass)->save($entity->getId(), $dataHolder);
 	}
 
@@ -212,6 +217,7 @@ class Accessor implements IAccessor
 	 * @param array $data
 	 * @param IIdentifier $identifier
 	 * @return IEntity
+	 * @todo conditional Entities (e.g. unit with vendor HTC creates Entity HtcUnit, but with same identifier as other)
 	 */
 	protected function createEntity($entityClass, $id, array $data, IIdentifier $identifier)
 	{
@@ -299,12 +305,17 @@ class Accessor implements IAccessor
 	}
 
 
-	private function check($entityClass, $entity, IDataHolder $dataHolder)
+	/**
+	 * @param string $entityClass
+	 * @return IChecker
+	 */
+	private function getChecker($entityClass)
 	{
 		$checker = $this->serviceAccessor->getChecker($entityClass);
 		if ($checker instanceof IChecker) {
-			$checker->check($entity, $dataHolder);
+			return $checker;
 		}
+		return NULL;
 	}
 
 

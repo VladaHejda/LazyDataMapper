@@ -8,7 +8,7 @@ use Shelter,
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class Test extends Shelter\Tests\TestCase
+class Test extends Shelter\Tests\AcceptanceTestCase
 {
 
 	public function testGet()

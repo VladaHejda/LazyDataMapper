@@ -108,6 +108,29 @@ class DataHolder implements IDataHolder
 
 
 	/**
+	 * @param string $param
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function __get($param)
+	{
+		if ($this->isContainer) {
+			throw new Exception("For container DataHolder use method getParams().");
+		}
+
+		if (array_key_exists($param, $this->params)) {
+			return $this->params[$param];
+		}
+
+		if ($this->suggestor->getParamMap()->hasParam($param)) {
+			return NULL;
+		}
+
+		throw new Exception("Parameter $param does not exist.");
+	}
+
+
+	/**
 	 * @param string $entityClass
 	 * @param string $sourceParam
 	 * @return self|null

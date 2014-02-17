@@ -11,7 +11,7 @@ require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/House.php';
 require_once __DIR__ . '/implementations/model/Kitchen.php';
 
-class LoadWithDescendantTest extends Shelter\Tests\TestCase
+class LoadWithDescendantTest extends Shelter\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()

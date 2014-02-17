@@ -9,11 +9,9 @@ interface IChecker
 {
 
 	/**
-	 * @param IEntity|null $entity or NULL during creating process
-	 * @param IDataHolder $holder
+	 * @param IDataEnvelope $subject IEntity when updating, IDataHolder when creating new Entity
 	 * @return void
-	 * @throws IntegrityException
-	 * todo co když checker (při sejvu, create entitu nedostane) entitu změní!?
+	 * @throws IntegrityException when integrity fails
 	 */
-	function check($entity, IDataHolder $holder);
+	function check(IDataEnvelope $subject);
 }
