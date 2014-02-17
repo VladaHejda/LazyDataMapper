@@ -18,8 +18,6 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 
 	public function testSet()
 	{
-		// todo test unset
-
 		$requestKey = new Shelter\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
@@ -51,6 +49,18 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 
 	/**
 	 * @depends testSet
+	 */
+	public function testUnset(Tests\Icebox $icebox)
+	{
+		unset($icebox->capacity);
+		$this->assertEquals(0, $icebox->capacity);
+
+		return $icebox;
+	}
+
+
+	/**
+	 * @depends testUnset
 	 */
 	public function testReset(Tests\Icebox $icebox)
 	{

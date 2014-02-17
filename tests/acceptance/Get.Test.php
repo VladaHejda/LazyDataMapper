@@ -13,8 +13,6 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 
 	public function testGet()
 	{
-		// todo test isset
-
 		$requestKey = new Shelter\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
@@ -40,6 +38,11 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 
 		$this->assertTrue($icebox->isReadOnly('food'));
 		$this->assertFalse($icebox->isReadOnly('color'));
+
+		$this->assertTrue(isset($icebox->color));
+		$this->assertTrue(isset($icebox->repaired));
+		$this->assertFalse(isset($icebox->undeclared));
+		$this->assertFalse(isset($icebox->repairs));
 
 		return $icebox;
 	}
