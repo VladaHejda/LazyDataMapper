@@ -95,5 +95,8 @@ abstract class defaultMapper implements Shelter\IMapper
 	}
 
 
-	public function remove($id){}
+	public function remove($id)
+	{
+		unset(static::$data[$id]);
+	}
 }
