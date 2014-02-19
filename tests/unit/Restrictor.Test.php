@@ -1,11 +1,11 @@
 <?php
 
-namespace Shelter\Tests\Restrictor;
+namespace LazyDataMapper\Tests\Restrictor;
 
-use Shelter,
-	Shelter\Restrictor;
+use LazyDataMapper,
+	LazyDataMapper\Restrictor;
 
-class Test extends Shelter\Tests\TestCase
+class Test extends LazyDataMapper\Tests\TestCase
 {
 
 	/** @var \OpenObject */
@@ -15,7 +15,7 @@ class Test extends Shelter\Tests\TestCase
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->restrictor =  new \OpenObject(\Mockery::mock('Shelter\Restrictor[]'));
+		$this->restrictor =  new \OpenObject(\Mockery::mock('LazyDataMapper\Restrictor[]'));
 	}
 
 
@@ -33,7 +33,7 @@ class Test extends Shelter\Tests\TestCase
 
 		$this->assertException(function() {
 			$this->restrictor->notEquals('color', ['yellow', 'brown']);
-		}, 'Shelter\Exception');
+		}, 'LazyDataMapper\Exception');
 
 		$this->restrictor->equals('color', ['black'], Restrictor::UNION);
 		$this->assertEquals(['blue', 'red', 'black'], $this->restrictor->getEqual('color'));
@@ -57,7 +57,7 @@ class Test extends Shelter\Tests\TestCase
 
 		$this->assertException(function() {
 			$this->restrictor->equals('color', ['blue', 'red']);
-		}, 'Shelter\Exception');
+		}, 'LazyDataMapper\Exception');
 
 		$this->restrictor->notEquals('color', ['white'], Restrictor::UNION);
 		$this->assertEquals(['yellow', 'brown', 'white'], $this->restrictor->getUnequal('color'));

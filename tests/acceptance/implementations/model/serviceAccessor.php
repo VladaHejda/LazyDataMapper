@@ -1,10 +1,10 @@
 <?php
 
-namespace Shelter\Tests;
+namespace LazyDataMapper\Tests;
 
-use Shelter;
+use LazyDataMapper;
 
-class ResettableIdentifier extends Shelter\Identifier
+class ResettableIdentifier extends LazyDataMapper\Identifier
 {
 
 	static protected $counter = array();
@@ -17,25 +17,25 @@ class ResettableIdentifier extends Shelter\Identifier
 }
 
 
-class ServiceAccessor extends Shelter\EntityServiceAccessor
+class ServiceAccessor extends LazyDataMapper\EntityServiceAccessor
 {
 
 	protected static $paramMapsList = [
-		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxParamMap',
-		'Shelter\Tests\Kitchen' => 'Shelter\Tests\KitchenParamMap',
-		'Shelter\Tests\Car' => 'Shelter\Tests\CarParamMap',
-		'Shelter\Tests\House' => 'Shelter\Tests\HouseParamMap',
+		'LazyDataMapper\Tests\Icebox' => 'LazyDataMapper\Tests\IceboxParamMap',
+		'LazyDataMapper\Tests\Kitchen' => 'LazyDataMapper\Tests\KitchenParamMap',
+		'LazyDataMapper\Tests\Car' => 'LazyDataMapper\Tests\CarParamMap',
+		'LazyDataMapper\Tests\House' => 'LazyDataMapper\Tests\HouseParamMap',
 	];
 
 	protected static $mappersList = [
-		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxMapper',
-		'Shelter\Tests\Kitchen' => 'Shelter\Tests\KitchenMapper',
-		'Shelter\Tests\Car' => 'Shelter\Tests\CarMapper',
-		'Shelter\Tests\House' => 'Shelter\Tests\HouseMapper',
+		'LazyDataMapper\Tests\Icebox' => 'LazyDataMapper\Tests\IceboxMapper',
+		'LazyDataMapper\Tests\Kitchen' => 'LazyDataMapper\Tests\KitchenMapper',
+		'LazyDataMapper\Tests\Car' => 'LazyDataMapper\Tests\CarMapper',
+		'LazyDataMapper\Tests\House' => 'LazyDataMapper\Tests\HouseMapper',
 	];
 
 	protected static $checkersList = [
-		'Shelter\Tests\Icebox' => 'Shelter\Tests\IceboxChecker',
+		'LazyDataMapper\Tests\Icebox' => 'LazyDataMapper\Tests\IceboxChecker',
 	];
 
 	protected $paramMaps = [];
@@ -89,7 +89,7 @@ class ServiceAccessor extends Shelter\EntityServiceAccessor
 	}
 
 
-	public function composeIdentifier($entityClass, $isContainer = FALSE, Shelter\IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	public function composeIdentifier($entityClass, $isContainer = FALSE, LazyDataMapper\IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
 		return new ResettableIdentifier($entityClass, $isContainer, $parentIdentifier, $sourceParam);
 	}

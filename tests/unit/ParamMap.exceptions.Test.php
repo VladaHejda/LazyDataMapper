@@ -1,16 +1,16 @@
 <?php
 
-namespace Shelter\Tests\ParamMap;
+namespace LazyDataMapper\Tests\ParamMap;
 
-use Shelter;
+use LazyDataMapper;
 
 require_once __DIR__ . '/prepared/ParamMap.php';
 
-class ExceptionsTest extends Shelter\Tests\TestCase
+class ExceptionsTest extends LazyDataMapper\Tests\TestCase
 {
 
 	/**
-	 * @expectedException Shelter\Exception
+	 * @expectedException LazyDataMapper\Exception
 	 */
 	public function testParamMapOneDimensionalGetType()
 	{
@@ -20,7 +20,7 @@ class ExceptionsTest extends Shelter\Tests\TestCase
 
 
 	/**
-	 * @expectedException Shelter\Exception
+	 * @expectedException LazyDataMapper\Exception
 	 */
 	public function testParamMapTwoDimensionalGetUnknownType()
 	{

@@ -1,22 +1,22 @@
 <?php
 
-namespace Shelter\Tests\EntityServiceAccessor;
+namespace LazyDataMapper\Tests\EntityServiceAccessor;
 
-use Shelter;
+use LazyDataMapper;
 
 require_once __DIR__ . '/prepared/Facade.php';
 
-class Test extends Shelter\Tests\TestCase
+class Test extends LazyDataMapper\Tests\TestCase
 {
 
-	/** @var Shelter\EntityServiceAccessor */
+	/** @var LazyDataMapper\EntityServiceAccessor */
 	private $serviceAccessor;
 
 
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->serviceAccessor = \Mockery::mock('Shelter\EntityServiceAccessor[]');
+		$this->serviceAccessor = \Mockery::mock('LazyDataMapper\EntityServiceAccessor[]');
 	}
 
 
@@ -29,7 +29,7 @@ class Test extends Shelter\Tests\TestCase
 
 	public function testGetEntityClass()
 	{
-		$facade = new Shelter\Tests\Facade\EmptyFacade(\Mockery::mock('Shelter\IAccessor'));
-		$this->assertEquals('Shelter\Tests\Facade\Empty', $this->serviceAccessor->getEntityClass($facade));
+		$facade = new LazyDataMapper\Tests\Facade\EmptyFacade(\Mockery::mock('LazyDataMapper\IAccessor'));
+		$this->assertEquals('LazyDataMapper\Tests\Facade\Empty', $this->serviceAccessor->getEntityClass($facade));
 	}
 }

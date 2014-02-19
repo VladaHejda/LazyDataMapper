@@ -1,9 +1,9 @@
 <?php
 
-namespace Shelter\Tests\Restrictor;
+namespace LazyDataMapper\Tests\Restrictor;
 
-use Shelter,
-	Shelter\Tests;
+use LazyDataMapper,
+	LazyDataMapper\Tests;
 
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
@@ -11,7 +11,7 @@ require_once __DIR__ . '/implementations/model/Icebox.php';
 /**
  * @internal changed name convention because of conflict with Restrictor unit test
  */
-class AcceptanceTest extends Shelter\Tests\AcceptanceTestCase
+class AcceptanceTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	/** @var Tests\IceboxFacade */
@@ -20,11 +20,11 @@ class AcceptanceTest extends Shelter\Tests\AcceptanceTestCase
 
 	protected function setUp()
 	{
-		$requestKey = new Shelter\RequestKey;
+		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$this->facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
 	}
 

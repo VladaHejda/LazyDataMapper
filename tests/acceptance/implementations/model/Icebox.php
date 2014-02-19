@@ -1,13 +1,13 @@
 <?php
 
-namespace Shelter\Tests;
+namespace LazyDataMapper\Tests;
 
-use Shelter;
+use LazyDataMapper;
 
 require_once __DIR__ . '/default.php';
 require_once __DIR__ . '/serviceAccessor.php';
 
-class Icebox extends Shelter\Entity
+class Icebox extends LazyDataMapper\Entity
 {
 
 	protected $privateParams = ['repairs'];
@@ -113,7 +113,7 @@ class Icebox extends Shelter\Entity
 }
 
 
-class Iceboxes extends Shelter\EntityContainer
+class Iceboxes extends LazyDataMapper\EntityContainer
 {
 
 	protected function getCapacity()
@@ -127,14 +127,14 @@ class Iceboxes extends Shelter\EntityContainer
 }
 
 
-class IceboxFacade extends Shelter\Facade
+class IceboxFacade extends LazyDataMapper\Facade
 {
 
-	protected $entityClass = ['Shelter\Tests\Icebox', 'Shelter\Tests\Iceboxes'];
+	protected $entityClass = ['LazyDataMapper\Tests\Icebox', 'LazyDataMapper\Tests\Iceboxes'];
 }
 
 
-class IceboxRestrictor extends Shelter\FilterRestrictor
+class IceboxRestrictor extends LazyDataMapper\FilterRestrictor
 {
 
 	public function limitCapacity($min, $max = NULL)
@@ -171,24 +171,24 @@ class IceboxRestrictor extends Shelter\FilterRestrictor
 }
 
 
-class IceboxParamMap extends Shelter\ParamMap
+class IceboxParamMap extends LazyDataMapper\ParamMap
 {
 
 	protected $map = ['color', 'capacity', 'freezer', 'food', 'repairs', ];
 }
 
 
-class IceboxChecker extends Shelter\Checker
+class IceboxChecker extends LazyDataMapper\Checker
 {
 
-	protected function checkUpdate(Shelter\IEntity $icebox)
+	protected function checkUpdate(LazyDataMapper\IEntity $icebox)
 	{
 		$this->checkRequired(['color']);
 		$this->addCheck('integrity');
 	}
 
 
-	protected function checkCreate(Shelter\IDataHolder $holder)
+	protected function checkCreate(LazyDataMapper\IDataHolder $holder)
 	{
 		$this->addCheck('integrity');
 
@@ -198,7 +198,7 @@ class IceboxChecker extends Shelter\Checker
 	}
 
 
-	protected function checkIntegrity(Shelter\IDataEnvelope $subject)
+	protected function checkIntegrity(LazyDataMapper\IDataEnvelope $subject)
 	{
 		if (count($subject->food) > 4 && $subject->capacity < 20) {
 			$this->addError("Not enough space in icebox.");
@@ -213,10 +213,10 @@ class IceboxMapper extends defaultMapper
 	public static $calledGetById = 0;
 	public static $calledGetByRestrictions = 0;
 
-	/** @var Shelter\ISuggestor */
+	/** @var LazyDataMapper\ISuggestor */
 	public static $lastSuggestor;
 
-	/** @var Shelter\IDataHolder */
+	/** @var LazyDataMapper\IDataHolder */
 	public static $lastHolder;
 
 	public static $data;

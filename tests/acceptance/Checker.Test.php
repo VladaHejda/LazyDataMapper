@@ -1,14 +1,14 @@
 <?php
 
-namespace Shelter\Tests\Checker;
+namespace LazyDataMapper\Tests\Checker;
 
-use Shelter,
-	Shelter\Tests;
+use LazyDataMapper,
+	LazyDataMapper\Tests;
 
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class Test extends Shelter\Tests\AcceptanceTestCase
+class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	/** @var Tests\IceboxFacade */
@@ -17,11 +17,11 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 
 	protected function setUp()
 	{
-		$requestKey = new Shelter\RequestKey;
+		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$this->facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
 	}
 
@@ -34,7 +34,7 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 		$icebox->color = '';
 		$this->assertException(
 			function() use ($icebox) { $icebox->save(); },
-			'Shelter\IntegrityException'
+			'LazyDataMapper\IntegrityException'
 		);
 
 		// check method
@@ -44,7 +44,7 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 		$icebox->capacity = 15;
 		$this->assertException(
 			function() use ($icebox) { $icebox->save(); },
-			'Shelter\IntegrityException'
+			'LazyDataMapper\IntegrityException'
 		);
 
 		// MultiException
@@ -56,7 +56,7 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 		try {
 			$icebox->save();
 			$this->fail('Expected that IntegrityException was thrown.');
-		} catch (Shelter\IntegrityException $e) {
+		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(2, $e->getAllMessages());
 		}
 
@@ -69,7 +69,7 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 		try {
 			$icebox->save(TRUE);
 			$this->fail('Expected that IntegrityException was thrown.');
-		} catch (Shelter\IntegrityException $e) {
+		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(1, $e->getAllMessages());
 		}
 	}
@@ -89,14 +89,14 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 		try {
 			$this->facade->create($data);
 			$this->fail('Expected that IntegrityException was thrown.');
-		} catch (Shelter\IntegrityException $e) {
+		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(1, $e->getAllMessages());
 		}
 
 		try {
 			$this->facade->create($data, FALSE);
 			$this->fail('Expected that IntegrityException was thrown.');
-		} catch (Shelter\IntegrityException $e) {
+		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(2, $e->getAllMessages());
 		}
 	}

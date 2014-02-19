@@ -1,7 +1,7 @@
 {
-	"name": "VladaHejda/ShelterModel",
+	"name": "VladaHejda/LazyDataMapper",
 	"autoload": {
-		"classmap": ["Shelter"]
+		"classmap": ["LazyDataMapper"]
 	},
 	"require": {
 		"php": ">=5.3.0"

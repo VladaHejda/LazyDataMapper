@@ -1,15 +1,15 @@
 <?php
 
-namespace Shelter\Tests\Caching;
+namespace LazyDataMapper\Tests\Caching;
 
-use Shelter,
-	Shelter\Tests,
-	Shelter\Tests\IceboxMapper;
+use LazyDataMapper,
+	LazyDataMapper\Tests,
+	LazyDataMapper\Tests\IceboxMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class Test extends Shelter\Tests\AcceptanceTestCase
+class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	/** @var Tests\IceboxFacade */
@@ -18,11 +18,11 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 
 	public function testFirstGet()
 	{
-		$requestKey = new Shelter\RequestKey;
+		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
 		self::$facade = $facade;
 

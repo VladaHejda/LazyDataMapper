@@ -1,24 +1,24 @@
 <?php
 
-namespace Shelter\Tests\Create;
+namespace LazyDataMapper\Tests\Create;
 
-use Shelter,
-	Shelter\Tests,
-	Shelter\Tests\IceboxMapper;
+use LazyDataMapper,
+	LazyDataMapper\Tests,
+	LazyDataMapper\Tests\IceboxMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class Test extends Shelter\Tests\AcceptanceTestCase
+class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	protected function createServices()
 	{
-		$requestKey = new Shelter\RequestKey;
+		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
 		return [$cache, $facade];
 	}
@@ -29,9 +29,9 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 		list(, $facade) = $this->createServices();
 
 		$icebox = $facade->create([]);
-		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $icebox);
 		$icebox = $facade->getById($icebox->getId());
-		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $icebox);
 
 		$this->assertEquals(0, IceboxMapper::$calledGetById);
 	}
@@ -43,7 +43,7 @@ class Test extends Shelter\Tests\AcceptanceTestCase
 
 		$icebox = $facade->create(['color' => 'yellow', 'repairs' => '6', ]);
 
-		$this->assertInstanceOf('Shelter\Tests\Icebox', $icebox);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $icebox);
 		$this->assertEquals('yellow', $icebox->color);
 		$this->assertTrue($icebox->repaired);
 		$this->assertEquals(0, $icebox->capacity);

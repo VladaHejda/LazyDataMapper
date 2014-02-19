@@ -1,13 +1,13 @@
 <?php
 
-namespace Shelter\Tests\Entity;
+namespace LazyDataMapper\Tests\Entity;
 
-use Shelter;
+use LazyDataMapper;
 
-class Car extends Shelter\Entity
+class Car extends LazyDataMapper\Entity
 {}
 
-class ChangeLockTest extends Shelter\Tests\TestCase
+class ChangeLockTest extends LazyDataMapper\Tests\TestCase
 {
 
 	/** @var Car */
@@ -20,8 +20,8 @@ class ChangeLockTest extends Shelter\Tests\TestCase
 
 		parent::setUp();
 
-		$accessor = \Mockery::mock('Shelter\IAccessor');
-		$identifier = \Mockery::mock('Shelter\IIdentifier');
+		$accessor = \Mockery::mock('LazyDataMapper\IAccessor');
+		$identifier = \Mockery::mock('LazyDataMapper\IIdentifier');
 		$data = [
 			'name' => 'John', 'age' => 17
 		];
@@ -30,7 +30,7 @@ class ChangeLockTest extends Shelter\Tests\TestCase
 
 
 	/**
-	 * @expectedException Shelter\Exception
+	 * @expectedException LazyDataMapper\Exception
 	 */
 	public function testSaveLocked()
 	{
@@ -75,7 +75,7 @@ class ChangeLockTest extends Shelter\Tests\TestCase
 
 
 	/**
-	 * @expectedException Shelter\Exception
+	 * @expectedException LazyDataMapper\Exception
 	 */
 	public function testLockedAfterSave()
 	{

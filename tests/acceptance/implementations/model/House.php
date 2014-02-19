@@ -1,27 +1,27 @@
 <?php
 
-namespace Shelter\Tests;
+namespace LazyDataMapper\Tests;
 
-use Shelter,
-	Shelter\Tests\KitchenMapper;
+use LazyDataMapper,
+	LazyDataMapper\Tests\KitchenMapper;
 
 require_once __DIR__ . '/default.php';
 require_once __DIR__ . '/serviceAccessor.php';
 
-class House extends Shelter\Entity
+class House extends LazyDataMapper\Entity
 {
 
 	protected function getKitchen()
 	{
-		return $this->getDescendant('Shelter\Tests\Kitchen', 'kitchen');
+		return $this->getDescendant('LazyDataMapper\Tests\Kitchen', 'kitchen');
 	}
 }
 
-class HouseFacade extends Shelter\Facade
+class HouseFacade extends LazyDataMapper\Facade
 {}
 
 
-class HouseParamMap extends Shelter\ParamMap
+class HouseParamMap extends LazyDataMapper\ParamMap
 {
 
 	protected $map = [
@@ -36,7 +36,7 @@ class HouseMapper extends defaultMapper
 
 	public static $calledGetById = 0;
 
-	/** @var Shelter\ISuggestor */
+	/** @var LazyDataMapper\ISuggestor */
 	public static $lastSuggestor;
 
 	public static $data;
@@ -47,14 +47,14 @@ class HouseMapper extends defaultMapper
 	];
 
 
-	public function getById($id, Shelter\ISuggestor $suggestor)
+	public function getById($id, LazyDataMapper\ISuggestor $suggestor)
 	{
 		$holder = parent::getById($id, $suggestor);
 
-		if ($suggestor->hasDescendant('Shelter\Tests\Kitchen')) {
-			$descendant = $suggestor->getDescendant('Shelter\Tests\Kitchen');
+		if ($suggestor->hasDescendant('LazyDataMapper\Tests\Kitchen')) {
+			$descendant = $suggestor->getDescendant('LazyDataMapper\Tests\Kitchen');
 			$data = array_intersect_key(KitchenMapper::$data[static::$data[$id]['kitchen']] ,array_flip($descendant->getParamNames()));
-			$holder->getDescendant('Shelter\Tests\Kitchen')->setParams($data);
+			$holder->getDescendant('LazyDataMapper\Tests\Kitchen')->setParams($data);
 		}
 
 		return $holder;

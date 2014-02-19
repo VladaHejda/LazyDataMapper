@@ -1,6 +1,6 @@
 <?php
 
-namespace Shelter\Tests;
+namespace LazyDataMapper\Tests;
 
 abstract class AcceptanceTestCase extends TestCase
 {
