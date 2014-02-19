@@ -77,7 +77,18 @@ abstract class defaultMapper implements Shelter\IMapper
 	}
 
 
-	public function getIdsByRestrictions(Shelter\IRestrictor $restrictor){}
+	public function getIdsByRestrictions(Shelter\IRestrictor $restrictor)
+	{
+		$restrictions = $restrictor->getRestrictions();
+
+		$ids = [];
+		foreach (static::$data as $id => $data) {
+			if ($restrictions($data)) {
+				$ids[] = $id;
+			}
+		}
+		return $ids;
+	}
 
 
 	public function save($id, Shelter\IDataHolder $holder)

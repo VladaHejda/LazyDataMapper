@@ -15,12 +15,14 @@ abstract class Restrictor implements IRestrictor
 		'range' => array(),
 		'equal' => array(),
 		'unequal' => array(),
+		'match' => array(),
+		'notMatch' => array(),
 	);
 
 
 	/**
 	 * @param string $paramName
-	 * @param mixed $values
+	 * @param mixed $values or self::DENY to erase limit
 	 * @param int $composition
 	 * @throws Exception
 	 */
@@ -32,7 +34,7 @@ abstract class Restrictor implements IRestrictor
 		}
 
 		if (isset($this->limit['unequal'][$paramName])) {
-			throw new Exception(get_class($this) . ': only equals or notEquals can be used, not both.');
+			throw new Exception(get_class($this) . " $paramName limit: only equals or notEquals can be used, not both.");
 		}
 
 		$this->compose($this->limit['equal'], $paramName, $values, $composition);
@@ -41,7 +43,7 @@ abstract class Restrictor implements IRestrictor
 
 	/**
 	 * @param string $paramName
-	 * @param mixed $values
+	 * @param mixed $values or self::DENY to erase limit
 	 * @param int $composition
 	 * @throws Exception
 	 */
@@ -53,7 +55,7 @@ abstract class Restrictor implements IRestrictor
 		}
 
 		if (isset($this->limit['equal'][$paramName])) {
-			throw new Exception(get_class($this) . ': only equals or notEquals can be used, not both.');
+			throw new Exception(get_class($this) . " $paramName limit: only equals or notEquals can be used, not both.");
 		}
 
 		$this->compose($this->limit['unequal'], $paramName, $values, $composition);
@@ -62,14 +64,19 @@ abstract class Restrictor implements IRestrictor
 
 	/**
 	 * @param string $paramName
-	 * @param null|mixed $min
+	 * @param null|mixed $min or self::DENY to erase limit
 	 * @param null|mixed $max
 	 * @throws Exception
 	 */
 	protected function inRange($paramName, $min,  $max = NULL)
 	{
+		if ($min === self::DENY) {
+			unset($this->limit['range'][$paramName]);
+			return;
+		}
+
 		if (NULL === $min && NULL === $max) {
-			throw new Exception(get_class($this) . ": at least min or max must be defined.");
+			throw new Exception(get_class($this) . " $paramName limit: at least min or max must be defined.");
 		}
 
 		if (NULL !== $min && NULL !== $max && $min > $max) {
@@ -80,6 +87,46 @@ abstract class Restrictor implements IRestrictor
 		}
 
 		$this->limit['range'][$paramName] = array($min, $max);
+	}
+
+
+	/**
+	 * @param string $paramName
+	 * @param string $pattern or self::DENY to erase limit
+	 * @throws Exception
+	 */
+	protected function match($paramName, $pattern)
+	{
+		if ($pattern === self::DENY) {
+			unset($this->limit['match'][$paramName]);
+			return;
+		}
+
+		if (isset($this->limit['notMatch'][$paramName])) {
+			throw new Exception(get_class($this) . " $paramName limit: only match or notMatch can be used, not both.");
+		}
+
+		$this->limit['match'][$paramName] = (string) $pattern;
+	}
+
+
+	/**
+	 * @param string $paramName
+	 * @param string $pattern or self::DENY to erase limit
+	 * @throws Exception
+	 */
+	protected function notMatch($paramName, $pattern)
+	{
+		if ($pattern === self::DENY) {
+			unset($this->limit['notMatch'][$paramName]);
+			return;
+		}
+
+		if (isset($this->limit['match'][$paramName])) {
+			throw new Exception(get_class($this) . " $paramName limit: only match or notMatch can be used, not both.");
+		}
+
+		$this->limit['notMatch'][$paramName] = (string) $pattern;
 	}
 
 
@@ -133,6 +180,44 @@ abstract class Restrictor implements IRestrictor
 			}
 
 			return $this->limit['range'][$paramName];
+
+		} else {
+			return array();
+		}
+	}
+
+
+	protected function getMatch($paramName = NULL)
+	{
+		if (isset($this->limit['match'])) {
+			if (NULL === $paramName) {
+				return $this->limit['match'];
+			}
+
+			if (!array_key_exists($paramName, $this->limit['match'])) {
+				return array();
+			}
+
+			return $this->limit['match'][$paramName];
+
+		} else {
+			return array();
+		}
+	}
+
+
+	protected function getNotMatch($paramName = NULL)
+	{
+		if (isset($this->limit['notMatch'])) {
+			if (NULL === $paramName) {
+				return $this->limit['notMatch'];
+			}
+
+			if (!array_key_exists($paramName, $this->limit['notMatch'])) {
+				return array();
+			}
+
+			return $this->limit['notMatch'][$paramName];
 
 		} else {
 			return array();

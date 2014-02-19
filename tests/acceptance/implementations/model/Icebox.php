@@ -134,6 +134,43 @@ class IceboxFacade extends Shelter\Facade
 }
 
 
+class IceboxRestrictor extends Shelter\FilterRestrictor
+{
+
+	public function limitCapacity($min, $max = NULL)
+	{
+		$this->inRange('capacity', $min, $max);
+	}
+
+
+	public function limitColor($color, $deny = FALSE)
+	{
+		if ($deny) {
+			$this->notEquals('color', $color);
+		} else {
+			$this->equals('color', $color);
+		}
+	}
+
+
+	public function limitFood($food, $deny = FALSE)
+	{
+		$pattern = $deny ? $this->getNotMatch('food') : $this->getMatch('food');
+		if (empty($pattern)) {
+			$pattern = "/\b($food)\b/";
+		} else {
+			$pattern = str_replace(')', "|$food)", $pattern);
+		}
+
+		if ($deny) {
+			$this->notMatch('food', $pattern);
+		} else {
+			$this->match('food', $pattern);
+		}
+	}
+}
+
+
 class IceboxParamMap extends Shelter\ParamMap
 {
 
