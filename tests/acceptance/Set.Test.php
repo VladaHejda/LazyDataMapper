@@ -1,14 +1,15 @@
 <?php
 
-namespace Shelter\Tests\Set;
+namespace LazyDataMapper\Tests\Set;
 
-use Shelter,
-	Shelter\Tests;
+use LazyDataMapper,
+	LazyDataMapper\Tests,
+	LazyDataMapper\Tests\IceboxMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class Test extends Shelter\Tests\TestCase
+class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	/** @var Tests\IceboxFacade */
@@ -17,25 +18,30 @@ class Test extends Shelter\Tests\TestCase
 
 	public function testSet()
 	{
-		// todo am I testing all dependencies if there is wrapper & unwrapper of fictive parameter?
-
-		$requestKey = new Shelter\RequestKey;
+		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
 		self::$facade = $facade;
 
 		$icebox = $facade->getById(4);
 
+		$icebox->capacity = 30;
+		$this->assertEquals(['capacity'], IceboxMapper::$lastSuggestor->getParamNames());
+
+		$this->assertEquals('white', $icebox->color);
 		$icebox->color = 'yellow';
+		$this->assertEquals(30, $icebox->capacity);
 		$this->assertEquals('yellow', $icebox->color);
 		$this->assertTrue($icebox->isChanged());
 		$this->assertTrue($icebox->isChanged('color'));
-		$this->assertFalse($icebox->isChanged('capacity'));
+		$this->assertFalse($icebox->isChanged('food'));
 		$this->assertEquals('white', $icebox->getOriginal('color'));
-		$this->assertEquals(['color' => 'yellow'], $icebox->getChanges());
+		$this->assertEquals(['color' => 'yellow', 'capacity' => 30], $icebox->getChanges());
+
+		$this->assertEquals(2, IceboxMapper::$calledGetById);
 
 		return $icebox;
 	}
@@ -44,8 +50,21 @@ class Test extends Shelter\Tests\TestCase
 	/**
 	 * @depends testSet
 	 */
+	public function testUnset(Tests\Icebox $icebox)
+	{
+		unset($icebox->capacity);
+		$this->assertEquals(0, $icebox->capacity);
+
+		return $icebox;
+	}
+
+
+	/**
+	 * @depends testUnset
+	 */
 	public function testReset(Tests\Icebox $icebox)
 	{
+		$icebox->reset('capacity');
 		$icebox->reset('color');
 		$this->assertEquals('white', $icebox->color);
 		$this->assertFalse($icebox->isChanged());
@@ -64,6 +83,8 @@ class Test extends Shelter\Tests\TestCase
 		$this->assertFalse($icebox->isChanged('color'));
 		$this->assertFalse($icebox->isChanged('capacity'));
 
+		$this->assertEquals(0, IceboxMapper::$calledGetById);
+
 		return $icebox;
 	}
 
@@ -73,9 +94,13 @@ class Test extends Shelter\Tests\TestCase
 	 */
 	public function testUnwrapper(Tests\Icebox $icebox)
 	{
-		$icebox->upgrade = 2;
-		$this->assertEquals(40, $icebox->capacity);
-		$this->assertEquals('metallic white', $icebox->color);
+		$this->assertFalse($icebox->freezer);
+		$this->assertEquals(0, $icebox->freezerCapacity);
+		$icebox->freezerCapacity = 4;
+		$this->assertTrue($icebox->freezer);
+		$this->assertEquals(4, $icebox->freezerCapacity);
+
+		$this->assertEquals(1, IceboxMapper::$calledGetById);
 
 		return $icebox;
 	}
@@ -88,6 +113,9 @@ class Test extends Shelter\Tests\TestCase
 	{
 		$icebox->reset();
 		$this->assertEquals(1, $icebox->addRepair());
+
+		$this->assertEquals(1, IceboxMapper::$calledGetById);
+
 		$this->assertTrue($icebox->isChanged());
 		$this->assertTrue($icebox->isChanged('repairs'));
 		$this->assertEquals(0, $icebox->getOriginal('repairs'));
@@ -117,6 +145,9 @@ class Test extends Shelter\Tests\TestCase
 		$icebox->reset();
 		$icebox->color = 'brown';
 		$icebox->save();
+
+		$this->assertEquals(['color' => 'brown'], IceboxMapper::$lastHolder->getParams());
+
 		$this->assertEquals('brown', $icebox->color);
 		$this->assertEquals(20, $icebox->capacity);
 		$this->assertFalse($icebox->isChanged());
@@ -136,8 +167,9 @@ class Test extends Shelter\Tests\TestCase
 	public function testSuccessfullySaved()
 	{
 		$icebox = self::$facade->getById(4);
-
 		$this->assertEquals('brown', $icebox->color);
+
+		$this->assertEquals(1, IceboxMapper::$calledGetById);
 
 		return $icebox;
 	}
@@ -151,19 +183,19 @@ class Test extends Shelter\Tests\TestCase
 		// undeclared
 		$this->assertException(
 			function() use ($icebox) { $icebox->undeclared = ''; },
-			'Shelter\EntityException', Shelter\EntityException::WRITE_UNDECLARED
+			'LazyDataMapper\EntityException', LazyDataMapper\EntityException::WRITE_UNDECLARED
 		);
 
 		// private
 		$this->assertException(
 			function() use ($icebox) { $icebox->repairs = ''; },
-			'Shelter\EntityException', Shelter\EntityException::WRITE_UNDECLARED
+			'LazyDataMapper\EntityException', LazyDataMapper\EntityException::WRITE_UNDECLARED
 		);
 
 		// readonly
 		$this->assertException(
 			function() use ($icebox) { $icebox->food = ''; },
-			'Shelter\EntityException', Shelter\EntityException::WRITE_READONLY
+			'LazyDataMapper\EntityException', LazyDataMapper\EntityException::WRITE_READONLY
 		);
 	}
 }

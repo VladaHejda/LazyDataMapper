@@ -1,10 +1,10 @@
 <?php
 
-namespace Shelter\Tests\Identifier;
+namespace LazyDataMapper\Tests\Identifier;
 
-use Shelter\Identifier;
+use LazyDataMapper\Identifier;
 
-class Test extends \Shelter\Tests\TestCase
+class Test extends \LazyDataMapper\Tests\TestCase
 {
 
 	public function testTopEntity()

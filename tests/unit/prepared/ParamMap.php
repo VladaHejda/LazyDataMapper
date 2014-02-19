@@ -1,13 +1,13 @@
 <?php
 
-namespace Shelter\Tests\ParamMap;
+namespace LazyDataMapper\Tests\ParamMap;
 
-class OneDimensionalParamMap extends \Shelter\ParamMap
+class OneDimensionalParamMap extends \LazyDataMapper\ParamMap
 {
 	protected $map = ['name', 'age'];
 }
 
-class TwoDimensionalParamMap extends \Shelter\ParamMap
+class TwoDimensionalParamMap extends \LazyDataMapper\ParamMap
 {
 	protected $map = [
 		'personal' => ['name', 'age'],

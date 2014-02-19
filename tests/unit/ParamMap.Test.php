@@ -1,12 +1,12 @@
 <?php
 
-namespace Shelter\Tests\ParamMap;
+namespace LazyDataMapper\Tests\ParamMap;
 
-use Shelter;
+use LazyDataMapper;
 
 require_once __DIR__ . '/prepared/ParamMap.php';
 
-class Test extends Shelter\Tests\TestCase
+class Test extends LazyDataMapper\Tests\TestCase
 {
 
 	public function testParamMapOneDimensional()

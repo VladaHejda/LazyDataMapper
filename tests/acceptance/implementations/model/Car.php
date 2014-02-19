@@ -1,20 +1,20 @@
 <?php
 
-namespace Shelter\Tests;
+namespace LazyDataMapper\Tests;
 
-use Shelter;
+use LazyDataMapper;
 
 require_once __DIR__ . '/default.php';
 require_once __DIR__ . '/serviceAccessor.php';
 
-class Car extends Shelter\Entity
+class Car extends LazyDataMapper\Entity
 {}
 
-class CarFacade extends Shelter\Facade
+class CarFacade extends LazyDataMapper\Facade
 {}
 
 
-class CarParamMap extends Shelter\ParamMap
+class CarParamMap extends LazyDataMapper\ParamMap
 {
 
 	protected $map = [
@@ -29,6 +29,7 @@ class CarMapper extends defaultMapper
 
 	public static $calledGetById = 0;
 
+	/** @var LazyDataMapper\ISuggestor */
 	public static $lastSuggestor;
 
 	public static $data;

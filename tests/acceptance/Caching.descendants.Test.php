@@ -1,58 +1,47 @@
 <?php
 
-namespace Shelter\Tests\Caching;
+namespace LazyDataMapper\Tests\Caching;
 
-use Shelter,
-	Shelter\Tests,
-	Shelter\Tests\KitchenMapper,
-	Shelter\Tests\IceboxMapper;
+use LazyDataMapper,
+	LazyDataMapper\Tests,
+	LazyDataMapper\Tests\KitchenMapper,
+	LazyDataMapper\Tests\IceboxMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Kitchen.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class DescendantsTest extends Shelter\Tests\TestCase
+class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()
 	{
-		$requestKey = new Shelter\RequestKey;
+		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\KitchenFacade($accessor, $serviceAccessor);
 
 		$kitchen = $facade->getById(1);
 
-		$this->assertInstanceOf('Shelter\Tests\Icebox', $kitchen->icebox);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $kitchen->icebox);
 		$this->assertEquals(22, $kitchen->area);
 
 		$this->assertEquals(45, $kitchen->icebox->capacity);
 
-		return [$cache, $facade];
+		return $facade;
 	}
 
 
 	/**
 	 * @depends testFirstGet
 	 */
-	public function testCaching(array $services)
+	public function testCaching(Tests\KitchenFacade $facade)
 	{
-		list($cache, $facade) = $services;
-		KitchenMapper::$calledGetById = 0;
-		IceboxMapper::$calledGetById = 0;
-
-		// force cache
-		foreach ($cache->cache as $originalKey => $cached) {
-			$newKey = $originalKey;
-			$newKey[strlen($newKey) -1] = 1;
-			$cache->cache[$newKey] = $cached;
-		}
-
 		$kitchen = $facade->getById(2);
 
-		$this->assertInstanceOf('Shelter\Tests\Icebox', $kitchen->icebox);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $kitchen->icebox);
 		$this->assertEquals(54, $kitchen->area);
 		$this->assertEquals(25, $kitchen->icebox->capacity);
 
@@ -63,10 +52,10 @@ class DescendantsTest extends Shelter\Tests\TestCase
 		// tests suggestions
 		$this->assertEquals(['icebox', 'area'], KitchenMapper::$lastSuggestor->getParamNames());
 		$this->assertTrue(KitchenMapper::$lastSuggestor->hasDescendants());
-		$this->assertTrue(KitchenMapper::$lastSuggestor->hasDescendant('Shelter\Tests\Icebox', $source));
+		$this->assertTrue(KitchenMapper::$lastSuggestor->hasDescendant('LazyDataMapper\Tests\Icebox', $source));
 		$this->assertEquals('icebox', $source);
-		$descendant = KitchenMapper::$lastSuggestor->getDescendant('Shelter\Tests\Icebox', $source);
-		$this->assertInstanceOf('Shelter\ISuggestor', $descendant);
+		$descendant = KitchenMapper::$lastSuggestor->getDescendant('LazyDataMapper\Tests\Icebox', $source);
+		$this->assertInstanceOf('LazyDataMapper\ISuggestor', $descendant);
 		$this->assertEquals(['capacity'], $descendant->getParamNames());
 	}
 }

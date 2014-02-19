@@ -1,15 +1,15 @@
 <?php
 
-namespace Shelter\Tests\Caching;
+namespace LazyDataMapper\Tests\Caching;
 
-use Shelter,
-	Shelter\Tests,
-	Shelter\Tests\IceboxMapper;
+use LazyDataMapper,
+	LazyDataMapper\Tests,
+	LazyDataMapper\Tests\IceboxMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Icebox.php';
 
-class Test extends Shelter\Tests\TestCase
+class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	/** @var Tests\IceboxFacade */
@@ -18,11 +18,11 @@ class Test extends Shelter\Tests\TestCase
 
 	public function testFirstGet()
 	{
-		$requestKey = new Shelter\RequestKey;
+		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new Shelter\SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new Shelter\Accessor($suggestorCache, $serviceAccessor);
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
 		self::$facade = $facade;
 
@@ -52,12 +52,6 @@ class Test extends Shelter\Tests\TestCase
 	public function testCaching(array $services)
 	{
 		list($cache, $facade) = $services;
-		IceboxMapper::$calledGetById = 0;
-
-		// force cache
-		$originalKey = $newKey = key($cache->cache);
-		$newKey[strlen($newKey) -1] = 1;
-		$cache->cache[$newKey] = $cache->cache[$originalKey];
 
 		$icebox = $facade->getById(5);
 
@@ -74,14 +68,12 @@ class Test extends Shelter\Tests\TestCase
 		$this->assertEquals(['capacity'], IceboxMapper::$lastSuggestor->getParamNames());
 
 		// tests if new suggestion cached
-		$this->assertEquals(['color', 'food', 'capacity'], reset($cache->cache[$newKey]));
+		$this->assertEquals(['color', 'food', 'capacity'], reset(reset($cache->cache)));
 	}
 
 
 	public function testGetNonexistent()
 	{
-		IceboxMapper::$calledGetById = 0;
-
 		$this->assertNull(self::$facade->getById(99));
 		$this->assertEquals(0, IceboxMapper::$calledGetById);
 	}

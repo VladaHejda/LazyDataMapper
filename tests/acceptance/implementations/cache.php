@@ -1,8 +1,8 @@
 <?php
 
-namespace Shelter\Tests\Cache;
+namespace LazyDataMapper\Tests\Cache;
 
-class SimpleCache implements \Shelter\IExternalCache
+class SimpleCache implements \LazyDataMapper\IExternalCache
 {
 
 	public $cache = [];

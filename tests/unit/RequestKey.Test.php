@@ -1,20 +1,20 @@
 <?php
 
-namespace Shelter\Tests\RequestKey;
+namespace LazyDataMapper\Tests\RequestKey;
 
-use Shelter;
+use LazyDataMapper;
 
-class Test extends Shelter\Tests\TestCase
+class Test extends LazyDataMapper\Tests\TestCase
 {
 
-	/** @var Shelter\RequestKey */
+	/** @var LazyDataMapper\RequestKey */
 	private $requestKey;
 
 
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->requestKey = new Shelter\RequestKey();
+		$this->requestKey = new LazyDataMapper\RequestKey();
 	}
 
 

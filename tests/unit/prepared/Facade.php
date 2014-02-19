@@ -1,8 +1,8 @@
 <?php
 
-namespace Shelter\Tests\Facade;
+namespace LazyDataMapper\Tests\Facade;
 
-class EmptyFacade extends \Shelter\Facade
+class EmptyFacade extends \LazyDataMapper\Facade
 {
 	protected $entityClass = '';
 }
