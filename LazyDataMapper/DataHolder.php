@@ -37,7 +37,7 @@ class DataHolder implements IDataHolder
 
 	/**
 	 * @param array|array[] $params array for one; array of arrays for container, indexed by id
-	 * @return void
+	 * @return self
 	 * @throws Exception on not suggested/unknown parameter
 	 * @throws Exception on unknown id
 	 */
@@ -62,6 +62,8 @@ class DataHolder implements IDataHolder
 			$this->checkAgainstSuggestions(array_keys($params), $suggestions);
 			$this->params = $params + $this->params;
 		}
+
+		return $this;
 	}
 
 
