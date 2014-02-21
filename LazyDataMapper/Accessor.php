@@ -140,7 +140,8 @@ class Accessor implements IAccessor
 		$entityClass = get_class($entity);
 		$suggestor = $this->cache->cacheParamName($entity->getIdentifier(), $paramName, $entityClass);
 		$dataHolder = $this->loadDataHolderByMapper($entityClass, $entity->getId(), $suggestor);
-		return array_shift($dataHolder->getParams());
+		$params = $dataHolder->getParams();
+		return array_shift($params);
 	}
 
 
