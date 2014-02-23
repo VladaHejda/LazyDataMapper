@@ -49,7 +49,7 @@ interface IEntityServiceAccessor
 
 
 	/**
-	 * Compose identifier based on input arguments. It is arbitrary distinctive string key.
+	 * Compose persistent identifier based on input arguments. It should be arbitrary distinctive string key.
 	 * @param string $entityClass
 	 * @param bool $isContainer
 	 * @param IIdentifier $parentIdentifier

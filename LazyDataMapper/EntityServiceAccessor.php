@@ -16,14 +16,13 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 
 	/**
-	 * Creates ParamMap service from classname created from Entity classname
-	 * by adding "ParamMap" at the end of it.
+	 * Creates ParamMap service from classname returned by self::getParamMapClass().
 	 * @param string $entityClass
 	 * @return IParamMap
 	 */
 	public function getParamMap($entityClass)
 	{
-		$mapName = $entityClass . 'ParamMap';
+		$mapName = $this->getParamMapClass($entityClass);
 		if (!isset($this->paramMaps[$mapName])) {
 			$this->paramMaps[$mapName] = new $mapName;
 		}
@@ -32,14 +31,13 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 
 	/**
-	 * Creates Mapper service from classname created from Entity classname
-	 * by adding "Mapper" at the end of it.
+	 * Creates Mapper service from classname returned by self::getMapperClass().
 	 * @param string $entityClass
 	 * @return IMapper
 	 */
 	public function getMapper($entityClass)
 	{
-		$mapperName = $entityClass . 'Mapper';
+		$mapperName = $this->getMapperClass($entityClass);
 		if (!isset($this->mappers[$mapperName])) {
 			$this->mappers[$mapperName] = new $mapperName;
 		}
@@ -48,14 +46,14 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 
 	/**
-	 * Tries to create Checker service from classname created from Entity classname
-	 * by adding "Checker" at the end of it. When class does not exists, returns NULL.
+	 * Tries to create Checker service from classname returned by self::getCheckerClass().
+	 * When class does not exist, returns NULL.
 	 * @param string $entityClass
 	 * @return IChecker|null
 	 */
 	public function getChecker($entityClass)
 	{
-		$checkerName = $entityClass . 'Checker';
+		$checkerName = $this->getCheckerClass($entityClass);
 		if (!array_key_exists($checkerName, $this->checkers)) {
 			$this->checkers[$checkerName] = class_exists($checkerName) ? new $checkerName : NULL;
 		}
@@ -81,7 +79,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 	/**
 	 * Makes plural (adds "s" at the end) from Entity classname.
-	 * For better results see for example @link https://gist.github.com/VladaHejda/8775965
+	 * For improved solution see for example @link https://gist.github.com/VladaHejda/8775965
 	 * @param string $entityClass
 	 * @return string
 	 */
@@ -93,6 +91,39 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 			return $entityClass . 'es';
 		}
 		return $entityClass . 's';
+	}
+
+
+	/**
+	 * Adds "ParamMap" at the end of Entity classname.
+	 * @param string $entityClass
+	 * @return string
+	 */
+	public function getParamMapClass($entityClass)
+	{
+		return $entityClass . 'ParamMap';
+	}
+
+
+	/**
+	 * Adds "Mapper" at the end of Entity classname.
+	 * @param string $entityClass
+	 * @return string
+	 */
+	public function getMapperClass($entityClass)
+	{
+		return $entityClass . 'Mapper';
+	}
+
+
+	/**
+	 * Adds "Checker" at the end of Entity classname.
+	 * @param string $entityClass
+	 * @return string
+	 */
+	public function getCheckerClass($entityClass)
+	{
+		return $entityClass . 'Checker';
 	}
 
 
