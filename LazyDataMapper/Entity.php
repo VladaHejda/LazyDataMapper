@@ -2,6 +2,9 @@
 
 namespace LazyDataMapper;
 
+/**
+ * @todo add toggle to let get only from wrappers (not clear parameters from ParamMap)
+ */
 abstract class Entity implements IEntity
 {
 
