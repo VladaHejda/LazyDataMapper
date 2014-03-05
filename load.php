@@ -13,5 +13,5 @@ function loadLazyDataMapper(IExternalCache $cache)
 	$requestKey = new \LazyDataMapper\RequestKey;
 	$entityServiceAccessor = new \LazyDataMapper\EntityServiceAccessor;
 	$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $entityServiceAccessor);
-	return new LazyDataMapper\Accessor($suggestorCache, $entityServiceAccessor);
+	return new Accessor($suggestorCache, $entityServiceAccessor);
 }
