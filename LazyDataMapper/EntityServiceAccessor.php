@@ -24,7 +24,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	{
 		$mapName = $this->getParamMapClass($entityClass);
 		if (!isset($this->paramMaps[$mapName])) {
-			$this->paramMaps[$mapName] = new $mapName;
+			$this->paramMaps[$mapName] = $this->createParamMap($mapName);
 		}
 		return $this->paramMaps[$mapName];
 	}
@@ -39,7 +39,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	{
 		$mapperName = $this->getMapperClass($entityClass);
 		if (!isset($this->mappers[$mapperName])) {
-			$this->mappers[$mapperName] = new $mapperName;
+			$this->mappers[$mapperName] = $this->createMapper($mapperName);
 		}
 		return $this->mappers[$mapperName];
 	}
@@ -55,7 +55,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	{
 		$checkerName = $this->getCheckerClass($entityClass);
 		if (!array_key_exists($checkerName, $this->checkers)) {
-			$this->checkers[$checkerName] = class_exists($checkerName) ? new $checkerName : NULL;
+			$this->checkers[$checkerName] = class_exists($checkerName) ? $this->createChecker($checkerName) : NULL;
 		}
 		return $this->checkers[$checkerName];
 	}
@@ -95,11 +95,24 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 
 	/**
+	 * @param string $entityClass
+	 * @param bool $isContainer
+	 * @param IIdentifier $parentIdentifier
+	 * @param string $sourceParam
+	 * @return IIdentifier
+	 */
+	public function composeIdentifier($entityClass, $isContainer = FALSE, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	{
+		return new Identifier($entityClass, $isContainer, $parentIdentifier, $sourceParam);
+	}
+
+
+	/**
 	 * Adds "ParamMap" at the end of Entity classname.
 	 * @param string $entityClass
 	 * @return string
 	 */
-	public function getParamMapClass($entityClass)
+	protected function getParamMapClass($entityClass)
 	{
 		return $entityClass . 'ParamMap';
 	}
@@ -110,7 +123,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return string
 	 */
-	public function getMapperClass($entityClass)
+	protected function getMapperClass($entityClass)
 	{
 		return $entityClass . 'Mapper';
 	}
@@ -121,21 +134,26 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return string
 	 */
-	public function getCheckerClass($entityClass)
+	protected function getCheckerClass($entityClass)
 	{
 		return $entityClass . 'Checker';
 	}
 
 
-	/**
-	 * @param string $entityClass
-	 * @param bool $isContainer
-	 * @param IIdentifier $parentIdentifier
-	 * @param string $sourceParam
-	 * @return IIdentifier
-	 */
-	public function composeIdentifier($entityClass, $isContainer = FALSE, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	protected function createParamMap($mapName)
 	{
-		return new Identifier($entityClass, $isContainer, $parentIdentifier, $sourceParam);
+		return new $mapName;
+	}
+
+
+	protected function createMapper($mapperName)
+	{
+		return new $mapperName;
+	}
+
+
+	protected function createChecker($checkerName)
+	{
+		return new $checkerName;
 	}
 }
