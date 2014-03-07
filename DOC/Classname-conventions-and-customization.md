@@ -23,9 +23,6 @@ To change classname calculating, override method `getMapperClass()`, to change t
 But this is very simple pluralization, for much better results see
 [PHP class for pluralizing english words](https://gist.github.com/VladaHejda/8775965) or implement your own method.
 
-- If you have your own [`Identifier`](https://github.com/VladaHejda/LazyDataMapper/blob/master/DOC/Identifier.md),
-you have to override method `composeIdentifier()`.
-
 ### Example
 
 ```php
