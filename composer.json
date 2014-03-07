@@ -1,8 +1,7 @@
 {
 	"name": "VladaHejda/LazyDataMapper",
 	"autoload": {
-		"classmap": ["LazyDataMapper/"],
-		"files": ["load.php"]
+		"classmap": ["LazyDataMapper/"]
 	},
 	"require": {
 		"php": ">=5.3.0"
