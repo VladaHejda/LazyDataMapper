@@ -6,13 +6,13 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 {
 
 	/** @var IParamMap[] */
-	protected $paramMaps = array();
+	private $paramMaps = array();
 
 	/** @var IMapper[] */
-	protected $mappers = array();
+	private $mappers = array();
 
 	/** @var IChecker[] */
-	protected $checkers = array();
+	private $checkers = array();
 
 
 	/**
@@ -20,7 +20,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return IParamMap
 	 */
-	public function getParamMap($entityClass)
+	final public function getParamMap($entityClass)
 	{
 		$mapName = $this->getParamMapClass($entityClass);
 		if (!isset($this->paramMaps[$mapName])) {
@@ -35,7 +35,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return IMapper
 	 */
-	public function getMapper($entityClass)
+	final public function getMapper($entityClass)
 	{
 		$mapperName = $this->getMapperClass($entityClass);
 		if (!isset($this->mappers[$mapperName])) {
@@ -51,7 +51,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return IChecker|null
 	 */
-	public function getChecker($entityClass)
+	final public function getChecker($entityClass)
 	{
 		$checkerName = $this->getCheckerClass($entityClass);
 		if (!array_key_exists($checkerName, $this->checkers)) {

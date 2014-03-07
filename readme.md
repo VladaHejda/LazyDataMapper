@@ -10,9 +10,9 @@ LazyDataMapper
 
 ```
 
-### create class implementing `LazyDataMapper\IExternalCache` with some persistent caching method
+### create `LazyDataMapper\IExternalCache`
 
-Apply some **persistent** caching way (`SomeFileCache` class is illustrative).
+Apply some **persistent** caching way in `LazyDataMapper\IExternalCache` (`SomeFileCache` class is illustrative).
 
 ```php
 class LazyDataMapperCache implements \LazyDataMapper\IExternalCache
