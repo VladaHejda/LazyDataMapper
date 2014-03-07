@@ -29,7 +29,6 @@ But this is very simple pluralization, for much better results see
 class Product extends \LazyDataMapper\Entity
 {
 }
-
 ```
 
 ```php
@@ -38,7 +37,6 @@ namespace Product;
 class Facade extends \LazyDataMapper\Facade
 {
 }
-
 ```
 
 ```php
@@ -50,7 +48,6 @@ class ParamMap extends \LazyDataMapper\ParamMap
 		'name', 'price', 'count',
 	];
 }
-
 ```
 
 Mapper needs `PDO`:
@@ -70,7 +67,6 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	// ...
 }
-
 ```
 
 So we must override method `createMapper()` in `EntityServiceAccessor` to maintain dependency injection:
@@ -111,5 +107,4 @@ class MyEntityServiceAccessor extends \LazyDataMapper\EntityServiceAccessor
 		return new $mapper($this->pdo);
 	}
 }
-
 ```

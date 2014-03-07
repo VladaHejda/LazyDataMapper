@@ -11,11 +11,10 @@ This is the occasion for [`EntityContainer`](https://github.com/VladaHejda/LazyD
 class Products extends \LazyDataMapper\EntityContainer
 {
 }
-
 ```
 
 *If the classname is not the plural version of Entity classname, see how to solve it at
-[Classname conventions and customization](https://github.com/VladaHejda/LazyDataMapper/blob/master/DOC/Classname-conventions-and-customization.md)*
+[Classname conventions and customization](https://github.com/VladaHejda/LazyDataMapper/blob/master/DOC/Classname-conventions-and-customization.md).*
 
 ### then you need to gain data range in Mapper:
 
@@ -45,7 +44,6 @@ class Mapper implements \LazyDataMapper\IMapper
 
 	// ...
 }
-
 ```
 
 ### done, you can create one
@@ -60,7 +58,6 @@ foreach ($products as $i => $product) {
 	echo $product->count . 'x';
 	echo "\n";
 }
-
 ```
 
 will result to something similar to:
@@ -69,5 +66,4 @@ will result to something similar to:
 1. Calculator 5x
 2. Notebook 1x
 3. TV 17x
-
 ```

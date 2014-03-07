@@ -7,7 +7,6 @@ LazyDataMapper
 "require": {
     "vladahejda/lazydatamapper": "@dev"
 }
-
 ```
 
 ### create `LazyDataMapper\IExternalCache`
@@ -35,7 +34,6 @@ class LazyDataMapperCache implements \LazyDataMapper\IExternalCache
 		$this->cache->save($key, $value);
 	}
 }
-
 ```
 
 ### init LazyDataMapper
@@ -49,7 +47,6 @@ $requestKey = new \LazyDataMapper\RequestKey;
 $entityServiceAccessor = new \LazyDataMapper\EntityServiceAccessor;
 $suggestorCache = new \LazyDataMapper\SuggestorCache($cache, $requestKey, $entityServiceAccessor);
 $lazyDataMapperAccessor = new \LazyDataMapper\Accessor($suggestorCache, $entityServiceAccessor);
-
 ```
 
 Or you can let build dependencies by your famous framework.
@@ -70,7 +67,6 @@ class Product extends \LazyDataMapper\Entity
 class ProductFacade extends \LazyDataMapper\Facade
 {
 }
-
 ```
 
 `ParamMap` must define the list of parameters, which will be loaded from data storage.
@@ -83,7 +79,6 @@ class ProductParamMap extends \LazyDataMapper\ParamMap
 		'name', 'price', 'count',
 	];
 }
-
 ```
 
 Mapper becomes your pivotal class for each model. It is the place where you must implement data getting from anywhere.
@@ -145,7 +140,6 @@ class Mapper implements \LazyDataMapper\IMapper
 	{
 	}
 }
-
 ```
 
 And this is it! You have got the most elemental LazyDataMapper model for real work!
@@ -164,7 +158,6 @@ Now, create ProductFacade:
 
 ```php
 $productFacade = new \ProductFacade($lazyDataMapperAccessor);
-
 ```
 
 and happily get entities:
