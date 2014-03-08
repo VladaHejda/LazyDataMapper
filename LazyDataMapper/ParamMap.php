@@ -2,6 +2,7 @@
 
 namespace LazyDataMapper;
 
+// todo not typed, but GROUPED! :)
 abstract class ParamMap implements IParamMap
 {
 
