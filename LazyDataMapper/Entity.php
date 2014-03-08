@@ -4,6 +4,7 @@ namespace LazyDataMapper;
 
 /**
  * @todo add toggle to let get only from wrappers (not clear parameters from ParamMap)
+ * @todo change "clear" to "base"?
  */
 abstract class Entity implements IEntity
 {
@@ -22,6 +23,8 @@ abstract class Entity implements IEntity
 
 	/** @var bool give TRUE to activate paramNames translation, see self::translate() */
 	protected $translate = FALSE;
+
+	const SELF = 0;
 
 	/** @var array */
 	private $params;
@@ -362,15 +365,20 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * @param string $entityClass
+	 * @param string $entityClass or self::SELF to get descendant of same class
 	 * @param string|IRestrictor $sourceParamOrRestrictor
 	 * @param int|null $id id of Entity, when not accessible from source parameter
 	 * @return IOperand
 	 * @todo maybe when getter directly gets descendant and sourceParam is the same, sourceParam argument should be omitted?
+	 * @todo and when id is given, source parameter could be calculated automatically
+	 * @todo when creating descendant of self, maybe even the first argument can be omitted
 	 */
 	protected function getDescendant($entityClass, $sourceParamOrRestrictor, $id = NULL)
 	{
-		if ($sourceParamOrRestrictor instanceof IRestrictor) {
+		if ($entityClass === self::SELF) {
+			$entityClass = get_class($this);
+		}
+		if (is_array($sourceParamOrRestrictor) || $sourceParamOrRestrictor instanceof IRestrictor) {
 			return $this->accessor->getByRestrictions($entityClass, $sourceParamOrRestrictor, $this);
 		} else {
 			if (NULL === $id) {
