@@ -1,4 +1,4 @@
-Entity
+Entity (reading)
 ===
 
 ### Wrappers

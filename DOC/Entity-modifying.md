@@ -1,0 +1,175 @@
+Entity (modifying)
+===
+
+## Unwrappers
+
+As for reading are **wrappers**, modifying ensure **unwrappers**.
+
+In default Entity state, all parameters are read-only. If you want to make some of them
+changeable, you have to create unwrapper:
+
+```php
+class Product extends \LazyDataMapper\Entity
+{
+	protected function setName($name)
+	{
+		return (string) $name;
+	}
+}
+
+$product = $productFacade->getById(3);
+
+echo $product->name; // prints "Icebox"
+$product->name = "TV";
+echo $product->name; // prints "TV"
+```
+
+Unwrapper is the excellent place to validate and adapt inputs.
+
+### Abstract unwrapper
+
+You can make abstract unwrapper:
+
+```php
+class Product extends \LazyDataMapper\Entity
+{
+	protected function setTax($tax)
+	{
+		$this->taxedPrice = $this->price + $tax;
+	}
+}
+
+$product = $productFacade->getById(3);
+
+echo $product->price; // prints 100
+echo $product->taxedPrice; // prints 110
+$product->tax = 30;
+echo $product->taxedPrice; // prints 130
+```
+
+### Private and read-only parameter
+
+If you want to modify private or read-only parameter:
+
+```php
+class Product extends \LazyDataMapper\Entity
+{
+	protected function setStockCount($count)
+	{
+		$this->setReadOnlyOrPrivate('on_stock', $count);
+	}
+}
+
+$product = $productFacade->getById(3);
+
+$product->stockCount = 15;
+```
+
+### NULL value exception
+
+*Notice that unwrapper is watched if it did not forget to return new value. In rare cases this can bring
+unexpected Exception. See this:*
+
+```php
+class Product extends \LazyDataMapper\Entity
+{
+	protected function setAccessory($accessory)
+	{
+		if ($accessory === 'NONE') {
+			return NULL;
+		}
+		return (string) $accessory;
+	}
+}
+
+$product = $productFacade->getById(3);
+
+$product->accessory = 'NONE'; // you expect that $product->accessory becomes NULL, but Exception is thrown
+```
+
+This behavior occurs because Entity does not know if you forgot to return new value or if you really
+returned *NULL* (in PHP this cannot be discovered). What you must to do is to throw `NullValueException`:
+
+```php
+class Product extends \LazyDataMapper\Entity
+{
+	protected function setAccessory($accessory)
+	{
+		if ($accessory === 'NONE') {
+			throw new \LazyDataMapper\NullValueException;
+		}
+		return (string) $accessory;
+	}
+}
+```
+
+But this occurs only rarely, because if you return *NULL* and the set value is something equal to *FALSE*
+(in loose comparison, e.g. "", 0, empty array), it works fine (in previous example, string "NONE" did not
+equal to FALSE):
+
+```php
+class Product extends \LazyDataMapper\Entity
+{
+	protected function setAccessory($accessory)
+	{
+		if (!$accessory) {
+			return NULL; // works fine, because $accessory == FALSE
+		}
+		return (string) $accessory;
+	}
+}
+```
+
+## Saving modified Entity
+
+Save is triggered simply:
+
+```php
+$product->save();
+```
+
+But what is needed is to implement method `save()` in Mapper:
+
+```php
+use LazyDataMapper\IDataHolder;
+
+class Mapper implements \LazyDataMapper\IMapper
+{
+	// ...
+
+	public function save($id, IDataHolder $holder)
+	{
+		$changes = $holder->getParams();
+		$columns = '`' . implode('` = ?,`', array_keys($changes)) . '` = ?';
+		$statement = $this->pdo->prepare("UPDATE product SET $columns WHERE id = ?");
+		$statement->execute(array_merge(array_values($changes), [$id]));
+	}
+}
+```
+
+That's all. Product can be modified!
+
+## Entity state
+
+Entity provides several methods to discover the state of it:
+
+- `$product->getId()` returns id of Entity
+
+- `isset($product->name)` says whether parameter is achievable
+
+- `$product->isReadOnly('name')` says whether parameter is immutable
+
+- `$product->isChanged('name')` says whether parameter was changed (and not saved yet)
+
+- `$product->isChanged()` says whether at least one parameter in Entity was modified
+
+- `$product->getOriginal('name')` returns original value of parameter (has sense if it was modified)
+
+- `$product->reset('name')` if parameter is modified, this resets it to original value
+
+- `$product->reset()` resets all changed parameters in Entity
+
+- `unset($product->name)` same as $product->name = NULL
+
+- `$product->save()` after save, Entity adopts all changed parameters as original, so it
+reports that it is not changed
