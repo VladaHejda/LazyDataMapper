@@ -71,22 +71,23 @@ abstract class Facade implements IFacade
 
 
 	/**
-	 * Recommended to override and apply mandatory arguments for new Entity.
-	 * @param array $data
-	 * @param bool $throwFirst whether throw first IntegrityException from Checker
-	 * @return IEntity
+	 * @param int $id
 	 */
-	public function create(array $data = array(), $throwFirst = TRUE)
+	public function remove($id)
 	{
-		return $this->accessor->create($this->entityClass, $data, $throwFirst);
+		$this->accessor->remove($this->entityClass, $id);
 	}
 
 
 	/**
-	 * @param int $id
+	 * For creation it is recommended to create method self::create() in descendant
+	 * and require mandatory parameters for new Entity.
+	 * @param array $data
+	 * @param bool $throwFirst whether throw first IntegrityException from Checker
+	 * @return IEntity
 	 */
-	function remove($id)
+	protected function createEntity(array $data = array(), $throwFirst = TRUE)
 	{
-		$this->accessor->remove($this->entityClass, $id);
+		return $this->accessor->create($this->entityClass, $data, $throwFirst);
 	}
 }

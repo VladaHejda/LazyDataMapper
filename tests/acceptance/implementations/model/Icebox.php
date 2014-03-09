@@ -131,6 +131,12 @@ class IceboxFacade extends LazyDataMapper\Facade
 {
 
 	protected $entityClass = ['LazyDataMapper\Tests\Icebox', 'LazyDataMapper\Tests\Iceboxes'];
+
+
+	public function create(array $data, $throwFirst = TRUE)
+	{
+		return $this->createEntity($data, $throwFirst);
+	}
 }
 
 
