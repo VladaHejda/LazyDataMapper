@@ -40,7 +40,8 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		// tests if suggestions cached
 		$this->assertCount(1, $cache->cache);
-		$this->assertEquals(['color', 'food'], reset(reset($cache->cache)));
+		$cached = reset($cache->cache);
+		$this->assertEquals(['color', 'food'], reset($cached));
 
 		return [$cache, $facade];
 	}
@@ -68,7 +69,8 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(['capacity'], IceboxMapper::$lastSuggestor->getParamNames());
 
 		// tests if new suggestion cached
-		$this->assertEquals(['color', 'food', 'capacity'], reset(reset($cache->cache)));
+		$cached = reset($cache->cache);
+		$this->assertEquals(['color', 'food', 'capacity'], reset($cached));
 	}
 
 

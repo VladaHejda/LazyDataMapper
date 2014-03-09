@@ -50,7 +50,8 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals([], $icebox->food);
 
 		$this->assertEquals(2, IceboxMapper::$calledGetById);
-		$this->assertEquals(['capacity', 'food'], reset(reset($cache->cache)));
+		$cached = reset($cache->cache);
+		$this->assertEquals(['capacity', 'food'], reset($cached));
 
 		return [$cache, $facade];
 	}
@@ -73,6 +74,7 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertFalse($icebox->repaired);
 		$this->assertEquals(2, IceboxMapper::$calledGetById);
-		$this->assertEquals(['capacity', 'food', 'repairs'], reset(reset($cache->cache)));
+		$cached = reset($cache->cache);
+		$this->assertEquals(['capacity', 'food', 'repairs'], reset($cached));
 	}
 }
