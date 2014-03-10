@@ -1,4 +1,4 @@
 LazyDataMapper
 ===
 
-See [installation at DOC](https://github.com/VladaHejda/LazyDataMapper/blob/master/DOC/Installation.md).
+See [installation at DOC](DOC/1.Installation.md).
