@@ -110,4 +110,12 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	{
 		unset(static::$data[$id]);
 	}
+
+
+	public function removeByIdsRange(array $ids)
+	{
+		foreach ($ids as $id) {
+			$this->remove($id);
+		}
+	}
 }

@@ -7,7 +7,8 @@ namespace LazyDataMapper;
  * There are two ways of determining Entity / EntityContainer classname:
  * - override property $entityClass in the descendant of this class due to the array pattern:
  *   [<EntityClassname>, <EntityContainerClassname>]
- * - apply solution in IEntityServiceAccessor::getEntityClass(). There is some default solution.
+ * - apply solution in IEntityServiceAccessor method getEntityClass() and getEntityContainerClass().
+ *   There is some default solution.
  */
 abstract class Facade implements IFacade
 {
@@ -15,16 +16,16 @@ abstract class Facade implements IFacade
 	/** @var array|string */
 	protected $entityClass;
 
-	/** @var IAccessor */
+	/** @var Accessor */
 	private $accessor;
 
 
 	/**
-	 * @param IAccessor $accessor
+	 * @param Accessor $accessor
 	 * @param IEntityServiceAccessor $serviceAccessor
 	 * @throws Exception
 	 */
-	public function __construct(IAccessor $accessor, IEntityServiceAccessor $serviceAccessor = NULL)
+	public function __construct(Accessor $accessor, IEntityServiceAccessor $serviceAccessor = NULL)
 	{
 		$this->accessor = $accessor;
 		if (NULL === $this->entityClass) {
@@ -76,6 +77,24 @@ abstract class Facade implements IFacade
 	public function remove($id)
 	{
 		$this->accessor->remove($this->entityClass, $id);
+	}
+
+
+	/**
+	 * @param int[] $ids
+	 */
+	public function removeByIdsRange(array $ids)
+	{
+		$this->accessor->removeByRestrictions($this->entityClass, $ids);
+	}
+
+
+	/**
+	 * @param IRestrictor $restrictor
+	 */
+	public function removeByRestrictions(IRestrictor $restrictor)
+	{
+		$this->accessor->removeByRestrictions($this->entityClass, $restrictor);
 	}
 
 

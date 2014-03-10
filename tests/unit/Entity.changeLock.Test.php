@@ -20,7 +20,7 @@ class ChangeLockTest extends LazyDataMapper\Tests\TestCase
 
 		parent::setUp();
 
-		$accessor = \Mockery::mock('LazyDataMapper\IAccessor');
+		$accessor = new LazyDataMapper\Accessor(\Mockery::mock('LazyDataMapper\ISuggestorCache'), \Mockery::mock('LazyDataMapper\IEntityServiceAccessor'));
 		$identifier = \Mockery::mock('LazyDataMapper\IIdentifier');
 		$data = [
 			'name' => 'John', 'age' => 17

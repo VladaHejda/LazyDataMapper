@@ -68,4 +68,11 @@ interface IMapper
 	 * @return void
 	 */
 	function remove($id);
+
+
+	/**
+	 * @param array $ids
+	 * @return void
+	 */
+	function removeByIdsRange(array $ids);
 }

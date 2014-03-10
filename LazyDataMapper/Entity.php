@@ -16,7 +16,7 @@ abstract class Entity implements IEntity
 	/** @var IIdentifier */
 	protected $identifier;
 
-	/** @var IAccessor */
+	/** @var Accessor */
 	protected $accessor;
 
 	/** @var array list of private param names */
@@ -50,9 +50,9 @@ abstract class Entity implements IEntity
 	 * @param int $id
 	 * @param array $params
 	 * @param IIdentifier $identifier
-	 * @param IAccessor $accessor
+	 * @param Accessor $accessor
 	 */
-	public function __construct($id, array $params, IIdentifier $identifier, IAccessor $accessor)
+	public function __construct($id, array $params, IIdentifier $identifier, Accessor $accessor)
 	{
 		$this->id = (int) $id;
 		$this->params = $params;

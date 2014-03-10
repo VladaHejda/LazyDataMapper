@@ -3,9 +3,10 @@
 namespace LazyDataMapper;
 
 /**
- * @todo make some methods final (this is pivotal class of model)
+ * The main class leading all dependencies.
+ * @todo baseNamespace setting? It could be for example AppName\Entities - will be added during new instance creating, but not stored to cache
  */
-class Accessor implements IAccessor
+final class Accessor
 {
 
 	/** @var ISuggestorCache */
@@ -29,6 +30,9 @@ class Accessor implements IAccessor
 	}
 
 
+	/********************* interface for IFacade *********************/
+
+
 	/**
 	 * Do not call this method directly!
 	 * @param array|string $entityClass
@@ -38,7 +42,7 @@ class Accessor implements IAccessor
 	 * @return IEntity
 	 * @throws Exception
 	 */
-	final public function getById($entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
+	public function getById($entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
 	{
 		list($entityClass) = $this->extractEntityClasses($entityClass);
 
@@ -85,25 +89,11 @@ class Accessor implements IAccessor
 	 */
 	public function getByRestrictions($entityClass, $restrictor, IOperand $parent = NULL)
 	{
-		if (!$restrictor instanceof IRestrictor && !is_array($restrictor)) {
-			throw new Exception('Expected instance of IRestrictor or an array.');
-		}
-
 		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
 
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
+		$ids = $this->loadIdsByRestrictions($entityClass, $restrictor);
 
-		if (is_array($restrictor)) {
-			$ids = $restrictor;
-		} else {
-			$mapper = $this->serviceAccessor->getMapper($entityClass);
-			$ids = $mapper->getIdsByRestrictions($restrictor);
-			if (NULL === $ids) {
-				$ids = array();
-			} elseif (!is_array($ids)) {
-				throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
-			}
-		}
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
 
 		if (!empty($ids)) {
 			$suggestor = $this->cache->getCached($identifier, $entityClass);
@@ -120,28 +110,6 @@ class Accessor implements IAccessor
 		}
 
 		return $this->createEntityContainer($entityContainerClass, $data, $identifier, $entityClass);
-	}
-
-
-	public function hasParam(IEntity $entity, $paramName)
-	{
-		$entityClass = get_class($entity);
-		return $this->serviceAccessor->getParamMap($entityClass)->hasParam($paramName);
-	}
-
-
-	/**
-	 * @param IEntity $entity
-	 * @param string $paramName
-	 * @return string
-	 */
-	public function getParam(IEntity $entity, $paramName)
-	{
-		$entityClass = get_class($entity);
-		$suggestor = $this->cache->cacheParamName($entity->getIdentifier(), $paramName, $entityClass);
-		$dataHolder = $this->loadDataHolderByMapper($entityClass, $entity->getId(), $suggestor);
-		$params = $dataHolder->getParams();
-		return array_shift($params);
 	}
 
 
@@ -180,6 +148,59 @@ class Accessor implements IAccessor
 
 
 	/**
+	 * @param array|string $entityClass
+	 * @param int $id
+	 */
+	public function remove($entityClass, $id)
+	{
+		list($entityClass) = $this->extractEntityClasses($entityClass);
+		$this->serviceAccessor->getMapper($entityClass)->remove($id);
+	}
+
+
+	/**
+	 * @param string $entityClass
+	 * @param IRestrictor|int[] $restrictor
+	 * @throws Exception
+	 */
+	public function removeByRestrictions($entityClass, $restrictor)
+	{
+		list($entityClass) = $this->extractEntityClasses($entityClass);
+
+		$ids = $this->loadIdsByRestrictions($entityClass, $restrictor);
+
+		if (!empty($ids)) {
+			$this->serviceAccessor->getMapper($entityClass)->removeByIdsRange($ids);
+		}
+	}
+
+
+	/********************* interface for IEntity *********************/
+
+
+	public function hasParam(IEntity $entity, $paramName)
+	{
+		$entityClass = get_class($entity);
+		return $this->serviceAccessor->getParamMap($entityClass)->hasParam($paramName);
+	}
+
+
+	/**
+	 * @param IEntity $entity
+	 * @param string $paramName
+	 * @return string
+	 */
+	public function getParam(IEntity $entity, $paramName)
+	{
+		$entityClass = get_class($entity);
+		$suggestor = $this->cache->cacheParamName($entity->getIdentifier(), $paramName, $entityClass);
+		$dataHolder = $this->loadDataHolderByMapper($entityClass, $entity->getId(), $suggestor);
+		$params = $dataHolder->getParams();
+		return array_shift($params);
+	}
+
+
+	/**
 	 * @param IEntity $entity
 	 * @param bool $throwFirst
 	 */
@@ -195,17 +216,6 @@ class Accessor implements IAccessor
 		$dataHolder->setParams($data);
 
 		$this->serviceAccessor->getMapper($entityClass)->save($entity->getId(), $dataHolder);
-	}
-
-
-	/**
-	 * @param array|string $entityClass
-	 * @param int $id
-	 */
-	public function remove($entityClass, $id)
-	{
-		list($entityClass) = $this->extractEntityClasses($entityClass);
-		$this->serviceAccessor->getMapper($entityClass)->remove($id);
 	}
 
 
@@ -252,6 +262,34 @@ class Accessor implements IAccessor
 
 
 	/********************* internal *********************/
+
+
+	/**
+	 * @param string $entityClass
+	 * @param IRestrictor|int[] $restrictor
+	 * @return int[]
+	 * @throws Exception
+	 */
+	private function loadIdsByRestrictions($entityClass, $restrictor)
+	{
+		if (!$restrictor instanceof IRestrictor && !is_array($restrictor)) {
+			throw new Exception('Expected instance of IRestrictor or an array.');
+		}
+
+		if (is_array($restrictor)) {
+			$ids = $restrictor;
+		} else {
+			$mapper = $this->serviceAccessor->getMapper($entityClass);
+			$ids = $mapper->getIdsByRestrictions($restrictor);
+			if (NULL === $ids) {
+				$ids = array();
+			} elseif (!is_array($ids)) {
+				throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
+			}
+		}
+
+		return $ids;
+	}
 
 
 	/**

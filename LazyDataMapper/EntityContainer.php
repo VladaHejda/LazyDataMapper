@@ -10,7 +10,7 @@ abstract class EntityContainer implements IEntityContainer
 	/** @var IIdentifier */
 	protected $identifier;
 
-	/** @var IAccessor */
+	/** @var Accessor */
 	protected $accessor;
 
 	/** @var int[] */
@@ -35,11 +35,11 @@ abstract class EntityContainer implements IEntityContainer
 	/**
 	 * @param array[] $data array of params of each Entity, indexed by id, order dependent
 	 * @param IIdentifier $identifier
-	 * @param IAccessor $accessor
+	 * @param Accessor $accessor
 	 * @param string $entityClass
 	 * @throws Exception
 	 */
-	public function __construct(array $data, IIdentifier $identifier, IAccessor $accessor, $entityClass)
+	public function __construct(array $data, IIdentifier $identifier, Accessor $accessor, $entityClass)
 	{
 		foreach ($data as $params) {
 			if (!is_array($params)) {

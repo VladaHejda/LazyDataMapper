@@ -33,4 +33,16 @@ interface IFacade
 	 * @param int $id
 	 */
 	function remove($id);
+
+
+	/**
+	 * @param int[] $ids
+	 */
+	function removeByIdsRange(array $ids);
+
+
+	/**
+	 * @param IRestrictor $restrictor
+	 */
+	function removeByRestrictions(IRestrictor $restrictor);
 }

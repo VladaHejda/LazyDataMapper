@@ -29,7 +29,8 @@ class Test extends LazyDataMapper\Tests\TestCase
 
 	public function testGetEntityClass()
 	{
-		$facade = new LazyDataMapper\Tests\Facade\EmptyFacade(\Mockery::mock('LazyDataMapper\IAccessor'));
+		$accessor = new LazyDataMapper\Accessor(\Mockery::mock('LazyDataMapper\ISuggestorCache'), \Mockery::mock('LazyDataMapper\IEntityServiceAccessor'));
+		$facade = new LazyDataMapper\Tests\Facade\EmptyFacade($accessor);
 		$this->assertEquals('LazyDataMapper\Tests\Facade\Empty', $this->serviceAccessor->getEntityClass($facade));
 	}
 }
