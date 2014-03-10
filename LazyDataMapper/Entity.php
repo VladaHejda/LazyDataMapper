@@ -5,6 +5,7 @@ namespace LazyDataMapper;
 /**
  * @todo add toggle to let get only from wrappers (not clear parameters from ParamMap)
  * @todo change "clear" to "base"?
+ * @property-read int $id
  */
 abstract class Entity implements IEntity
 {
@@ -85,6 +86,10 @@ abstract class Entity implements IEntity
 	 */
 	public function __get($param)
 	{
+		if ($param === 'id') {
+			return $this->id;
+		}
+
 		$param[0] = strtolower($param[0]);
 		$param = $this->translateParamName($param);
 
