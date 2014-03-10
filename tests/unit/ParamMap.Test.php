@@ -9,9 +9,14 @@ require_once __DIR__ . '/prepared/ParamMap.php';
 class Test extends LazyDataMapper\Tests\TestCase
 {
 
-	public function testParamMapOneDimensional()
+	public function testOneDimensional()
 	{
 		$paramMap = new OneDimensionalParamMap;
+
+		$this->assertFalse($paramMap->isSeparatedByType());
+		$this->assertTrue($paramMap->hasParam('name'));
+		$this->assertFalse($paramMap->hasParam('unknown'));
+
 		$map = $paramMap->getMap();
 		$this->assertCount(2, $map);
 		$this->assertTrue(array_key_exists('name', $map));
@@ -19,9 +24,17 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testParamMapTwoDimensional()
+	public function testTwoDimensional()
 	{
 		$paramMap = new TwoDimensionalParamMap;
+
+		$this->assertTrue($paramMap->isSeparatedByType());
+		$this->assertTrue($paramMap->hasParam('strength'));
+		$this->assertFalse($paramMap->hasParam('unknown'));
+		$this->assertTrue($paramMap->hasType('skill'));
+		$this->assertFalse($paramMap->hasType('unknown'));
+		$this->assertEquals('skill', $paramMap->getParamType('intelligence'));
+
 		$map = $paramMap->getMap();
 		$this->assertCount(2, $map);
 		$this->assertTrue(isset($map['personal']));
@@ -35,7 +48,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testParamMapOneDimensionalNoFlip()
+	public function testOneDimensionalNoFlip()
 	{
 		$paramMap = new OneDimensionalParamMap;
 		$map = $paramMap->getMap(NULL, FALSE);
@@ -45,7 +58,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testParamMapTwoDimensionalNoFlip()
+	public function testTwoDimensionalNoFlip()
 	{
 		$paramMap = new TwoDimensionalParamMap;
 		$map = $paramMap->getMap(NULL, FALSE);
@@ -57,7 +70,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testParamMapTwoDimensionalGetType()
+	public function testTwoDimensionalGetType()
 	{
 		$paramMap = new TwoDimensionalParamMap;
 		$map = $paramMap->getMap('personal');
@@ -67,12 +80,21 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testParamMapTwoDimensionalGetTypeNoFlip()
+	public function testTwoDimensionalGetTypeNoFlip()
 	{
 		$paramMap = new TwoDimensionalParamMap;
 		$map = $paramMap->getMap('skill', FALSE);
 		$this->assertCount(2, $map);
 		$this->assertTrue(in_array('strength', $map));
 		$this->assertTrue(in_array('intelligence', $map));
+	}
+
+
+	public function testDefaultParams()
+	{
+		$paramMap = new DefaultParamsParamMap;
+		$this->assertNull($paramMap->getDefaultValue('name'));
+		$this->assertTrue(0 === $paramMap->getDefaultValue('age'));
+		$this->assertEquals('01-01-2009', $paramMap->getDefaultValue('time'));
 	}
 }

@@ -176,7 +176,7 @@ abstract class EntityContainer implements IEntityContainer
 	protected function createEntity($id, array $params)
 	{
 		$entityClass = $this->entityClass;
-		return new $entityClass($id, $params, $this->identifier, $this->accessor);
+		return new $entityClass($id, $params, $this->accessor, $this->identifier);
 	}
 
 

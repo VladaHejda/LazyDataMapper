@@ -9,9 +9,9 @@ interface IChecker
 {
 
 	/**
-	 * @param IDataEnvelope $subject IEntity when updating, IDataHolder when creating new Entity
+	 * @param IEntity $entity
 	 * @return void
 	 * @throws IntegrityException when integrity fails
 	 */
-	function check(IDataEnvelope $subject);
+	function check(IEntity $entity);
 }

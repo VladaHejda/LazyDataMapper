@@ -27,6 +27,9 @@ abstract class Entity implements IEntity
 
 	const SELF = 0;
 
+	/** @var bool */
+	private $persistent = FALSE;
+
 	/** @var array */
 	private $params;
 
@@ -47,16 +50,23 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * @param int $id
+	 * @param int|NULL $id
 	 * @param array $params
-	 * @param IIdentifier $identifier
 	 * @param Accessor $accessor
+	 * @param IIdentifier $identifier
+	 * @throws Exception
 	 */
-	public function __construct($id, array $params, IIdentifier $identifier, Accessor $accessor)
+	public function __construct($id, array $params, Accessor $accessor, IIdentifier $identifier = NULL)
 	{
-		$this->id = (int) $id;
+		if (NULL !== $id) {
+			$this->id = (int) $id;
+			if (!$identifier) {
+				throw new Exception("Identifier is required in persistent Entity.");
+			}
+			$this->identifier = $identifier;
+			$this->persistent = TRUE;
+		}
 		$this->params = $params;
-		$this->identifier = $identifier;
 		$this->accessor = $accessor;
 	}
 
@@ -462,8 +472,8 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * Method for extension prepared for lazy loading. When param does not exist, this can say
-	 * it actually exists, but was not loaded by method load(). It will load by method lazyLoad().
+	 * Method for lazy loading. When param does not exist, this can say it actually exists.
+	 * It will load by method lazyLoad().
 	 * @param string $paramName
 	 * @return bool
 	 */
@@ -474,13 +484,16 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * Lazy loading method for extension. When method hasLazy() said that param exists, this method
-	 * loads it.
+	 * Lazy loading method. When method hasLazy() said that param exists, this method loads it.
+	 * If Entity is not persisted (during creation process), it loads default value.
 	 * @param string $paramName
 	 * @return mixed
 	 */
 	protected function lazyLoad($paramName)
 	{
+		if (!$this->persistent) {
+			return $this->accessor->getDefaultParam($this, $paramName);
+		}
 		return $this->accessor->getParam($this, $paramName);
 	}
 

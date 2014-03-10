@@ -99,14 +99,14 @@ abstract class Facade implements IFacade
 
 
 	/**
-	 * For creation it is recommended to create method self::create() in descendant
-	 * and require mandatory parameters for new Entity.
-	 * @param array $data
+	 * For creation create method self::create() in descendant and require mandatory parameters for new Entity.
+	 * @param array $publicData
+	 * @param array $privateData
 	 * @param bool $throwFirst whether throw first IntegrityException from Checker
 	 * @return IEntity
 	 */
-	protected function createEntity(array $data = array(), $throwFirst = TRUE)
+	protected function createEntity(array $publicData, array $privateData = array(), $throwFirst = TRUE)
 	{
-		return $this->accessor->create($this->entityClass, $data, $throwFirst);
+		return $this->accessor->create($this->entityClass, $publicData, $privateData, $throwFirst);
 	}
 }

@@ -135,7 +135,13 @@ class IceboxFacade extends LazyDataMapper\Facade
 
 	public function create(array $data, $throwFirst = TRUE)
 	{
-		return $this->createEntity($data, $throwFirst);
+		if (isset($data['food'])) {
+			$data['food'] = implode('|', $data['food']);
+		}
+		$private = array_flip(['repairs', 'food']);
+		$publicData = array_diff_key($data, $private);
+		$privateData = array_intersect_key($data, $private);
+		return $this->createEntity($publicData, $privateData, $throwFirst);
 	}
 }
 
@@ -194,19 +200,19 @@ class IceboxChecker extends LazyDataMapper\Checker
 	}
 
 
-	protected function checkCreate(LazyDataMapper\IDataHolder $holder)
+	protected function checkCreate(LazyDataMapper\IEntity $icebox)
 	{
 		$this->addCheck('integrity');
 
-		if ($holder->color == 'nice') {
+		if ($icebox->color == 'nice') {
 			$this->addError('Nice is not a color!');
 		}
 	}
 
 
-	protected function checkIntegrity(LazyDataMapper\IDataEnvelope $subject)
+	protected function checkIntegrity(LazyDataMapper\IEntity $icebox)
 	{
-		if (count($subject->food) > 4 && $subject->capacity < 20) {
+		if (count($icebox->food) > 4 && $icebox->capacity < 20) {
 			$this->addError("Not enough space in icebox.");
 		}
 	}

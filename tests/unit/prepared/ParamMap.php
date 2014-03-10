@@ -14,3 +14,10 @@ class TwoDimensionalParamMap extends \LazyDataMapper\ParamMap
 		'skill' => ['strength', 'intelligence'],
 	];
 }
+
+class DefaultParamsParamMap extends \LazyDataMapper\ParamMap
+{
+	protected $map = ['name', 'age', 'time'];
+
+	protected $default = ['age' => 0, 'time' => '01-01-2009'];
+}

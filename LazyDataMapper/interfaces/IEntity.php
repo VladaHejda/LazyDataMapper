@@ -5,7 +5,7 @@ namespace LazyDataMapper;
 /**
  * @entityDependent
  */
-interface IEntity extends IOperand, IDataEnvelope
+interface IEntity extends IOperand
 {
 
 	/**

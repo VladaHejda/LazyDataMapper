@@ -46,4 +46,12 @@ interface IParamMap
 	 * @throws Exception on unknown param name
 	 */
 	function getParamType($paramName);
+
+
+	/**
+	 * @param string $paramName
+	 * @return mixed
+	 * @throws Exception on unknown param name
+	 */
+	function getDefaultValue($paramName);
 }

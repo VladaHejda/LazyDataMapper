@@ -9,6 +9,9 @@ abstract class ParamMap implements IParamMap
 	/** @var array set this map in descendant */
 	protected $map = array();
 
+	/** @var array optional default values of parameters */
+	protected $default = array();
+
 	/** @var bool */
 	private $separatedByType;
 
@@ -125,5 +128,23 @@ abstract class ParamMap implements IParamMap
 			}
 		}
 		throw new Exception(get_class($this).": unknown parameter name $paramName.");
+	}
+
+
+	/**
+	 * @param string $paramName
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function getDefaultValue($paramName)
+	{
+		if (!$this->hasParam($paramName)) {
+			throw new Exception(get_class($this).": unknown parameter name $paramName.");
+		}
+
+		if (array_key_exists($paramName, $this->default)) {
+			return $this->default[$paramName];
+		}
+		return NULL;
 	}
 }

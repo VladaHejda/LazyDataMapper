@@ -115,20 +115,29 @@ final class Accessor
 
 	/**
 	 * @param array|string $entityClass
-	 * @param array $data
+	 * @param array $publicData
+	 * @param array $privateData
 	 * @param bool $throwFirst
 	 * @return IEntity
 	 * @throws Exception
 	 */
-	public function create($entityClass, array $data, $throwFirst = TRUE)
+	public function create($entityClass, array $publicData, array $privateData = array(), $throwFirst = TRUE)
 	{
 		list($entityClass) = $this->extractEntityClasses($entityClass);
 
+		$entity = $this->createEntity($entityClass, NULL, $privateData);
+
+		foreach ($publicData as $paramName => $value) {
+			$entity->$paramName = $value;
+		}
+
+		if ($checker = $this->getChecker($entityClass)) {
+			$checker->check($entity, TRUE, $throwFirst);
+		}
+
+		$data = $entity->getChanges() + $privateData;
 		$dataHolder = $this->createDataHolder($entityClass, array_keys($data));
 		$dataHolder->setParams($data);
-		if ($checker = $this->getChecker($entityClass)) {
-			$checker->check($dataHolder, $throwFirst);
-		}
 
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		$id = $mapper->create($dataHolder);
@@ -202,13 +211,25 @@ final class Accessor
 
 	/**
 	 * @param IEntity $entity
+	 * @param string $paramName
+	 * @return string
+	 */
+	public function getDefaultParam(IEntity $entity, $paramName)
+	{
+		$entityClass = get_class($entity);
+		return $this->serviceAccessor->getParamMap($entityClass)->getDefaultValue($paramName);
+	}
+
+
+	/**
+	 * @param IEntity $entity
 	 * @param bool $throwFirst
 	 */
 	public function save(IEntity $entity, $throwFirst = FALSE)
 	{
 		$entityClass = get_class($entity);
 		if ($checker = $this->getChecker($entityClass)) {
-			$checker->check($entity, $throwFirst);
+			$checker->check($entity, FALSE, $throwFirst);
 		}
 
 		$data = $entity->getChanges();
@@ -230,9 +251,9 @@ final class Accessor
 	 * @return IEntity
 	 * @todo conditional Entities (e.g. unit with vendor HTC creates Entity HtcUnit, but with same identifier as other)
 	 */
-	protected function createEntity($entityClass, $id, array $data, IIdentifier $identifier)
+	protected function createEntity($entityClass, $id, array $data, IIdentifier $identifier = NULL)
 	{
-		return new $entityClass($id, $data, $identifier, $this);
+		return new $entityClass($id, $data, $this, $identifier);
 	}
 
 

@@ -2,16 +2,6 @@
 
 namespace LazyDataMapper;
 
-/**
- * @todo !pokud checker dostane DataHolder, nemůže v něm modifikovat data
- *       do creatu se data vkládají wrapnutá, v checkeru je očekáváš wrapnutá (stejně jako od Entity), ale v mapperu už je očekáváš clear (unwrapnutá)
- *          což ale DataHolder nesplňuje!
- *       vše nasvědčuje tomu, založit Entitu ještě dřív, než bude skutečně existovat - čili měla by dva mody:
- *          1. normální mod ve kterym funguje teď
- *          2. mod kdy nemá přiděleno id a neznámý parametry získají hodnotu NULL, jenže u těch vzniká problém, že skutečně přidělený hodnoty po
- *              vytvoření rozhodně NULL být nemusí. Řešením by mohl být seznam defaultních hodnot - ale to duplikuje informaci s datovým úložištěm
- *              a muselo by se spravovat na dvou místech.
- */
 abstract class Checker implements IChecker
 {
 
@@ -31,34 +21,44 @@ abstract class Checker implements IChecker
 
 
 	/**
-	 * @param IDataHolder $dataHolder
+	 * @param IEntity $entity
 	 * @return void
 	 * @throws IntegrityException
 	 */
-	abstract protected function checkCreate(IDataHolder $dataHolder);
+	abstract protected function checkCreate(IEntity $entity);
 
 
 	/**
-	 * @param IDataEnvelope $subject
+	 * @param IEntity $entity
+	 * @param bool $creation
 	 * @param bool $throwFirst
 	 * @throws Exception
 	 */
-	final public function check(IDataEnvelope $subject, $throwFirst = FALSE)
+	final public function check(IEntity $entity, $creation = FALSE, $throwFirst = FALSE)
 	{
-		$this->stack[] = array($subject, $throwFirst);
+		$this->stack[] = array($entity, $throwFirst);
 
-		if ($subject instanceof IEntity) {
-			$this->checkUpdate($subject);
-
-		} elseif ($subject instanceof IDataHolder) {
-			$this->checkCreate($subject);
-
+		if ($creation) {
+			$this->checkCreate($entity);
 		} else {
-			throw new Exception(get_class($this) . ": expected IEntity or IDataHolder, got " . (is_object($subject) ? get_class($subject) : gettype($subject)) . '.');
+			$this->checkUpdate($entity);
 		}
 
 		array_pop($this->stack);
 		$this->throwException();
+	}
+
+
+	/**
+	 * If exception occurred, throws it.
+	 */
+	final public function throwException()
+	{
+		if ($this->exception) {
+			$e = $this->exception;
+			$this->exception = NULL;
+			throw $e;
+		}
 	}
 
 
@@ -117,19 +117,6 @@ abstract class Checker implements IChecker
 
 		if ($throwFirst) {
 			$this->throwException();
-		}
-	}
-
-
-	/**
-	 * If exception occurred, throws it.
-	 */
-	final public function throwException()
-	{
-		if ($this->exception) {
-			$e = $this->exception;
-			$this->exception = NULL;
-			throw $e;
 		}
 	}
 }
