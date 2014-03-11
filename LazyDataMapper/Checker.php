@@ -72,7 +72,7 @@ abstract class Checker implements IChecker
 		foreach ($paramNames as $paramName) {
 			if (!$subject->$paramName) {
 				$class = $subject instanceof IEntity ? get_class($subject) : get_class($this);
-				$this->addError($class . ": required parameter $paramName is not set.");
+				$this->addError($class . ": required parameter $paramName is not set.", $paramName);
 			}
 		}
 	}
@@ -104,7 +104,7 @@ abstract class Checker implements IChecker
 	/**
 	 * Adds new error message into cached exception.
 	 */
-	final protected function addError($message)
+	final protected function addError($message, $paramName = NULL)
 	{
 		list(, $throwFirst) = end($this->stack);
 
@@ -112,7 +112,7 @@ abstract class Checker implements IChecker
 			$this->exception = new IntegrityException($message);
 
 		} else {
-			$this->exception->addMessage($message);
+			$this->exception->addMessage($message, $paramName);
 		}
 
 		if ($throwFirst) {

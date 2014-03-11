@@ -205,7 +205,7 @@ class IceboxChecker extends LazyDataMapper\Checker
 		$this->addCheck('integrity');
 
 		if ($icebox->color == 'nice') {
-			$this->addError('Nice is not a color!');
+			$this->addError('Nice is not a color!', 'color');
 		}
 	}
 
@@ -213,7 +213,7 @@ class IceboxChecker extends LazyDataMapper\Checker
 	protected function checkIntegrity(LazyDataMapper\IEntity $icebox)
 	{
 		if (count($icebox->food) > 4 && $icebox->capacity < 20) {
-			$this->addError("Not enough space in icebox.");
+			$this->addError("Not enough space in icebox.", 'capacity');
 		}
 	}
 }

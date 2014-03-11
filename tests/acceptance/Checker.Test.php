@@ -47,7 +47,7 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 			'LazyDataMapper\IntegrityException'
 		);
 
-		// MultiException
+		// multi-message Exception
 		$icebox->reset();
 		$icebox->color = '';
 		$icebox->addFood('apple');

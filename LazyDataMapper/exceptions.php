@@ -9,6 +9,7 @@ class Exception extends \Exception
 {
 }
 
+
 /**
  * Exception thrown by Entity / EntityContainer.
  */
@@ -20,6 +21,7 @@ class EntityException extends \Exception
 		WRITE_READONLY = 30;
 }
 
+
 /**
  * When entity unwrapper (setter) need to return NULL, throws this exception.
  * It's designed to protect saving NULL after forgotten return statement.
@@ -28,27 +30,55 @@ class NullValueException extends \Exception
 {
 }
 
+
 /**
- * Exception that gathers several messages when it's suitable to provide more error messages together.
+ * Thrown when integrity of Entity's modified parameters fails.
+ * Exception gathers several messages when it's suitable to provide more error messages together.
  */
-class MultiException extends Exception
+class IntegrityException extends Exception
 {
 
 	/** @var string[] */
 	protected $messages = array();
 
 
-	public function __construct($message = '', $code = 0, \Exception $previous = null)
+	public function __construct($message = '', $paramName = NULL, $code = 0, \Exception $previous = null)
 	{
-		if ($message) $this->messages[] = $message;
+		if (NULL !== $message) {
+			if (NULL === $paramName) {
+				$this->messages[] = $message;
+			} else {
+				$this->messages[$paramName] = $message;
+			}
+		}
 		parent::__construct($message, $code, $previous);
 	}
 
 
-	public function addMessage($message = '')
+	/**
+	 * Sets the parameter name for first error message.
+	 */
+	public function setParamName($paramName)
 	{
-		if (!$this->message) $this->message = $message;
-		$this->messages[] = $message;
+		if (!$this->messages) {
+			throw new Exception("There's no message to assign parameter.");
+		}
+
+		$message = array_shift($this->messages);
+		$this->messages = array_merge(array($paramName => $message), $this->messages);
+	}
+
+
+	public function addMessage($message = '', $paramName = NULL)
+	{
+		if (NULL === $this->message) {
+			$this->message = $message;
+		}
+		if (NULL === $paramName) {
+			$this->messages[] = $message;
+		} else {
+			$this->messages[$paramName] = $message;
+		}
 	}
 
 
@@ -58,12 +88,6 @@ class MultiException extends Exception
 	}
 }
 
-/**
- * Thrown when integrity of Entity's modified parameters fails.
- */
-class IntegrityException extends MultiException
-{
-}
 
 /**
  * todo viz IMapper - anotaci maxCount jsem zamejšlel jak??

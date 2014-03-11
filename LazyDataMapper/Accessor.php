@@ -127,8 +127,24 @@ final class Accessor
 
 		$entity = $this->createEntity($entityClass, NULL, $privateData);
 
+		$cachedException = NULL;
 		foreach ($publicData as $paramName => $value) {
-			$entity->$paramName = $value;
+			try {
+				$entity->$paramName = $value;
+			} catch (IntegrityException $e) {
+				if ($throwFirst) {
+					throw $e;
+				}
+				if (!$cachedException) {
+					$cachedException = $e;
+				} else {
+					$cachedException->addMessage($e->getMessage(), $paramName);
+				}
+			}
+		}
+
+		if ($cachedException) {
+			throw $cachedException;
 		}
 
 		if ($checker = $this->getChecker($entityClass)) {

@@ -210,6 +210,7 @@ abstract class Entity implements IEntity
 	 * @param string $param
 	 * @param mixed $value
 	 * @throws EntityException when set undeclared / read-only / private param
+	 * @throws IntegrityException by unwrapper when input value is incorrect
 	 */
 	public function __set($param, $value)
 	{
@@ -637,7 +638,7 @@ abstract class Entity implements IEntity
 
 		// fictive param
 		if (!$hasClear) {
-			$this->$unwrapper($value);
+			$this->unwrap($unwrapper, $value, $param);
 			return;
 		}
 
@@ -645,7 +646,7 @@ abstract class Entity implements IEntity
 		if ($unwrapper) {
 			try {
 				$assigned = $value;
-				$value = $this->$unwrapper($value);
+				$value = $this->unwrap($unwrapper, $value, $param);
 
 				// possibly missing return in unwrapper
 				if ($value === NULL && $assigned) {
@@ -682,6 +683,17 @@ abstract class Entity implements IEntity
 		$this->params[$param] = $value;
 		// invalid wrapped params dependent on current param
 		$this->invalidDependent($param);
+	}
+
+
+	private function unwrap($unwrapper, $value, $param)
+	{
+		try {
+			return $this->$unwrapper($value);
+		} catch (IntegrityException $e) {
+			$e->setParamName($param);
+			throw $e;
+		}
 	}
 
 
