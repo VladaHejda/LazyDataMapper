@@ -147,6 +147,7 @@ class DataHolder implements IDataHolder
 		}
 
 		$suggestor = $this->suggestor->getDescendant($entityClass, $sourceParam);
+		// todo what if descendant has to be container? How to give ids?
 		$descendantHolder = new self($suggestor);
 		$this->descendants[$key] = $descendantHolder;
 		return $descendantHolder;

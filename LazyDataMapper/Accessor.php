@@ -112,6 +112,7 @@ final class Accessor
 
 		} else {
 			$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
+			// todo is there saving descendants possible?
 			$this->saveDescendants($dataHolder);
 			$data = $dataHolder->getParams();
 			$this->sortData($ids, $data);
@@ -383,7 +384,6 @@ final class Accessor
 	}
 
 
-	// todo cachovat i data aktuálního? pak by se to teda nejmenoval saveDescendants ale saveData. a bylo by to k něčemu?
 	private function saveDescendants(IDataHolder $dataHolder)
 	{
 		/** @var IDataHolder $descendant */
