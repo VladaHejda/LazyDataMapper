@@ -45,7 +45,7 @@ class Icebox extends LazyDataMapper\Entity
 		if (!$this->freezer) {
 			return 0;
 		}
-		$capacity = (int) $this->getClear('freezer');
+		$capacity = (int) $this->getBase('freezer');
 		switch ($unit) {
 			case 'l':
 				return $capacity;
@@ -69,7 +69,7 @@ class Icebox extends LazyDataMapper\Entity
 
 	protected function getRepaired()
 	{
-		return (bool) $this->getClear('repairs');
+		return (bool) $this->getBase('repairs');
 	}
 
 
@@ -97,14 +97,14 @@ class Icebox extends LazyDataMapper\Entity
 
 	public function addRepair()
 	{
-		$this->setReadOnlyOrPrivate('repairs', (int) $this->getClear('repairs') +1);
-		return $this->getClear('repairs');
+		$this->setReadOnlyOrPrivate('repairs', (int) $this->getBase('repairs') +1);
+		return $this->getBase('repairs');
 	}
 
 
 	public function addFood($food)
 	{
-		$foods = $this->getClear('food');
+		$foods = $this->getBase('food');
 		if (!empty($foods)) {
 			$foods .= '|';
 		}

@@ -3,10 +3,9 @@
 namespace LazyDataMapper;
 
 /**
- * @todo add toggle to let get only from wrappers (not clear parameters from ParamMap):
+ * @todo add toggle to let get only from wrappers (not base parameters from ParamMap):
  *	     @var bool in strict mode any parameter cannot be get without wrapper
  *            protected $strictMode = FALSE;
- * @todo change "clear" to "base"?
  *
  * @property-read int $id
  */
@@ -119,21 +118,21 @@ abstract class Entity implements IEntity
 			return $this->wrappedParams[$param];
 		}
 
-		$hasClear = $this->hasClear($param, $isLazy);
+		$hasBase = $this->hasBase($param, $isLazy);
 		$this->hasWrapper($param, $wrapper);
 
 		// undeclared / private param
-		if ((!$wrapper && !$hasClear) || $this->isPrivate($param)) {
+		if ((!$wrapper && !$hasBase) || $this->isPrivate($param)) {
 			throw new EntityException(get_class($this) . ": Cannot read an undeclared parameter $param.", EntityException::READ_UNDECLARED);
 		}
 
 		// wrapper
 		if ($wrapper) {
-			if ($hasClear) {
-				$clear = $this->getClear($param);
+			if ($hasBase) {
+				$base = $this->getBase($param);
 			}
 			$this->getting[] = $param;
-			$this->wrappedParams[$param] = $hasClear ? $this->$wrapper($clear) : $this->$wrapper();
+			$this->wrappedParams[$param] = $hasBase ? $this->$wrapper($base) : $this->$wrapper();
 
 			array_pop($this->getting);
 			return $this->wrappedParams[$param];
@@ -143,7 +142,7 @@ abstract class Entity implements IEntity
 			$this->params[$param] = $this->lazyLoad($param);
 		}
 
-		// clear param
+		// base param
 		return $this->wrappedParams[$param] = $this->params[$param];
 	}
 
@@ -169,13 +168,13 @@ abstract class Entity implements IEntity
 		$param[0] = strtolower($param[0]);
 		$param = $this->translateParamName($param);
 
-		$hasClear = $this->hasClear($param, $isLazy);
+		$hasBase = $this->hasBase($param, $isLazy);
 		if ($isLazy) {
 			$this->params[$param] = $this->lazyLoad($param);
 		}
 
 		// wrapper with arguments
-		if ($hasClear) {
+		if ($hasBase) {
 			array_unshift($args, $this->params[$param]);
 		}
 		return call_user_func_array(array($this, $wrapper), $args);
@@ -192,7 +191,7 @@ abstract class Entity implements IEntity
 		$param[0] = strtolower($param[0]);
 		$param = $this->translateParamName($param);
 
-		return ($this->hasClear($param) && !$this->isPrivate($param)) || $this->hasWrapper($param);
+		return ($this->hasBase($param) && !$this->isPrivate($param)) || $this->hasWrapper($param);
 	}
 
 
@@ -245,10 +244,10 @@ abstract class Entity implements IEntity
 			return TRUE;
 		}
 
-		$hasClear = $this->hasClear($param);
+		$hasBase = $this->hasBase($param);
 
 		// undeclared param
-		if (!$hasClear && !$this->hasWrapper($param)) {
+		if (!$hasBase && !$this->hasWrapper($param)) {
 			throw new EntityException(get_class($this) . ": Cannot read an undeclared parameter $param.", EntityException::READ_UNDECLARED);
 		}
 
@@ -259,7 +258,7 @@ abstract class Entity implements IEntity
 
 		// fictive param is changed when is changed param which is dependent on
 		// when dependencies are not loaded yet, param cannot be changed
-		if (!$hasClear) {
+		if (!$hasBase) {
 			$depLoaded = FALSE;
 
 			do {
@@ -289,7 +288,7 @@ abstract class Entity implements IEntity
 			while (1);
 		}
 
-		// clear param
+		// base param
 		return array_key_exists($param, $this->originalParams);
 	}
 
@@ -319,7 +318,7 @@ abstract class Entity implements IEntity
 		if ($this->isChanged($param)) {
 			return $this->originalParams[$param];
 		}
-		return array_key_exists($param, $this->params) ? $this->params[$param] : $this->getClear($param);
+		return array_key_exists($param, $this->params) ? $this->params[$param] : $this->getBase($param);
 	}
 
 
@@ -377,7 +376,7 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * Returns array of changed params with their clear values.
+	 * Returns array of changed params with their base values.
 	 * @return array
 	 */
 	final public function getChanges()
@@ -404,7 +403,7 @@ abstract class Entity implements IEntity
 			return $this->accessor->getByRestrictions($entityClass, $sourceParamOrRestrictor, $this);
 		} else {
 			if (NULL === $id) {
-				$id = $this->getClear($sourceParamOrRestrictor);
+				$id = $this->getBase($sourceParamOrRestrictor);
 			}
 			return $this->accessor->getById($entityClass, $id, $this, $sourceParamOrRestrictor);
 		}
@@ -422,21 +421,21 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * Returns the clear variant of param.
+	 * Returns the base variant of param.
 	 * @param string $param
 	 * @return mixed
 	 * @throws EntityException
 	 */
-	protected function getClear($param)
+	protected function getBase($param)
 	{
 		$param[0] = strtolower($param[0]);
 		$param = $this->translateParamName($param);
 
-		$hasClear = $this->hasClear($param, $isLazy);
+		$hasBase = $this->hasBase($param, $isLazy);
 
 		// undeclared param
-		if (!$hasClear) {
-			throw new EntityException(get_class($this) . ": Cannot read an undeclared clear parameter $param'.", EntityException::READ_UNDECLARED);
+		if (!$hasBase) {
+			throw new EntityException(get_class($this) . ": Cannot read an undeclared base parameter $param'.", EntityException::READ_UNDECLARED);
 		}
 
 		if ($isLazy) {
@@ -567,7 +566,7 @@ abstract class Entity implements IEntity
 	/********************* private methods *********************/
 
 
-	private function hasClear($param, &$isLazy = NULL)
+	private function hasBase($param, &$isLazy = NULL)
 	{
 		$isLazy = FALSE;
 		if (array_key_exists($param, $this->params)) {
@@ -614,18 +613,18 @@ abstract class Entity implements IEntity
 		$param[0] = strtolower($param[0]);
 		$param = $this->translateParamName($param);
 
-		$hasClear = $this->hasClear($param, $isLazy);
+		$hasBase = $this->hasBase($param, $isLazy);
 		$this->hasUnwrapper($param, $unwrapper);
 
 		$exception = FALSE;
 
-		if ($hasClear && !$unwrapper && $checkImmutable) {
+		if ($hasBase && !$unwrapper && $checkImmutable) {
 			$exception = $this->isPrivate($param) ? EntityException::WRITE_UNDECLARED : EntityException::WRITE_READONLY;
 
 		} elseif ($unwrapper && $this->isPrivate($param) && $checkImmutable) {
 			$exception = EntityException::WRITE_UNDECLARED;
 
-		} elseif (!$hasClear && !$unwrapper) {
+		} elseif (!$hasBase && !$unwrapper) {
 			if (!$this->hasWrapper($param)) {
 				$exception = EntityException::WRITE_UNDECLARED;
 
@@ -643,7 +642,7 @@ abstract class Entity implements IEntity
 		}
 
 		// fictive param
-		if (!$hasClear) {
+		if (!$hasBase) {
 			$this->unwrap($unwrapper, $value, $param);
 			return;
 		}
