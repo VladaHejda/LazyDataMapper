@@ -24,8 +24,6 @@ class DataHolder implements IDataHolder
 	/**
 	 * @param ISuggestor $suggestor
 	 * @param array $ids for container holder
-	 *        todo problem: it is easy to forget in Mapper
-	 *        to give $ids for container Holder and hard to debug...
 	 */
 	public function __construct(ISuggestor $suggestor, array $ids = NULL)
 	{
@@ -152,6 +150,15 @@ class DataHolder implements IDataHolder
 		$descendantHolder = new self($suggestor);
 		$this->descendants[$key] = $descendantHolder;
 		return $descendantHolder;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isContainer()
+	{
+		return $this->isContainer;
 	}
 
 

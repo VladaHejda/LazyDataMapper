@@ -338,12 +338,23 @@ final class Accessor
 	 */
 	private function loadDataHolderByMapper($entityClass, $id, ISuggestor $suggestor)
 	{
-		$m = is_array($id) ? 'getByIdsRange' : 'getById';
+		$isContainer = is_array($id);
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
-		$dataHolder = $mapper->$m($id, $suggestor);
+		if ($isContainer) {
+			$m = 'getByIdsRange';
+			$datHolder = new DataHolder($suggestor, $id);
+		} else {
+			$m = 'getById';
+			$datHolder = new DataHolder($suggestor);
+		}
+
+		$dataHolder = $mapper->$m($id, $suggestor, $datHolder);
 
 		if (!$dataHolder instanceof IDataHolder) {
-			throw new Exception(get_class($mapper) . "::$m() must return IDataHolder instance.");
+			throw new Exception(get_class($mapper) . "::$m() must return loaded IDataHolder instance.");
+		}
+		if ($isContainer && !$dataHolder->isContainer()) {
+			throw new Exception(get_class($mapper) . "::$m() you forgot to add second argument into IDataHolder (ids array).");
 		}
 		return $dataHolder;
 	}

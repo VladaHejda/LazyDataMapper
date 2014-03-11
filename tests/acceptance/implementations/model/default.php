@@ -48,26 +48,24 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	}
 
 
-	public function getById($id, LazyDataMapper\ISuggestor $suggestor)
+	public function getById($id, LazyDataMapper\ISuggestor $suggestor, LazyDataMapper\IDataHolder $holder = NULL)
 	{
 		// analytics
 		++static::$calledGetById;
 		static::$lastSuggestor = $suggestor;
 
-		$holder = new LazyDataMapper\DataHolder($suggestor);
 		$data = array_intersect_key(static::$data[$id], array_flip($suggestor->getParamNames()));
 		$holder->setParams($data);
 		return $holder;
 	}
 
 
-	public function getByIdsRange(array $ids, LazyDataMapper\ISuggestor $suggestor)
+	public function getByIdsRange(array $ids, LazyDataMapper\ISuggestor $suggestor, LazyDataMapper\IDataHolder $holder = NULL)
 	{
 		++static::$calledGetByRestrictions;
 		static::$lastSuggestor = $suggestor;
 
 		$suggestions = array_flip($suggestor->getParamNames());
-		$holder = new LazyDataMapper\DataHolder($suggestor, $ids);
 		foreach ($ids as $id) {
 			$data = array_intersect_key(static::$data[$id], $suggestions);
 			$holder->setParams([$id => $data]);

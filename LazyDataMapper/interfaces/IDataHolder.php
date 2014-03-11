@@ -10,7 +10,7 @@ interface IDataHolder extends \Iterator
 
 	/**
 	 * @param array $params
-	 * @return void
+	 * @return self provides fluent interface
 	 */
 	function setParams(array $params);
 
@@ -36,6 +36,12 @@ interface IDataHolder extends \Iterator
 	 * @return self|NULL
 	 */
 	function getDescendant($entityClass, &$sourceParam = NULL);
+
+
+	/**
+	 * @return bool
+	 */
+	public function isContainer();
 
 
 	/**

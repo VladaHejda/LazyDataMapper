@@ -18,12 +18,13 @@ interface IMapper
 
 
 	/**
-	 * Get data for one entity.
+	 * Get data for one entity. Returns loaded IDataHolder.
 	 * @param int $id
 	 * @param ISuggestor $suggestor
+	 * @param IDataHolder $dataHolder
 	 * @return IDataHolder
 	 */
-	function getById($id, ISuggestor $suggestor);
+	function getById($id, ISuggestor $suggestor, IDataHolder $dataHolder = NULL);
 
 
 	/**
@@ -37,12 +38,13 @@ interface IMapper
 
 
 	/**
-	 * Get data for range of entities.
+	 * Get data for range of entities. Returns loaded IDataHolder.
 	 * @param int[] $ids
 	 * @param ISuggestor $suggestor
+	 * @param IDataHolder $dataHolder
 	 * @return IDataHolder
 	 */
-	function getByIdsRange(array $ids, ISuggestor $suggestor);
+	function getByIdsRange(array $ids, ISuggestor $suggestor, IDataHolder $dataHolder = NULL);
 
 
 	/**

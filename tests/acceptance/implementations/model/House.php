@@ -47,9 +47,9 @@ class HouseMapper extends defaultMapper
 	];
 
 
-	public function getById($id, LazyDataMapper\ISuggestor $suggestor)
+	public function getById($id, LazyDataMapper\ISuggestor $suggestor, LazyDataMapper\IDataHolder $holder = NULL)
 	{
-		$holder = parent::getById($id, $suggestor);
+		$holder = parent::getById($id, $suggestor, $holder);
 
 		if ($suggestor->hasDescendant('LazyDataMapper\Tests\Kitchen')) {
 			$descendant = $suggestor->getDescendant('LazyDataMapper\Tests\Kitchen');
