@@ -12,17 +12,17 @@ class ExceptionsTest extends LazyDataMapper\Tests\TestCase
 	/**
 	 * @expectedException LazyDataMapper\Exception
 	 */
-	public function testOneDimensionalGetType()
+	public function testOneDimensionalGetGroup()
 	{
 		$paramMap = new OneDimensionalParamMap;
-		$paramMap->getMap('unknown');
+		$paramMap->getMap('something');
 	}
 
 
 	/**
 	 * @expectedException LazyDataMapper\Exception
 	 */
-	public function testTwoDimensionalGetUnknownType()
+	public function testTwoDimensionalGetUnknownGroup()
 	{
 		$paramMap = new TwoDimensionalParamMap;
 		$paramMap->getMap('unknown');
@@ -34,18 +34,18 @@ class ExceptionsTest extends LazyDataMapper\Tests\TestCase
 		$paramMap = new OneDimensionalParamMap;
 
 		$this->assertException(function() use ($paramMap) {
-			$paramMap->getParamType('something');
+			$paramMap->getParamGroup('something');
 		}, 'LazyDataMapper\Exception');
 
 		$this->assertException(function() use ($paramMap) {
-			$paramMap->hasType('something');
+			$paramMap->hasGroup('something');
 		}, 'LazyDataMapper\Exception');
 
 
 		$paramMap = new TwoDimensionalParamMap;
 
 		$this->assertException(function() use ($paramMap) {
-			$paramMap->getParamType('unknown');
+			$paramMap->getParamGroup('unknown');
 		}, 'LazyDataMapper\Exception');
 
 

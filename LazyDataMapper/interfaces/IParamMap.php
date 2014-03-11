@@ -9,20 +9,20 @@ interface IParamMap
 {
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @param bool $flip when TRUE method returns parameter names in keys and NULL in values (prepared for fill),
 	 *      otherwise parameter names are in values.
-	 * @return array one or two dimensional array (dependent on whether requesting type or not)
-	 * @throws Exception when requesting type even if not separated by type
-	 * @throws Exception on unknown type
+	 * @return array one or two dimensional array (dependent on whether requesting group or not)
+	 * @throws Exception when requesting group even if not grouped
+	 * @throws Exception on unknown group
 	 */
-	function getMap($type = NULL, $flip = TRUE);
+	function getMap($group = NULL, $flip = TRUE);
 
 
 	/**
 	 * @return bool
 	 */
-	function isSeparatedByType();
+	function isGrouped();
 
 
 	/**
@@ -33,11 +33,11 @@ interface IParamMap
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return bool
-	 * @throws Exception if is not separated by type
+	 * @throws Exception if is not grouped
 	 */
-	function hasType($type);
+	function hasGroup($group);
 
 
 	/**
@@ -45,7 +45,7 @@ interface IParamMap
 	 * @return string
 	 * @throws Exception on unknown param name
 	 */
-	function getParamType($paramName);
+	function getParamGroup($paramName);
 
 
 	/**

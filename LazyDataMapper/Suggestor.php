@@ -46,27 +46,27 @@ class Suggestor implements ISuggestor
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return bool
 	 */
-	public function isSuggestedType($type)
+	public function isSuggestedGroup($group)
 	{
-		$map = $this->paramMap->getMap($type, FALSE);
+		$map = $this->paramMap->getMap($group, FALSE);
 		return (bool) array_intersect($this->suggestions, $map);
 	}
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return string[]
 	 */
-	public function getParamNames($type = NULL)
+	public function getParamNames($group = NULL)
 	{
-		if (NULL === $type) {
+		if (NULL === $group) {
 			return $this->suggestions;
 		}
 
-		$map = $this->paramMap->getMap($type, FALSE);
+		$map = $this->paramMap->getMap($group, FALSE);
 		$suggestions = array();
 		foreach ($map as $paramName) {
 			if (in_array($paramName, $this->suggestions)) {

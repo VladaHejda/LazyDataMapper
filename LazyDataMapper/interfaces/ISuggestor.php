@@ -10,18 +10,18 @@ interface ISuggestor extends \Iterator
 {
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return bool
 	 */
-	function isSuggestedType($type);
+	function isSuggestedGroup($group);
 
 
 	/**
-	 * If is separated by type but type is omitted, it returns all param names merged.
-	 * @param string $type
+	 * If grouped but group is omitted, it returns all param names merged.
+	 * @param string $group
 	 * @return string[]
 	 */
-	function getParamNames($type = NULL);
+	function getParamNames($group = NULL);
 
 
 	/**

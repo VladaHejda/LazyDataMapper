@@ -16,18 +16,18 @@ interface IDataHolder extends \Iterator
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return array
 	 */
-	function getParams($type = NULL);
+	function getParams($group = NULL);
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return bool
-	 * @throws Exception on unknown type
+	 * @throws Exception on unknown group
 	 */
-	function isDataOnType($type);
+	function isDataInGroup($group);
 
 
 	/**

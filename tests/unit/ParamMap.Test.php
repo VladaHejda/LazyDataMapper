@@ -13,7 +13,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	{
 		$paramMap = new OneDimensionalParamMap;
 
-		$this->assertFalse($paramMap->isSeparatedByType());
+		$this->assertFalse($paramMap->isGrouped());
 		$this->assertTrue($paramMap->hasParam('name'));
 		$this->assertFalse($paramMap->hasParam('unknown'));
 
@@ -28,12 +28,12 @@ class Test extends LazyDataMapper\Tests\TestCase
 	{
 		$paramMap = new TwoDimensionalParamMap;
 
-		$this->assertTrue($paramMap->isSeparatedByType());
+		$this->assertTrue($paramMap->isGrouped());
 		$this->assertTrue($paramMap->hasParam('strength'));
 		$this->assertFalse($paramMap->hasParam('unknown'));
-		$this->assertTrue($paramMap->hasType('skill'));
-		$this->assertFalse($paramMap->hasType('unknown'));
-		$this->assertEquals('skill', $paramMap->getParamType('intelligence'));
+		$this->assertTrue($paramMap->hasGroup('skill'));
+		$this->assertFalse($paramMap->hasGroup('unknown'));
+		$this->assertEquals('skill', $paramMap->getParamGroup('intelligence'));
 
 		$map = $paramMap->getMap();
 		$this->assertCount(2, $map);
@@ -70,7 +70,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testTwoDimensionalGetType()
+	public function testTwoDimensionalGetGroup()
 	{
 		$paramMap = new TwoDimensionalParamMap;
 		$map = $paramMap->getMap('personal');
@@ -80,7 +80,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testTwoDimensionalGetTypeNoFlip()
+	public function testTwoDimensionalGetGroupNoFlip()
 	{
 		$paramMap = new TwoDimensionalParamMap;
 		$map = $paramMap->getMap('skill', FALSE);

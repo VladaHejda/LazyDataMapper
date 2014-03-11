@@ -2,7 +2,6 @@
 
 namespace LazyDataMapper;
 
-// todo not typed, but GROUPED! :)
 abstract class ParamMap implements IParamMap
 {
 
@@ -13,18 +12,18 @@ abstract class ParamMap implements IParamMap
 	protected $default = array();
 
 	/** @var bool */
-	private $separatedByType;
+	private $grouped;
 
 
 	public function __construct()
 	{
 		foreach ($this->map as $map) {
-			if (NULL === $this->separatedByType) {
-				$this->separatedByType = is_array($map);
+			if (NULL === $this->grouped) {
+				$this->grouped = is_array($map);
 				continue;
 			}
 
-			if ($this->separatedByType && !is_array($map)) {
+			if ($this->grouped && !is_array($map)) {
 				throw new Exception(get_class($this).": map is defective.");
 			}
 		}
@@ -32,38 +31,38 @@ abstract class ParamMap implements IParamMap
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @param bool $flip
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getMap($type = NULL, $flip = TRUE)
+	public function getMap($group = NULL, $flip = TRUE)
 	{
-		if (NULl === $type) {
+		if (NULl === $group) {
 			if (!$flip) {
 				return $this->map;
 			}
-			if (!$this->separatedByType) {
+			if (!$this->grouped) {
 				return array_fill_keys($this->map, NULL);
 			}
-			$types = $this->map;
-			foreach ($types as &$map) {
+			$groups = $this->map;
+			foreach ($groups as &$map) {
 				$map = array_fill_keys($map, NULL);
 			}
-			return $types;
+			return $groups;
 
 		} else {
-			if (!$this->separatedByType) {
-				throw new Exception(get_class($this).": map is not separated by type, nevertheless type $type required.");
+			if (!$this->grouped) {
+				throw new Exception(get_class($this).": map is not grouped, nevertheless group $group required.");
 			}
-			if (!isset($this->map[$type])) {
-				throw new Exception(get_class($this).": unknown type $type.");
+			if (!isset($this->map[$group])) {
+				throw new Exception(get_class($this).": unknown group $group.");
 			}
 
 			if (!$flip) {
-				return $this->map[$type];
+				return $this->map[$group];
 			}
-			return array_fill_keys($this->map[$type], NULL);
+			return array_fill_keys($this->map[$group], NULL);
 		}
 	}
 
@@ -71,9 +70,9 @@ abstract class ParamMap implements IParamMap
 	/**
 	 * @return bool
 	 */
-	public function isSeparatedByType()
+	public function isGrouped()
 	{
-		return $this->separatedByType;
+		return $this->grouped;
 	}
 
 
@@ -83,7 +82,7 @@ abstract class ParamMap implements IParamMap
 	 */
 	public function hasParam($paramName)
 	{
-		if ($this->separatedByType) {
+		if ($this->grouped) {
 			foreach ($this->map as $map) {
 				if (in_array($paramName, $map)) {
 					return TRUE;
@@ -97,17 +96,17 @@ abstract class ParamMap implements IParamMap
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function hasType($type)
+	public function hasGroup($group)
 	{
-		if (!$this->separatedByType) {
-			throw new Exception(get_class($this).": map is not separated by type.");
+		if (!$this->grouped) {
+			throw new Exception(get_class($this).": map is not grouped.");
 		}
 
-		return isset($this->map[$type]);
+		return isset($this->map[$group]);
 	}
 
 
@@ -116,15 +115,15 @@ abstract class ParamMap implements IParamMap
 	 * @return string
 	 * @throws Exception
 	 */
-	public function getParamType($paramName)
+	public function getParamGroup($paramName)
 	{
-		if (!$this->separatedByType) {
-			throw new Exception(get_class($this).": map is not separated by type.");
+		if (!$this->grouped) {
+			throw new Exception(get_class($this).": map is not grouped.");
 		}
 
-		foreach ($this->map as $type => $map) {
+		foreach ($this->map as $group => $map) {
 			if (in_array($paramName, $map)) {
-				return $type;
+				return $group;
 			}
 		}
 		throw new Exception(get_class($this).": unknown parameter name $paramName.");

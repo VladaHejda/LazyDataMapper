@@ -9,7 +9,7 @@ use LazyDataMapper,
 require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 
-class MapSeparatedByTypeTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class GroupedParamMapTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	public function testGet()

@@ -66,16 +66,16 @@ class DataHolder implements IDataHolder
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return array
 	 */
-	public function getParams($type = NULL)
+	public function getParams($group = NULL)
 	{
-		if (NULL === $type) {
+		if (NULL === $group) {
 			return $this->params;
 		}
 
-		$map = $this->suggestor->getParamMap()->getMap($type);
+		$map = $this->suggestor->getParamMap()->getMap($group);
 		if ($this->isContainer) {
 			$containerMap = array();
 			foreach ($this->params as $id => $params) {
@@ -88,16 +88,16 @@ class DataHolder implements IDataHolder
 
 
 	/**
-	 * @param string $type
+	 * @param string $group
 	 * @return bool
 	 */
-	public function isDataOnType($type)
+	public function isDataInGroup($group)
 	{
-		$map = $this->suggestor->getParamMap()->getMap($type, FALSE);
+		$map = $this->suggestor->getParamMap()->getMap($group, FALSE);
 		if ($this->isContainer) {
 			foreach ($this->params as $params) {
-				$isDataOnType = (bool) array_intersect(array_keys($params), $map);
-				if ($isDataOnType) {
+				$isDataInGroup = (bool) array_intersect(array_keys($params), $map);
+				if ($isDataInGroup) {
 					return TRUE;
 				}
 			}
