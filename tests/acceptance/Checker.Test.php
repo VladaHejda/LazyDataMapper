@@ -54,7 +54,7 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$icebox->addFood('carrot');
 		$icebox->capacity = 15;
 		try {
-			$icebox->save();
+			$icebox->save(FALSE);
 			$this->fail('Expected that IntegrityException was thrown.');
 		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(2, $e->getAllMessages());

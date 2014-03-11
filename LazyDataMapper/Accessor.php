@@ -241,7 +241,7 @@ final class Accessor
 	 * @param IEntity $entity
 	 * @param bool $throwFirst
 	 */
-	public function save(IEntity $entity, $throwFirst = FALSE)
+	public function save(IEntity $entity, $throwFirst = TRUE)
 	{
 		$entityClass = get_class($entity);
 		if ($checker = $this->getChecker($entityClass)) {

@@ -326,7 +326,7 @@ abstract class Entity implements IEntity
 	 * @param bool $throwFirst whether throw first IntegrityException from Checker
 	 * @return void
 	 */
-	public function save($throwFirst = FALSE)
+	public function save($throwFirst = TRUE)
 	{
 		if ($this->isChanged()) {
 			$this->accessor->save($this, $throwFirst);
