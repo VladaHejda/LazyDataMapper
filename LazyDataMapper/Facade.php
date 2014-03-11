@@ -10,7 +10,7 @@ namespace LazyDataMapper;
  * - apply solution in IEntityServiceAccessor method getEntityClass() and getEntityContainerClass().
  *   There is some default solution.
  */
-abstract class Facade implements IFacade
+abstract class Facade
 {
 
 	/** @var array|string */
@@ -63,11 +63,12 @@ abstract class Facade implements IFacade
 
 	/**
 	 * @param IRestrictor $restrictor
+	 * @param int $maxCount
 	 * @return IEntityContainer
 	 */
-	public function getByRestrictions(IRestrictor $restrictor)
+	public function getByRestrictions(IRestrictor $restrictor, $maxCount = 100)
 	{
-		return $this->accessor->getByRestrictions($this->entityClass, $restrictor);
+		return $this->accessor->getByRestrictions($this->entityClass, $restrictor, NULL, $maxCount);
 	}
 
 

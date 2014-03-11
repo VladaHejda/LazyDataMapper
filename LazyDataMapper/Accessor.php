@@ -30,7 +30,7 @@ final class Accessor
 	}
 
 
-	/********************* interface for IFacade *********************/
+	/********************* interface for Facade *********************/
 
 
 	/**
@@ -82,16 +82,17 @@ final class Accessor
 	 * @param array|string $entityClass
 	 * @param IRestrictor|int[] $restrictions
 	 * @param IOperand $parent
+	 * @param int $maxCount
 	 * @return IEntityContainer
 	 * @throws Exception on wrong restrictions
 	 * @todo pokud dostane pole s idčkama, neproběhne kontrola jejich existence (což předtim nemuseal proběhnout taky)
 	 *       případnej container pak může místo entity vrátit NULL, což by neměl. Kontrolovat existenci idéček?
 	 */
-	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL)
+	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL, $maxCount = NULL)
 	{
 		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
 
-		$ids = $this->loadIdsByRestrictions($entityClass, $restrictions);
+		$ids = $this->loadIdsByRestrictions($entityClass, $restrictions, $maxCount);
 
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
 
@@ -304,25 +305,32 @@ final class Accessor
 	/**
 	 * @param string $entityClass
 	 * @param IRestrictor|int[] $restrictions
+	 * @param int $maxCount
 	 * @return int[]
 	 * @throws Exception
+	 * @throws TooManyItemsException
 	 */
-	private function loadIdsByRestrictions($entityClass, $restrictions)
+	private function loadIdsByRestrictions($entityClass, $restrictions, $maxCount = NULL)
 	{
-		if (!$restrictions instanceof IRestrictor && !is_array($restrictions)) {
+		if (is_array($restrictions)) {
+			return $restrictions;
+		}
+
+		if (!$restrictions instanceof IRestrictor) {
 			throw new Exception('Expected instance of IRestrictor or an array.');
 		}
 
-		if (is_array($restrictions)) {
-			$ids = $restrictions;
-		} else {
-			$mapper = $this->serviceAccessor->getMapper($entityClass);
-			$ids = $mapper->getIdsByRestrictions($restrictions);
-			if (NULL === $ids) {
-				$ids = array();
-			} elseif (!is_array($ids)) {
-				throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
-			}
+		$mapper = $this->serviceAccessor->getMapper($entityClass);
+
+		$ids = $mapper->getIdsByRestrictions($restrictions, NULL === $maxCount ? NULL : ++$maxCount);
+		if (NULL === $ids) {
+			$ids = array();
+		} elseif (!is_array($ids)) {
+			throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
+		}
+
+		if (NULL !== $maxCount && count($ids) > $maxCount) {
+			throw new TooManyItemsException("Trying to get more than $maxCount pieces of $entityClass. Increase the \$maxCount limit or restrict result more.");
 		}
 
 		return $ids;
@@ -333,22 +341,23 @@ final class Accessor
 	 * @param string $entityClass
 	 * @param int|int[] $id or ids
 	 * @param ISuggestor $suggestor
+	 * @param int $maxCount
 	 * @return IDataHolder
 	 * @throws Exception
 	 */
-	private function loadDataHolderByMapper($entityClass, $id, ISuggestor $suggestor)
+	private function loadDataHolderByMapper($entityClass, $id, ISuggestor $suggestor, $maxCount = NULL)
 	{
 		$isContainer = is_array($id);
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		if ($isContainer) {
 			$m = 'getByIdsRange';
 			$datHolder = new DataHolder($suggestor, $id);
+			$dataHolder = $mapper->getByIdsRange($id, $suggestor, $datHolder, $maxCount);
 		} else {
 			$m = 'getById';
 			$datHolder = new DataHolder($suggestor);
+			$dataHolder = $mapper->getById($id, $suggestor, $datHolder);
 		}
-
-		$dataHolder = $mapper->$m($id, $suggestor, $datHolder);
 
 		if (!$dataHolder instanceof IDataHolder) {
 			throw new Exception(get_class($mapper) . "::$m() must return loaded IDataHolder instance.");

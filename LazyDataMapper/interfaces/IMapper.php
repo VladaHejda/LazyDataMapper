@@ -29,12 +29,12 @@ interface IMapper
 
 	/**
 	 * Get ids of matching entities.
-	 * @maxCount 100 todo solve this
 	 * @param IRestrictor $restrictor
+	 * @param int $limit ids count or NULL as unlimited (ignoring this argument does not affect the functionality
+	 *        but if is used it can improve performance)
 	 * @return int[]|NULL array of ids passing restrictions, when nothing pass, return NULL or empty array
-	 * @throws TooManyItemsException when count exceeds maxCount annotation limit
 	 */
-	function getIdsByRestrictions(IRestrictor $restrictor);
+	function getIdsByRestrictions(IRestrictor $restrictor, $limit = NULL);
 
 
 	/**

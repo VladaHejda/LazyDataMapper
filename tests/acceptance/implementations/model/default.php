@@ -75,7 +75,7 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	}
 
 
-	public function getIdsByRestrictions(LazyDataMapper\IRestrictor $restrictor)
+	public function getIdsByRestrictions(LazyDataMapper\IRestrictor $restrictor, $maxCount = NULL)
 	{
 		$restrictions = $restrictor->getRestrictions();
 
