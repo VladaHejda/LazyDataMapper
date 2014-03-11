@@ -4,7 +4,6 @@ namespace LazyDataMapper;
 
 /**
  * Suggests parameter names and descendants to Mapper.
- * @todo some param helpers? (e.g. helper for creating 'param', 'param2', ... from paramNames array)
  */
 interface ISuggestor extends \Iterator
 {
