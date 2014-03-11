@@ -5,13 +5,11 @@ namespace LazyDataMapper;
 abstract class EntityContainer implements IEntityContainer
 {
 
-	// todo think about protected/private visibility
-
 	/** @var IIdentifier */
-	protected $identifier;
+	private $identifier;
 
 	/** @var Accessor */
-	protected $accessor;
+	private $accessor;
 
 	/** @var int[] */
 	private $ids;
