@@ -3,21 +3,17 @@
 namespace LazyDataMapper;
 
 /**
- * @todo add toggle to let get only from wrappers (not clear parameters from ParamMap)
+ * @todo add toggle to let get only from wrappers (not clear parameters from ParamMap):
+ *	     @var bool in strict mode any parameter cannot be get without wrapper
+ *            protected $strictMode = FALSE;
  * @todo change "clear" to "base"?
+ *
  * @property-read int $id
  */
 abstract class Entity implements IEntity
 {
 
-	/** @var int */
-	protected $id;
-
-	/** @var IIdentifier */
-	protected $identifier;
-
-	/** @var Accessor */
-	protected $accessor;
+	/********************* user-customizable *********************/
 
 	/** @var array list of private param names */
 	protected $privateParams = array();
@@ -25,7 +21,17 @@ abstract class Entity implements IEntity
 	/** @var bool give TRUE to activate paramNames translation, see self::translate() */
 	protected $translate = FALSE;
 
+
 	const SELF = 0;
+
+	/** @var int */
+	private $id;
+
+	/** @var IIdentifier */
+	private $identifier;
+
+	/** @var Accessor */
+	private $accessor;
 
 	/** @var bool */
 	private $persistent = FALSE;
