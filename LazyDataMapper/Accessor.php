@@ -85,8 +85,6 @@ final class Accessor
 	 * @param int $maxCount
 	 * @return IEntityContainer
 	 * @throws Exception on wrong restrictions
-	 * @todo pokud dostane pole s idčkama, neproběhne kontrola jejich existence (což předtim nemuseal proběhnout taky)
-	 *       případnej container pak může místo entity vrátit NULL, což by neměl. Kontrolovat existenci idéček?
 	 */
 	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL, $maxCount = NULL)
 	{
@@ -100,7 +98,16 @@ final class Accessor
 			$suggestor = $this->cache->getCached($identifier, $entityClass);
 		}
 
-		if (empty($ids) || !$suggestor) {
+		if (empty($ids)) {
+			$data = array();
+
+		} elseif (!$suggestor) {
+			// nonexistent ids prevention
+			foreach ($ids as $i => $id) {
+				if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
+					unset($ids[$i]);
+				}
+			}
 			$data = array_fill_keys($ids, array());
 
 		} else {
@@ -321,10 +328,10 @@ final class Accessor
 		}
 
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
-
 		$ids = $mapper->getIdsByRestrictions($restrictions, NULL === $maxCount ? NULL : ++$maxCount);
 		if (NULL === $ids) {
-			$ids = array();
+			return array();
+
 		} elseif (!is_array($ids)) {
 			throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
 		}
@@ -395,7 +402,9 @@ final class Accessor
 	{
 		$sorted = array();
 		foreach ($ids as $id) {
-			$sorted[$id] = isset($data[$id]) ? $data[$id] : array();
+			if (isset($data[$id])) {
+				$sorted[$id] = $data[$id];
+			}
 		}
 		return $sorted;
 	}
