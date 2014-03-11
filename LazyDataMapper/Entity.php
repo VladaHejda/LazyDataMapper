@@ -386,27 +386,41 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * @param string $entityClass or self::SELF to get descendant of same class
-	 * @param string|IRestrictor $sourceParamOrRestrictor
-	 * @param int|null $id id of Entity, when not accessible from source parameter
+	 * @param string|int $entityClass or self::SELF to get descendant of same class
+	 * @param mixed $arg
+	 *        string       source parameter to get id of descendant Entity
+	 *        int          id of Entity, when not accessible from any source parameter
+	 *        IRestrictor  to get EntityContainer by IRestrictor
+	 *        int[]        array of ids to get EntityContainer by ids range
 	 * @return IOperand
-	 * @todo maybe when getter directly gets descendant and sourceParam is the same, sourceParam argument should be omitted?
-	 * @todo and when id is given, source parameter could be calculated automatically
-	 * @todo when creating descendant of self, maybe even the first argument can be omitted
 	 */
-	protected function getDescendant($entityClass, $sourceParamOrRestrictor, $id = NULL)
+	protected function getDescendant($entityClass = self::SELF, $arg = NULL)
 	{
 		if ($entityClass === self::SELF) {
 			$entityClass = get_class($this);
 		}
-		if (is_array($sourceParamOrRestrictor) || $sourceParamOrRestrictor instanceof IRestrictor) {
-			return $this->accessor->getByRestrictions($entityClass, $sourceParamOrRestrictor, $this);
-		} else {
-			if (NULL === $id) {
-				$id = $this->getBase($sourceParamOrRestrictor);
-			}
-			return $this->accessor->getById($entityClass, $id, $this, $sourceParamOrRestrictor);
+
+		// Entity container
+		if (is_array($arg) || $arg instanceof IRestrictor) {
+			return $this->accessor->getByRestrictions($entityClass, $arg, $this);
 		}
+
+		// single Entity
+
+		// source param = currently taken param
+		if (NULL === $arg) {
+			$arg = end($this->getting);
+		}
+
+		// $arg = id
+		if (is_numeric($arg)) {
+			$id = $arg;
+			$arg = end($this->getting);
+		// arg = source param
+		} else {
+			$id = $this->getBase($arg);
+		}
+		return $this->accessor->getById($entityClass, $id, $this, $arg);
 	}
 
 

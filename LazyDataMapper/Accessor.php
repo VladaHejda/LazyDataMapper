@@ -80,18 +80,18 @@ final class Accessor
 	/**
 	 * Do not call this method directly!
 	 * @param array|string $entityClass
-	 * @param IRestrictor|int[] $restrictor
+	 * @param IRestrictor|int[] $restrictions
 	 * @param IOperand $parent
 	 * @return IEntityContainer
 	 * @throws Exception on wrong restrictions
 	 * @todo pokud dostane pole s idčkama, neproběhne kontrola jejich existence (což předtim nemuseal proběhnout taky)
 	 *       případnej container pak může místo entity vrátit NULL, což by neměl. Kontrolovat existenci idéček?
 	 */
-	public function getByRestrictions($entityClass, $restrictor, IOperand $parent = NULL)
+	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL)
 	{
 		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
 
-		$ids = $this->loadIdsByRestrictions($entityClass, $restrictor);
+		$ids = $this->loadIdsByRestrictions($entityClass, $restrictions);
 
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
 
@@ -185,14 +185,14 @@ final class Accessor
 
 	/**
 	 * @param string $entityClass
-	 * @param IRestrictor|int[] $restrictor
+	 * @param IRestrictor|int[] $restrictions
 	 * @throws Exception
 	 */
-	public function removeByRestrictions($entityClass, $restrictor)
+	public function removeByRestrictions($entityClass, $restrictions)
 	{
 		list($entityClass) = $this->extractEntityClasses($entityClass);
 
-		$ids = $this->loadIdsByRestrictions($entityClass, $restrictor);
+		$ids = $this->loadIdsByRestrictions($entityClass, $restrictions);
 
 		if (!empty($ids)) {
 			$this->serviceAccessor->getMapper($entityClass)->removeByIdsRange($ids);
@@ -303,21 +303,21 @@ final class Accessor
 
 	/**
 	 * @param string $entityClass
-	 * @param IRestrictor|int[] $restrictor
+	 * @param IRestrictor|int[] $restrictions
 	 * @return int[]
 	 * @throws Exception
 	 */
-	private function loadIdsByRestrictions($entityClass, $restrictor)
+	private function loadIdsByRestrictions($entityClass, $restrictions)
 	{
-		if (!$restrictor instanceof IRestrictor && !is_array($restrictor)) {
+		if (!$restrictions instanceof IRestrictor && !is_array($restrictions)) {
 			throw new Exception('Expected instance of IRestrictor or an array.');
 		}
 
-		if (is_array($restrictor)) {
-			$ids = $restrictor;
+		if (is_array($restrictions)) {
+			$ids = $restrictions;
 		} else {
 			$mapper = $this->serviceAccessor->getMapper($entityClass);
-			$ids = $mapper->getIdsByRestrictions($restrictor);
+			$ids = $mapper->getIdsByRestrictions($restrictions);
 			if (NULL === $ids) {
 				$ids = array();
 			} elseif (!is_array($ids)) {

@@ -12,7 +12,7 @@ class Kitchen extends LazyDataMapper\Entity
 
 	protected function getIcebox()
 	{
-		return $this->getDescendant('LazyDataMapper\Tests\Icebox', 'icebox');
+		return $this->getDescendant('LazyDataMapper\Tests\Icebox');
 	}
 }
 

@@ -13,7 +13,7 @@ class House extends LazyDataMapper\Entity
 
 	protected function getKitchen()
 	{
-		return $this->getDescendant('LazyDataMapper\Tests\Kitchen', 'kitchen');
+		return $this->getDescendant('LazyDataMapper\Tests\Kitchen');
 	}
 }
 
