@@ -8,9 +8,12 @@ class SuggestorHelpers
 	/**
 	 * Encapsulates parameter names into `column`, `another_column` ...
 	 */
-	static function wrapColumns(array $paramNames)
+	static function wrapColumns(array $paramNames, $extra = '')
 	{
-		return '`' . implode('`, `', $paramNames) . '`';
+		if (!empty($extra)) {
+			$extra = " $extra";
+		}
+		return '`' . implode("`$extra, `", $paramNames) . "`$extra";
 	}
 
 

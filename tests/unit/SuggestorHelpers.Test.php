@@ -14,5 +14,7 @@ class Test extends \LazyDataMapper\Tests\TestCase
 		$this->assertEquals('`name`, `age`, `address`', SuggestorHelpers::wrapColumns($paramNames));
 
 		$this->assertEquals("'name', 'age', 'address'", SuggestorHelpers::wrapParams($paramNames));
+
+		$this->assertEquals('`name` = ?, `age` = ?, `address` = ?', SuggestorHelpers::wrapColumns($paramNames, '= ?'));
 	}
 }
