@@ -7,14 +7,14 @@ use LazyDataMapper;
 require_once __DIR__ . '/default.php';
 require_once __DIR__ . '/serviceAccessor.php';
 
-class Car extends LazyDataMapper\Entity
+class xCar extends LazyDataMapper\Entity
 {}
 
-class CarFacade extends LazyDataMapper\Facade
+class xCarFacade extends LazyDataMapper\Facade
 {}
 
 
-class CarParamMap extends LazyDataMapper\ParamMap
+class xCarParamMap extends LazyDataMapper\ParamMap
 {
 
 	protected $map = [
@@ -24,7 +24,7 @@ class CarParamMap extends LazyDataMapper\ParamMap
 }
 
 
-class CarMapper extends defaultMapper
+class xCarMapper extends defaultMapper
 {
 
 	public static $calledGetById = 0;

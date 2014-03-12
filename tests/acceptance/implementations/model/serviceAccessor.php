@@ -23,7 +23,7 @@ class ServiceAccessor extends LazyDataMapper\EntityServiceAccessor
 	protected static $mappersList = [
 		'IceboxMapper',
 		'KitchenMapper',
-		'CarMapper',
+		'xCarMapper',
 		'HouseMapper',
 	];
 
