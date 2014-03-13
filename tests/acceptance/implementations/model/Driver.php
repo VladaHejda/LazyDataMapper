@@ -22,7 +22,7 @@ class Driver extends LazyDataMapper\Entity
 	protected function getCars()
 	{
 		$restrictor = new CarRestrictor;
-		$restrictor->limitDriver($this->id);
+		$restrictor->limitDriver($this);
 		return $this->getDescendant('LazyDataMapper\Tests\Car', $restrictor);
 	}
 
@@ -126,8 +126,29 @@ class DriverMapper extends defaultMapper
 			'wins' => '2', 'accidents' => '7', 'famous_cars' => ''
 		],
 		5 => [
-			'first_name' => 'Kristan', 'last_name' => 'Dorian', 'colleague' => '4',
+			'first_name' => 'Christine', 'last_name' => 'Dorian', 'colleague' => '4',
 			'wins' => '15', 'accidents' => '6', 'famous_cars' => '5'
 		],
 	];
+
+
+	public function getById($id, LazyDataMapper\ISuggestor $suggestor, LazyDataMapper\IDataHolder $holder = NULL)
+	{
+		$holder = parent::getById($id, $suggestor, $holder);
+
+		if ($suggestor->hasDescendant('LazyDataMapper\Tests\Car')) {
+			$descendant = $suggestor->getDescendant('LazyDataMapper\Tests\Car');
+			$data = array_intersect_key(CarMapper::$data[static::$data[$id]['car']] ,array_flip($descendant->getParamNames()));
+			$descendantHolder = $holder->getDescendant('LazyDataMapper\Tests\Car');
+			$descendantHolder->setParams($data);
+
+			if ($descendant->hasDescendant('LazyDataMapper\Tests\Race')) {
+				$descendant = $descendant->getDescendant('LazyDataMapper\Tests\Race');
+				$data = array_intersect_key(RaceMapper::$data[$data['race']] ,array_flip($descendant->getParamNames()));
+				$descendantHolder->getDescendant('LazyDataMapper\Tests\Race')->setParams($data);
+			}
+		}
+
+		return $holder;
+	}
 }

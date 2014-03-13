@@ -90,6 +90,14 @@ class Car extends LazyDataMapper\Entity
 	}
 
 
+	protected function getRaces()
+	{
+		$restrictor = new RaceRestrictor;
+		$restrictor->limitCar($this);
+		return $this->getDescendant('LazyDataMapper\Tests\Race', $restrictor);
+	}
+
+
 	protected function setName($name)
 	{
 		return $name;
