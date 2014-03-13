@@ -4,10 +4,10 @@ namespace LazyDataMapper\Tests\Caching;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
-	LazyDataMapper\Tests\IceboxMapper;
+	LazyDataMapper\Tests\CarMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/Icebox.php';
+require_once __DIR__ . '/implementations/model/Car.php';
 
 class ContainerTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
@@ -19,23 +19,23 @@ class ContainerTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
 
-		$iceboxes = $facade->getByIdsRange([4, 8]);
+		$cars = $facade->getByIdsRange([4, 6]);
 
-		$this->assertEquals('white', $iceboxes[0]->color);
-		$this->assertEquals('blue', $iceboxes[1]->color);
-		$this->assertEquals(['egg', 'butter'], $iceboxes[0]->food);
-		$this->assertEquals(['jam'], $iceboxes[1]->food);
+		$this->assertEquals('Diablo', $cars[0]->name);
+		$this->assertEquals('R8', $cars[1]->name);
+		$this->assertEquals(5760, $cars[0]->engine);
+		$this->assertEquals(5320, $cars[1]->engine);
 
 		// checks calls count
-		$this->assertEquals(0, IceboxMapper::$calledGetByRestrictions);
-		$this->assertEquals(4, IceboxMapper::$calledGetById);
+		$this->assertEquals(0, CarMapper::$calledGetByRestrictions);
+		$this->assertEquals(4, CarMapper::$calledGetById);
 
 		// tests if suggestions cached
 		$this->assertCount(1, $cache->cache);
 		$cached = reset($cache->cache);
-		$this->assertEquals(['color', 'food'], reset($cached));
+		$this->assertEquals(['name', 'engine'], reset($cached));
 
 		return [$cache, $facade];
 	}
@@ -48,22 +48,22 @@ class ContainerTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	{
 		list($cache, $facade) = $services;
 
-		$iceboxes = $facade->getByIdsRange([5, 4]);
+		$cars = $facade->getByIdsRange([5, 4]);
 
-		$this->assertEquals('silver', $iceboxes[0]->color);
-		$this->assertEquals('white', $iceboxes[1]->color);
-		$this->assertEquals([], $iceboxes[0]->food);
-		$this->assertEquals(['egg', 'butter'], $iceboxes[1]->food);
+		$this->assertEquals('Celica', $cars[0]->name);
+		$this->assertEquals('Diablo', $cars[1]->name);
+		$this->assertEquals(1998, $cars[0]->engine);
+		$this->assertEquals(5760, $cars[1]->engine);
 
 		// tests if getById called only once with right suggestions
-		$this->assertEquals(1, IceboxMapper::$calledGetByRestrictions);
-		$this->assertEquals(0, IceboxMapper::$calledGetById);
+		$this->assertEquals(1, CarMapper::$calledGetByRestrictions);
+		$this->assertEquals(0, CarMapper::$calledGetById);
 
 		// tries get new data
-		$this->assertTrue($iceboxes[0]->freezer);
+		$this->assertTrue($cars[0]->repaired);
 
 		// tests if new suggestion cached
 		$cached = reset($cache->cache);
-		$this->assertEquals(['color', 'food', 'freezer'], reset($cached));
+		$this->assertEquals(['name', 'engine', 'repairs'], reset($cached));
 	}
 }

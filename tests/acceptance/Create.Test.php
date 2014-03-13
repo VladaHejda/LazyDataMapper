@@ -4,10 +4,10 @@ namespace LazyDataMapper\Tests\Create;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
-	LazyDataMapper\Tests\IceboxMapper;
+	LazyDataMapper\Tests\CarMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/Icebox.php';
+require_once __DIR__ . '/implementations/model/Car.php';
 
 class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
@@ -19,7 +19,7 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
 		return [$cache, $facade];
 	}
 
@@ -28,12 +28,12 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 	{
 		list(, $facade) = $this->createServices();
 
-		$icebox = $facade->create([]);
-		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $icebox);
-		$icebox = $facade->getById($icebox->getId());
-		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $icebox);
+		$car = $facade->create('Suzuki', 'Swift', 25000);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $car);
+		$car = $facade->getById($car->getId());
+		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $car);
 
-		$this->assertEquals(0, IceboxMapper::$calledGetById);
+		$this->assertEquals(0, CarMapper::$calledGetById);
 	}
 
 
@@ -41,17 +41,18 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 	{
 		list($cache, $facade) = $this->createServices();
 
-		$icebox = $facade->create(['color' => 'yellow', 'repairs' => '6', ]);
+		$car = $facade->create('Ford', 'Mondeo', 35000);
 
-		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $icebox);
-		$this->assertEquals('yellow', $icebox->color);
-		$this->assertTrue($icebox->repaired);
-		$this->assertEquals(0, $icebox->capacity);
-		$this->assertEquals([], $icebox->food);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $car);
+		$this->assertEquals('Mondeo', $car->name);
+		$this->assertEquals(35000, $car->price);
+		$this->assertFalse($car->repaired);
+		$this->assertEquals(0, $car->engine);
+		$this->assertEquals(0, $car->cylinders);
 
-		$this->assertEquals(2, IceboxMapper::$calledGetById);
+		$this->assertEquals(2, CarMapper::$calledGetById);
 		$cached = reset($cache->cache);
-		$this->assertEquals(['capacity', 'food'], reset($cached));
+		$this->assertEquals(['repairs', 'engine'], reset($cached));
 
 		return [$cache, $facade];
 	}
@@ -64,17 +65,13 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 	{
 		list($cache, $facade) = $services;
 
-		$icebox = $facade->create(['color' => 'brown', 'capacity' => '37', ]);
+		$car = $facade->create('Peugeot', '307', 41000);
 
-		$this->assertEquals('brown', $icebox->color);
-		$this->assertEquals(37, $icebox->capacity);
-		$this->assertEquals([], $icebox->food);
+		$this->assertEquals('307', $car->name);
+		$this->assertEquals(41000, $car->price);
+		$this->assertEquals(0, $car->engine);
+		$this->assertEquals(0, $car->cylinders);
 
-		$this->assertEquals(1, IceboxMapper::$calledGetById);
-
-		$this->assertFalse($icebox->repaired);
-		$this->assertEquals(2, IceboxMapper::$calledGetById);
-		$cached = reset($cache->cache);
-		$this->assertEquals(['capacity', 'food', 'repairs'], reset($cached));
+		$this->assertEquals(1, CarMapper::$calledGetById);
 	}
 }

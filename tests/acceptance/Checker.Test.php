@@ -6,12 +6,12 @@ use LazyDataMapper,
 	LazyDataMapper\Tests;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/Icebox.php';
+require_once __DIR__ . '/implementations/model/Car.php';
 
 class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
-	/** @var Tests\IceboxFacade */
+	/** @var Tests\CarFacade */
 	private $facade;
 
 
@@ -22,52 +22,46 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$this->facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		$this->facade = new Tests\CarFacade($accessor, $serviceAccessor);
 	}
 
 
 	public function testSave()
 	{
-		$icebox = $this->facade->getById(2);
+		$car = $this->facade->getById(1);
 
 		// required parameter
-		$icebox->color = '';
+		$car->name = '';
 		$this->assertException(
-			function() use ($icebox) { $icebox->save(); },
+			function() use ($car) { $car->save(); },
 			'LazyDataMapper\IntegrityException'
 		);
 
 		// check method
-		$icebox->reset();
-		$icebox->addFood('apple');
-		$icebox->addFood('carrot');
-		$icebox->capacity = 15;
+		$car->reset();
+		$car->vendor = 'Very long vendor name';
 		$this->assertException(
-			function() use ($icebox) { $icebox->save(); },
-			'LazyDataMapper\IntegrityException'
+			function() use ($car) { $car->save(); },
+			'LazyDataMapper\IntegrityException', NULL, 'Brand is too long!'
 		);
 
 		// multi-message Exception
-		$icebox->reset();
-		$icebox->color = '';
-		$icebox->addFood('apple');
-		$icebox->addFood('carrot');
-		$icebox->capacity = 15;
+		$car->reset();
+		$car->name = '';
+		$car->vendor = 'Very long vendor name';
 		try {
-			$icebox->save(FALSE);
+			$car->save(FALSE);
 			$this->fail('Expected that IntegrityException was thrown.');
 		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(2, $e->getAllMessages());
 		}
 
 		// throw first
-		$icebox->reset();
-		$icebox->color = '';
-		$icebox->addFood('apple');
-		$icebox->addFood('carrot');
-		$icebox->capacity = 15;
+		$car->reset();
+		$car->name = '';
+		$car->vendor = 'Very long vendor name';
 		try {
-			$icebox->save(TRUE);
+			$car->save(TRUE);
 			$this->fail('Expected that IntegrityException was thrown.');
 		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(1, $e->getAllMessages());
@@ -78,23 +72,17 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 	public function testCreate()
 	{
 		// should pass normally
-		$this->facade->create(['color' => '']);
-
-		$data = [
-			'color' => 'nice',
-			'food' => ['salad', 'cucumber', 'rhubarb', 'cress', 'radish', ],
-			'capacity' => 15,
-		];
+		$this->facade->create('Suzuki', '', 3000);
 
 		try {
-			$this->facade->create($data);
+			$this->facade->create('Very long vendor name', '', 1000);
 			$this->fail('Expected that IntegrityException was thrown.');
 		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(1, $e->getAllMessages());
 		}
 
 		try {
-			$this->facade->create($data, FALSE);
+			$this->facade->create('Very long vendor name', '', 1000, FALSE);
 			$this->fail('Expected that IntegrityException was thrown.');
 		} catch (LazyDataMapper\IntegrityException $e) {
 			$this->assertCount(2, $e->getAllMessages());

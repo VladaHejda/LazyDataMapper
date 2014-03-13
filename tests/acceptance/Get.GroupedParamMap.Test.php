@@ -4,10 +4,10 @@ namespace LazyDataMapper\Tests\Get;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
-	LazyDataMapper\Tests\xCarMapper;
+	LazyDataMapper\Tests\DriverMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/xCar.php';
+require_once __DIR__ . '/implementations/model/Driver.php';
 
 class GroupedParamMapTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
@@ -19,15 +19,15 @@ class GroupedParamMapTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\xCarFacade($accessor, $serviceAccessor);
+		$facade = new Tests\DriverFacade($accessor, $serviceAccessor);
 
-		$car = $facade->getById(1);
+		$driver = $facade->getById(1);
 
-		$this->assertEquals('Seat', $car->brand);
-		$this->assertEquals(['brand'], xCarMapper::$lastSuggestor->getParamNames('feature'));
-		$this->assertEquals([], xCarMapper::$lastSuggestor->getParamNames('engine'));
-		$this->assertEquals(1.8, $car->volume);
-		$this->assertEquals(['volume'], xCarMapper::$lastSuggestor->getParamNames('engine'));
-		$this->assertEquals([], xCarMapper::$lastSuggestor->getParamNames('feature'));
+		$this->assertEquals('Pooh', $driver->last_name);
+		$this->assertEquals(['last_name'], DriverMapper::$lastSuggestor->getParamNames('personal'));
+		$this->assertEquals([], DriverMapper::$lastSuggestor->getParamNames('score'));
+		$this->assertEquals(2, $driver->accidents);
+		$this->assertEquals(['accidents'], DriverMapper::$lastSuggestor->getParamNames('score'));
+		$this->assertEquals([], DriverMapper::$lastSuggestor->getParamNames('personal'));
 	}
 }

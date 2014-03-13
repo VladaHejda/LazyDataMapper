@@ -4,15 +4,15 @@ namespace LazyDataMapper\Tests\Caching;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
-	LazyDataMapper\Tests\IceboxMapper;
+	LazyDataMapper\Tests\CarMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/Icebox.php';
+require_once __DIR__ . '/implementations/model/Car.php';
 
 class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
-	/** @var Tests\IceboxFacade */
+	/** @var Tests\CarFacade */
 	private static $facade;
 
 
@@ -23,25 +23,25 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
 		self::$facade = $facade;
 
-		$icebox = $facade->getById(4);
+		$car = $facade->getById(6);
 
-		$this->assertEquals('white', $icebox->color);
-		$this->assertEquals(['color'], IceboxMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals('R8', $car->name);
+		$this->assertEquals(['name'], CarMapper::$lastSuggestor->getParamNames());
 
-		$this->assertEquals(['egg', 'butter'], $icebox->food);
-		$this->assertEquals(['food'], IceboxMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(5320, $car->engine);
+		$this->assertEquals(['engine'], CarMapper::$lastSuggestor->getParamNames());
 
 		// checks if getById is not called again
-		$this->assertEquals('white', $icebox->color);
-		$this->assertEquals(2, IceboxMapper::$calledGetById);
+		$this->assertEquals('R8', $car->name);
+		$this->assertEquals(2, CarMapper::$calledGetById);
 
 		// tests if suggestions cached
 		$this->assertCount(1, $cache->cache);
 		$cached = reset($cache->cache);
-		$this->assertEquals(['color', 'food'], reset($cached));
+		$this->assertEquals(['name', 'engine'], reset($cached));
 
 		return [$cache, $facade];
 	}
@@ -54,29 +54,29 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 	{
 		list($cache, $facade) = $services;
 
-		$icebox = $facade->getById(5);
+		$car = $facade->getById(5);
 
-		$this->assertEquals('silver', $icebox->color);
-		$this->assertEquals([], $icebox->food);
+		$this->assertEquals('Celica', $car->name);
+		$this->assertEquals(1998, $car->engine);
 
 		// tests if getById called only once with right suggestions
-		$this->assertEquals(1, IceboxMapper::$calledGetById);
-		$this->assertEquals(['color', 'food'], IceboxMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(1, CarMapper::$calledGetById);
+		$this->assertEquals(['name', 'engine'], CarMapper::$lastSuggestor->getParamNames());
 
 		// tries get new data
-		$this->assertEquals(25, $icebox->capacity);
-		$this->assertEquals(2, IceboxMapper::$calledGetById);
-		$this->assertEquals(['capacity'], IceboxMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(12740, $car->price);
+		$this->assertEquals(2, CarMapper::$calledGetById);
+		$this->assertEquals(['price'], CarMapper::$lastSuggestor->getParamNames());
 
 		// tests if new suggestion cached
 		$cached = reset($cache->cache);
-		$this->assertEquals(['color', 'food', 'capacity'], reset($cached));
+		$this->assertEquals(['name', 'engine', 'price'], reset($cached));
 	}
 
 
 	public function testGetNonexistent()
 	{
 		$this->assertNull(self::$facade->getById(99));
-		$this->assertEquals(0, IceboxMapper::$calledGetById);
+		$this->assertEquals(0, CarMapper::$calledGetById);
 	}
 }

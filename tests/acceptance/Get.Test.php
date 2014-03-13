@@ -6,7 +6,7 @@ use LazyDataMapper,
 	LazyDataMapper\Tests;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/Icebox.php';
+require_once __DIR__ . '/implementations/model/Car.php';
 
 class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
@@ -18,50 +18,53 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
 
 		$this->assertNull($facade->getById(99));
 
-		$icebox = $facade->getById(2);
+		$car = $facade->getById(2);
 
-		$this->assertEquals('black', $icebox->color);
-		$this->assertEquals('black', $icebox->color);
-		$this->assertEquals(['beef steak', 'milk', 'egg'], $icebox->food);
-		$this->assertTrue(FALSE === $icebox->freezer);
-		$this->assertTrue(45 === $icebox->capacity);
-		$this->assertTrue(45 === $icebox->capacity());
-		$this->assertTrue(45 === $icebox->capacity('l'));
-		$this->assertTrue(0 === $icebox->freezerCapacity);
-		$this->assertEquals('Black icebox, 45 l.', $icebox->description);
-		$this->assertEquals('<p>Black icebox, 45 l.</p>', $icebox->taggedDescription);
-		$this->assertTrue($icebox->repaired);
+		$this->assertEquals('Gallardo', $car->name);
+		$this->assertEquals('Gallardo', $car->name);
+		$this->assertEquals('LAMBORGHINI', $car->brand);
+		$this->assertEquals('LAMBORGHINI Gallardo', $car->title);
+		$this->assertSame(TRUE, $car->repaired);
+		$this->assertSame(184000, $car->price);
+		$this->assertSame(184000, $car->price);
+		$this->assertSame(184000, $car->price());
+		$this->assertSame(184000, $car->price('USD'));
+		$this->assertSame(3680000, $car->price('CZK'));
+		$this->assertEquals('coupe', $car->chassis);
+		$this->assertEquals(5200, $car->volume);
+		$this->assertEquals(10, $car->cylinders);
+		$this->assertEquals(520, $car->cylinderVolume);
 
-		$this->assertTrue($icebox->isReadOnly('food'));
-		$this->assertFalse($icebox->isReadOnly('color'));
+		$this->assertTrue($car->isReadOnly('brand'));
+		$this->assertFalse($car->isReadOnly('name'));
 
-		$this->assertTrue(isset($icebox->color));
-		$this->assertTrue(isset($icebox->repaired));
-		$this->assertFalse(isset($icebox->undeclared));
-		$this->assertFalse(isset($icebox->repairs));
+		$this->assertTrue(isset($car->name));
+		$this->assertTrue(isset($car->repaired));
+		$this->assertFalse(isset($car->undeclared));
+		$this->assertFalse(isset($car->repairs));
 
-		return $icebox;
+		return $car;
 	}
 
 
 	/**
 	 * @depends testGet
 	 */
-	public function testUnobtainable(Tests\Icebox $icebox)
+	public function testUnobtainable(Tests\Car $car)
 	{
 		// undeclared
 		$this->assertException(
-			function() use ($icebox) { $icebox->undeclared; },
+			function() use ($car) { $car->undeclared; },
 			'LazyDataMapper\EntityException', LazyDataMapper\EntityException::READ_UNDECLARED
 		);
 
 		// private
 		$this->assertException(
-			function() use ($icebox) { $icebox->repairs; },
+			function() use ($car) { $car->repairs; },
 			'LazyDataMapper\EntityException', LazyDataMapper\EntityException::READ_UNDECLARED
 		);
 	}

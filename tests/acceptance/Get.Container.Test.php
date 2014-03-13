@@ -6,7 +6,7 @@ use LazyDataMapper,
 	LazyDataMapper\Tests;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/Icebox.php';
+require_once __DIR__ . '/implementations/model/Car.php';
 
 class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 {
@@ -18,29 +18,29 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
 
-		$iceboxes = $facade->getByIdsRange([2, 5, 8]);
+		$cars = $facade->getByIdsRange([2, 5, 7]);
 
-		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $iceboxes[0]);
-		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $iceboxes[1]);
-		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $iceboxes[2]);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $cars[0]);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $cars[1]);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $cars[2]);
 
-		$this->assertEquals('black', $iceboxes[0]->color);
-		$this->assertEquals('silver', $iceboxes[1]->color);
-		$this->assertEquals('blue', $iceboxes[2]->color);
+		$this->assertEquals('Gallardo', $cars[0]->name);
+		$this->assertEquals('Celica', $cars[1]->name);
+		$this->assertEquals('Yeti', $cars[2]->name);
 
 		$expected = [
-			2 => ['beef steak', 'milk', 'egg'],
-			5 => [],
-			8 => ['jam'],
+			2 => 5200,
+			5 => 1998,
+			7 => 2000,
 		];
 
-		foreach ($iceboxes as $icebox) {
-			$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $icebox);
-			$this->assertEquals($expected[$icebox->getId()], $icebox->food);
+		foreach ($cars as $car) {
+			$this->assertInstanceOf('LazyDataMapper\Tests\Car', $car);
+			$this->assertEquals($expected[$car->getId()], $car->volume);
 		}
 
-		$this->assertEquals(80, $iceboxes->capacity);
+		$this->assertEquals(207240, $cars->price);
 	}
 }

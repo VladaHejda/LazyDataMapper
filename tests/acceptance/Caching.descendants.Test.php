@@ -4,12 +4,12 @@ namespace LazyDataMapper\Tests\Caching;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
-	LazyDataMapper\Tests\KitchenMapper,
-	LazyDataMapper\Tests\IceboxMapper;
+	LazyDataMapper\Tests\CarMapper,
+	LazyDataMapper\Tests\DriverMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/Kitchen.php';
-require_once __DIR__ . '/implementations/model/Icebox.php';
+require_once __DIR__ . '/implementations/model/Driver.php';
+require_once __DIR__ . '/implementations/model/Car.php';
 
 class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
@@ -21,14 +21,14 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\KitchenFacade($accessor, $serviceAccessor);
+		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
 
-		$kitchen = $facade->getById(1);
+		$car = $facade->getById(1);
 
-		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $kitchen->icebox);
-		$this->assertEquals(22, $kitchen->area);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Driver', $car->driver);
+		$this->assertEquals(16250, $car->price);
 
-		$this->assertEquals(45, $kitchen->icebox->capacity);
+		$this->assertEquals('John', $car->driver->first_name);
 
 		return $facade;
 	}
@@ -37,25 +37,25 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	/**
 	 * @depends testFirstGet
 	 */
-	public function testCaching(Tests\KitchenFacade $facade)
+	public function testCaching(Tests\CarFacade $facade)
 	{
-		$kitchen = $facade->getById(2);
+		$car = $facade->getById(2);
 
-		$this->assertInstanceOf('LazyDataMapper\Tests\Icebox', $kitchen->icebox);
-		$this->assertEquals(54, $kitchen->area);
-		$this->assertEquals(25, $kitchen->icebox->capacity);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Driver', $car->driver);
+		$this->assertEquals(184000, $car->price);
+		$this->assertEquals('Mike', $car->driver->first_name);
 
 		// tests counts of getById calls
-		$this->assertEquals(1, KitchenMapper::$calledGetById);
-		$this->assertEquals(1, IceboxMapper::$calledGetById);
+		$this->assertEquals(1, CarMapper::$calledGetById);
+		$this->assertEquals(1, DriverMapper::$calledGetById);
 
 		// tests suggestions
-		$this->assertEquals(['icebox', 'area'], KitchenMapper::$lastSuggestor->getParamNames());
-		$this->assertTrue(KitchenMapper::$lastSuggestor->hasDescendants());
-		$this->assertTrue(KitchenMapper::$lastSuggestor->hasDescendant('LazyDataMapper\Tests\Icebox', $source));
-		$this->assertEquals('icebox', $source);
-		$descendant = KitchenMapper::$lastSuggestor->getDescendant('LazyDataMapper\Tests\Icebox', $source);
+		$this->assertEquals(['driver', 'price'], CarMapper::$lastSuggestor->getParamNames());
+		$this->assertTrue(CarMapper::$lastSuggestor->hasDescendants());
+		$this->assertTrue(CarMapper::$lastSuggestor->hasDescendant('LazyDataMapper\Tests\Driver', $source));
+		$this->assertEquals('driver', $source);
+		$descendant = CarMapper::$lastSuggestor->getDescendant('LazyDataMapper\Tests\Driver', $source);
 		$this->assertInstanceOf('LazyDataMapper\ISuggestor', $descendant);
-		$this->assertEquals(['capacity'], $descendant->getParamNames());
+		$this->assertEquals(['first_name'], $descendant->getParamNames());
 	}
 }

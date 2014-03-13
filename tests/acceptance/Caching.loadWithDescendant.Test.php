@@ -4,12 +4,12 @@ namespace LazyDataMapper\Tests\Caching;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
-	LazyDataMapper\Tests\HouseMapper,
-	LazyDataMapper\Tests\KitchenMapper;
+	LazyDataMapper\Tests\RaceMapper,
+	LazyDataMapper\Tests\CarMapper;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/House.php';
-require_once __DIR__ . '/implementations/model/Kitchen.php';
+require_once __DIR__ . '/implementations/model/Race.php';
+require_once __DIR__ . '/implementations/model/Car.php';
 
 class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
@@ -21,13 +21,13 @@ class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\HouseFacade($accessor, $serviceAccessor);
+		$facade = new Tests\RaceFacade($accessor, $serviceAccessor);
 
-		$house = $facade->getById(3);
+		$race = $facade->getById(5);
 
-		$this->assertEquals("King's road", $house->street);
-		$this->assertInstanceOf('LazyDataMapper\Tests\Kitchen', $house->kitchen);
-		$this->assertEquals(22, $house->kitchen->area);
+		$this->assertEquals('Oregon', $race->country);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $race->car);
+		$this->assertEquals(10500, $race->car->price);
 
 		return $facade;
 	}
@@ -36,16 +36,16 @@ class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	/**
 	 * @depends testFirstGet
 	 */
-	public function testCaching(Tests\HouseFacade $facade)
+	public function testCaching(Tests\RaceFacade $facade)
 	{
-		$house = $facade->getById(4);
+		$race = $facade->getById(4);
 
-		$this->assertEquals('Oak', $house->street);
-		$this->assertInstanceOf('LazyDataMapper\Tests\Kitchen', $house->kitchen);
-		$this->assertEquals(54, $house->kitchen->area);
+		$this->assertEquals('Texas', $race->country);
+		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $race->car);
+		$this->assertEquals(184000, $race->car->price);
 
-		// KitchenMapper cannot be called, everything solves HouseMapper
-		$this->assertEquals(1, HouseMapper::$calledGetById);
-		$this->assertEquals(0, KitchenMapper::$calledGetById);
+		// CarMapper cannot be called, everything solves RaceMapper
+		$this->assertEquals(1, RaceMapper::$calledGetById);
+		$this->assertEquals(0, CarMapper::$calledGetById);
 	}
 }

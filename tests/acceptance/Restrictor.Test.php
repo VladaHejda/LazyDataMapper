@@ -6,7 +6,8 @@ use LazyDataMapper,
 	LazyDataMapper\Tests;
 
 require_once __DIR__ . '/implementations/cache.php';
-require_once __DIR__ . '/implementations/model/Icebox.php';
+require_once __DIR__ . '/implementations/model/Car.php';
+require_once __DIR__ . '/implementations/model/Driver.php';
 
 /**
  * @internal changed name convention because of conflict with Restrictor unit test
@@ -14,7 +15,7 @@ require_once __DIR__ . '/implementations/model/Icebox.php';
 class AcceptanceTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
-	/** @var Tests\IceboxFacade */
+	/** @var Tests\CarFacade */
 	private $facade;
 
 
@@ -25,42 +26,43 @@ class AcceptanceTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$this->facade = new Tests\IceboxFacade($accessor, $serviceAccessor);
+		$this->facade = new Tests\CarFacade($accessor, $serviceAccessor);
 	}
 
 
 	public function testEquals()
 	{
-		$restrictor = new Tests\IceboxRestrictor;
-		$restrictor->limitColor(['blue', 'white']);
-		$iceboxes = $this->facade->getByRestrictions($restrictor);
-		$this->assertCount(2, $iceboxes);
-		$this->assertEquals(4, $iceboxes[0]->getId());
-		$this->assertEquals(8, $iceboxes[1]->getId());
+		$restrictor = new Tests\CarRestrictor;
+		$restrictor->limitChassis(['roadster', 'sedan']);
+		$cars = $this->facade->getByRestrictions($restrictor);
+		$this->assertCount(3, $cars);
+		$this->assertEquals(1, $cars[0]->getId());
+		$this->assertEquals(5, $cars[1]->getId());
+		$this->assertEquals(6, $cars[2]->getId());
 	}
 
 
 	public function testRange()
 	{
-		$restrictor = new Tests\IceboxRestrictor;
-		$restrictor->limitCapacity(15, 20);
-		$iceboxes = $this->facade->getByRestrictions($restrictor);
-		$this->assertCount(1, $iceboxes);
-		$this->assertEquals(4, $iceboxes[0]->getId());
+		$restrictor = new Tests\CarRestrictor;
+		$restrictor->limitPrice(12000, 15000);
+		$cars = $this->facade->getByRestrictions($restrictor);
+		$this->assertCount(1, $cars);
+		$this->assertEquals(5, $cars[0]->getId());
 
-		$restrictor = new Tests\IceboxRestrictor;
-		$restrictor->limitCapacity(25);
-		$iceboxes = $this->facade->getByRestrictions($restrictor);
-		$this->assertCount(2, $iceboxes);
-		$this->assertEquals(2, $iceboxes[0]->getId());
-		$this->assertEquals(5, $iceboxes[1]->getId());
+		$restrictor = new Tests\CarRestrictor;
+		$restrictor->limitPrice(180000);
+		$cars = $this->facade->getByRestrictions($restrictor);
+		$this->assertCount(2, $cars);
+		$this->assertEquals(2, $cars[0]->getId());
+		$this->assertEquals(4, $cars[1]->getId());
 
-		$restrictor = new Tests\IceboxRestrictor;
-		$restrictor->limitCapacity(NULL, 20);
-		$iceboxes = $this->facade->getByRestrictions($restrictor);
-		$this->assertCount(2, $iceboxes);
-		$this->assertEquals(4, $iceboxes[0]->getId());
-		$this->assertEquals(8, $iceboxes[1]->getId());
+		$restrictor = new Tests\CarRestrictor;
+		$restrictor->limitPrice(NULL, 16000);
+		$cars = $this->facade->getByRestrictions($restrictor);
+		$this->assertCount(2, $cars);
+		$this->assertEquals(5, $cars[0]->getId());
+		$this->assertEquals(7, $cars[1]->getId());
 
 		return $restrictor;
 	}
@@ -68,39 +70,49 @@ class AcceptanceTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 	public function testMatch()
 	{
-		$restrictor = new Tests\IceboxRestrictor;
-		$restrictor->limitFood('egg');
-		$iceboxes = $this->facade->getByRestrictions($restrictor);
-		$this->assertCount(2, $iceboxes);
-		$this->assertEquals(2, $iceboxes[0]->getId());
-		$this->assertEquals(4, $iceboxes[1]->getId());
+		$requestKey = new LazyDataMapper\RequestKey;
+		$cache = new Tests\Cache\SimpleCache;
+		$serviceAccessor = new Tests\ServiceAccessor;
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
+		$driverFacade = new Tests\DriverFacade($accessor, $serviceAccessor);
 
-		$restrictor->limitFood('jam');
-		$iceboxes = $this->facade->getByRestrictions($restrictor);
-		$this->assertCount(3, $iceboxes);
-		$this->assertEquals(8, $iceboxes[2]->getId());
+		$restrictor = new Tests\DriverRestrictor;
+		$cars = $this->facade->getByIdsRange([1, 4]);
+		$restrictor->limitFamousCars($cars);
+		$drivers = $driverFacade->getByRestrictions($restrictor);
+		$this->assertCount(3, $drivers);
+		$this->assertEquals(1, $drivers[0]->getId());
+		$this->assertEquals(2, $drivers[1]->getId());
+		$this->assertEquals(3, $drivers[2]->getId());
+
+		$car = $this->facade->getById(5);
+		$restrictor->limitFamousCars($car);
+		$drivers = $driverFacade->getByRestrictions($restrictor);
+		$this->assertCount(4, $drivers);
+		$this->assertEquals(5, $drivers[3]->getId());
 	}
 
 
 	public function testNotEquals()
 	{
-		$restrictor = new Tests\IceboxRestrictor;
-		$restrictor->limitColor(['black', 'white'], TRUE);
-		$iceboxes = $this->facade->getByRestrictions($restrictor);
-		$this->assertCount(2, $iceboxes);
-		$this->assertEquals(5, $iceboxes[0]->getId());
-		$this->assertEquals(8, $iceboxes[1]->getId());
+		$restrictor = new Tests\CarRestrictor;
+		$restrictor->limitChassis(['coupe', 'roadster'], TRUE);
+		$cars = $this->facade->getByRestrictions($restrictor);
+		$this->assertCount(2, $cars);
+		$this->assertEquals(5, $cars[0]->getId());
+		$this->assertEquals(7, $cars[1]->getId());
 	}
 
 
 	/**
 	 * @depends testRange
 	 */
-	public function testLimitsAggregate(Tests\IceboxRestrictor $restrictor)
+	public function testLimitsAggregate(Tests\CarRestrictor $restrictor)
 	{
-		$restrictor->limitColor('blue');
-		$iceboxes = $this->facade->getByRestrictions($restrictor);
-		$this->assertCount(1, $iceboxes);
-		$this->assertEquals(8, $iceboxes[0]->getId());
+		$restrictor->limitChassis('SUV');
+		$cars = $this->facade->getByRestrictions($restrictor);
+		$this->assertCount(1, $cars);
+		$this->assertEquals(7, $cars[0]->getId());
 	}
 }
