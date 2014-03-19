@@ -14,19 +14,31 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 
 	protected function assertException(callable $callback, $expectedException = 'Exception', $expectedCode = NULL, $expectedMessage = NULL)
 	{
+		if (!class_exists($expectedException) || interface_exists($expectedException)) {
+			$this->fail("An exception of type '$expectedException' does not exist.");
+		}
+
 		try {
 			$callback();
 		} catch (\Exception $e) {
-			$this->assertInstanceOf($expectedException, $e);
+			$class = get_class($e);
+			$message = $e->getMessage();
+			$code = $e->getCode();
+
+			$extraInfo = $message ? " (message was $message, code was $code)" : ($code ? " (code was $code)" : '');
+			$this->assertInstanceOf($expectedException, $e, "Failed asserting the class of exception$extraInfo.");
+
 			if (NULL !== $expectedCode) {
-				$this->assertEquals($expectedCode, $e->getCode());
+				$this->assertEquals($expectedCode, $code, "Failed asserting code of thrown $class.");
 			}
 			if (NULL !== $expectedMessage) {
-				$this->assertContains($expectedMessage, $e->getMessage());
+				$this->assertContains($expectedMessage, $message, "Failed asserting the message of thrown $class.");
 			}
 			return;
 		}
-		$this->fail('Failed asserting that exception is thrown.');
+
+		$extraInfo = $expectedException !== 'Exception' ? " of type $expectedException" : '';
+		$this->fail("Failed asserting that exception$extraInfo was thrown.");
 	}
 
 
