@@ -49,7 +49,7 @@ class RaceMapper extends defaultMapper
 
 	public static $calledGetById = 0;
 
-	/** @var LazyDataMapper\ISuggestor */
+	/** @var LazyDataMapper\Suggestor */
 	public static $lastSuggestor;
 
 	public static $data;
@@ -63,7 +63,7 @@ class RaceMapper extends defaultMapper
 	];
 
 
-	public function getById($id, LazyDataMapper\ISuggestor $suggestor, LazyDataMapper\IDataHolder $holder = NULL)
+	public function getById($id, LazyDataMapper\Suggestor $suggestor, LazyDataMapper\DataHolder $holder = NULL)
 	{
 		$holder = parent::getById($id, $suggestor, $holder);
 

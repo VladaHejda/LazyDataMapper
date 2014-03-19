@@ -9,7 +9,7 @@ namespace LazyDataMapper;
 final class Accessor
 {
 
-	/** @var ISuggestorCache */
+	/** @var SuggestorCache */
 	protected $cache;
 
 	/** @var IEntityServiceAccessor */
@@ -20,10 +20,10 @@ final class Accessor
 
 
 	/**
-	 * @param ISuggestorCache $cache
+	 * @param SuggestorCache $cache
 	 * @param IEntityServiceAccessor $serviceAccessor
 	 */
-	public function __construct(ISuggestorCache $cache, IEntityServiceAccessor $serviceAccessor)
+	public function __construct(SuggestorCache $cache, IEntityServiceAccessor $serviceAccessor)
 	{
 		$this->cache = $cache;
 		$this->serviceAccessor = $serviceAccessor;
@@ -361,12 +361,12 @@ final class Accessor
 	/**
 	 * @param string $entityClass
 	 * @param int|int[] $id or ids
-	 * @param ISuggestor $suggestor
+	 * @param Suggestor $suggestor
 	 * @param int $maxCount
-	 * @return IDataHolder
+	 * @return DataHolder
 	 * @throws Exception
 	 */
-	private function loadDataHolderByMapper($entityClass, $id, ISuggestor $suggestor, $maxCount = NULL)
+	private function loadDataHolderByMapper($entityClass, $id, Suggestor $suggestor, $maxCount = NULL)
 	{
 		$isContainer = is_array($id);
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
@@ -380,8 +380,8 @@ final class Accessor
 			$dataHolder = $mapper->getById($id, $suggestor, $datHolder);
 		}
 
-		if (!$dataHolder instanceof IDataHolder) {
-			throw new Exception(get_class($mapper) . "::$m() must return loaded IDataHolder instance.");
+		if (!$dataHolder instanceof DataHolder) {
+			throw new Exception(get_class($mapper) . "::$m() must return loaded DataHolder instance.");
 		}
 		return $dataHolder;
 	}
@@ -394,9 +394,9 @@ final class Accessor
 	}
 
 
-	private function saveDescendants(IDataHolder $dataHolder)
+	private function saveDescendants(DataHolder $dataHolder)
 	{
-		/** @var IDataHolder $descendant */
+		/** @var DataHolder $descendant */
 		foreach ($dataHolder as $descendant) {
 			if ($descendant->getSuggestor()->hasDescendants()) {
 				$this->saveDescendants($descendant);

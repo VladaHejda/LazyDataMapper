@@ -5,7 +5,7 @@ namespace LazyDataMapper;
 class EntityServiceAccessor implements IEntityServiceAccessor
 {
 
-	/** @var IParamMap[] */
+	/** @var ParamMap[] */
 	private $paramMaps = array();
 
 	/** @var IMapper[] */
@@ -18,7 +18,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	/**
 	 * Creates ParamMap service from classname returned by self::getParamMapClass().
 	 * @param string $entityClass
-	 * @return IParamMap
+	 * @return ParamMap
 	 */
 	final public function getParamMap($entityClass)
 	{

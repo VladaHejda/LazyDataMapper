@@ -18,13 +18,13 @@ interface IMapper
 
 
 	/**
-	 * Get data for one entity. Returns loaded IDataHolder.
+	 * Get data for one entity. Returns loaded DataHolder.
 	 * @param int $id
-	 * @param ISuggestor $suggestor
-	 * @param IDataHolder $dataHolder
-	 * @return IDataHolder
+	 * @param Suggestor $suggestor
+	 * @param DataHolder $dataHolder
+	 * @return DataHolder
 	 */
-	function getById($id, ISuggestor $suggestor, IDataHolder $dataHolder = NULL);
+	function getById($id, Suggestor $suggestor, DataHolder $dataHolder = NULL);
 
 
 	/**
@@ -38,30 +38,30 @@ interface IMapper
 
 
 	/**
-	 * Get data for range of entities. Returns loaded IDataHolder.
+	 * Get data for range of entities. Returns loaded DataHolder.
 	 * @param int[] $ids
-	 * @param ISuggestor $suggestor
-	 * @param IDataHolder $dataHolder
-	 * @return IDataHolder
+	 * @param Suggestor $suggestor
+	 * @param DataHolder $dataHolder
+	 * @return DataHolder
 	 */
-	function getByIdsRange(array $ids, ISuggestor $suggestor, IDataHolder $dataHolder = NULL);
+	function getByIdsRange(array $ids, Suggestor $suggestor, DataHolder $dataHolder = NULL);
 
 
 	/**
 	 * Saves modifications of entity.
 	 * @param int $id
-	 * @param IDataHolder $holder
+	 * @param DataHolder $holder
 	 * @return void
 	 */
-	function save($id, IDataHolder $holder);
+	function save($id, DataHolder $holder);
 
 
 	/**
 	 * Creates new entity record.
-	 * @param IDataHolder $holder
+	 * @param DataHolder $holder
 	 * @return int id
 	 */
-	function create(IDataHolder $holder);
+	function create(DataHolder $holder);
 
 
 	/**

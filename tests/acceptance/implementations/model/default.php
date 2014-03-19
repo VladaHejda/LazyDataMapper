@@ -12,10 +12,10 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	/** calls counters */
 	public static $calledGetById, $calledGetByRestrictions;
 
-	/** @var LazyDataMapper\ISuggestor */
+	/** @var LazyDataMapper\Suggestor */
 	public static $lastSuggestor;
 
-	/** @var LazyDataMapper\IDataHolder */
+	/** @var LazyDataMapper\DataHolder */
 	public static $lastHolder;
 
 	/** @var array */
@@ -48,7 +48,7 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	}
 
 
-	public function getById($id, LazyDataMapper\ISuggestor $suggestor, LazyDataMapper\IDataHolder $holder = NULL)
+	public function getById($id, LazyDataMapper\Suggestor $suggestor, LazyDataMapper\DataHolder $holder = NULL)
 	{
 		// analytics
 		++static::$calledGetById;
@@ -60,7 +60,7 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	}
 
 
-	public function getByIdsRange(array $ids, LazyDataMapper\ISuggestor $suggestor, LazyDataMapper\IDataHolder $holder = NULL)
+	public function getByIdsRange(array $ids, LazyDataMapper\Suggestor $suggestor, LazyDataMapper\DataHolder $holder = NULL)
 	{
 		++static::$calledGetByRestrictions;
 		static::$lastSuggestor = $suggestor;
@@ -89,14 +89,14 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	}
 
 
-	public function save($id, LazyDataMapper\IDataHolder $holder)
+	public function save($id, LazyDataMapper\DataHolder $holder)
 	{
 		static::$lastHolder = $holder;
 		static::$data[$id] = array_merge(static::$data[$id], $holder->getParams());
 	}
 
 
-	public function create(LazyDataMapper\IDataHolder $holder)
+	public function create(LazyDataMapper\DataHolder $holder)
 	{
 		static::$data[] = array_merge(static::$default, $holder->getParams());
 		end(static::$data);

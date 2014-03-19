@@ -270,10 +270,10 @@ class CarMapper extends defaultMapper
 	public static $calledGetById = 0;
 	public static $calledGetByRestrictions = 0;
 
-	/** @var LazyDataMapper\ISuggestor */
+	/** @var LazyDataMapper\Suggestor */
 	public static $lastSuggestor;
 
-	/** @var LazyDataMapper\IDataHolder */
+	/** @var LazyDataMapper\DataHolder */
 	public static $lastHolder;
 
 	public static $data;

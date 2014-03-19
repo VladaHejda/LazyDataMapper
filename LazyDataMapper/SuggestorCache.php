@@ -2,8 +2,15 @@
 
 namespace LazyDataMapper;
 
-class SuggestorCache implements ISuggestorCache
+/**
+ * Suggestor cache. Caches suggestions per deterministic request (see IRequestKey)
+ * for later efficient data load.
+ */
+class SuggestorCache
 {
+
+	const PARAM_NAMES = 0,
+		DESCENDANTS = 1;
 
 	/** @var IExternalCache */
 	protected $externalCache;
@@ -29,10 +36,11 @@ class SuggestorCache implements ISuggestorCache
 
 
 	/**
+	 * Adds parameter name under one identifier.
 	 * @param IIdentifier $identifier
 	 * @param string $paramName
 	 * @param string $entityClass
-	 * @return ISuggestor
+	 * @return Suggestor with one suggestion of cached parameter name
 	 */
 	public function cacheParamName(IIdentifier $identifier, $paramName, $entityClass)
 	{
@@ -63,6 +71,7 @@ class SuggestorCache implements ISuggestorCache
 
 
 	/**
+	 * Adds descendant under one identifier.
 	 * @param IIdentifier $identifier
 	 * @param string $descendantEntityClass
 	 * @param string $sourceParam
@@ -103,10 +112,11 @@ class SuggestorCache implements ISuggestorCache
 
 
 	/**
+	 * Gets all cached suggestions under one identifier or NULL when nothing cached.
 	 * @param IIdentifier $identifier
 	 * @param string $entityClass
 	 * @param bool $isContainer
-	 * @return ISuggestor
+	 * @return Suggestor
 	 */
 	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE)
 	{
@@ -142,14 +152,14 @@ class SuggestorCache implements ISuggestorCache
 
 
 	/**
-	 * @param IParamMap $paramMap
+	 * @param ParamMap $paramMap
 	 * @param IIdentifier $identifier
 	 * @param array $suggestions
 	 * @param array $descendants
 	 * @param bool $isContainer
-	 * @return ISuggestor
+	 * @return Suggestor
 	 */
-	protected function createSuggestor(IParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $descendants = array(), $isContainer = FALSE)
+	protected function createSuggestor(ParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $descendants = array(), $isContainer = FALSE)
 	{
 		return new Suggestor($paramMap, $this, $suggestions, $isContainer, $identifier, $descendants);
 	}

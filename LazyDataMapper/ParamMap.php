@@ -2,7 +2,10 @@
 
 namespace LazyDataMapper;
 
-abstract class ParamMap implements IParamMap
+/**
+ * @entityDependent
+ */
+abstract class ParamMap
 {
 
 	/** @var array set this map in descendant */
@@ -32,9 +35,11 @@ abstract class ParamMap implements IParamMap
 
 	/**
 	 * @param string $group
-	 * @param bool $flip
-	 * @return array
-	 * @throws Exception
+	 * @param bool $flip when TRUE method returns parameter names in keys and NULL in values (prepared for fill),
+	 *      otherwise parameter names are in values.
+	 * @return array one or two dimensional array (dependent on whether requesting group or not)
+	 * @throws Exception when requesting group even if not grouped
+	 * @throws Exception on unknown group
 	 */
 	public function getMap($group = NULL, $flip = TRUE)
 	{
@@ -98,7 +103,7 @@ abstract class ParamMap implements IParamMap
 	/**
 	 * @param string $group
 	 * @return bool
-	 * @throws Exception
+	 * @throws Exception if is not grouped
 	 */
 	public function hasGroup($group)
 	{
@@ -113,7 +118,7 @@ abstract class ParamMap implements IParamMap
 	/**
 	 * @param string $paramName
 	 * @return string
-	 * @throws Exception
+	 * @throws Exception on unknown param name
 	 */
 	public function getParamGroup($paramName)
 	{
@@ -133,7 +138,7 @@ abstract class ParamMap implements IParamMap
 	/**
 	 * @param string $paramName
 	 * @return mixed
-	 * @throws Exception
+	 * @throws Exception on unknown param name
 	 */
 	public function getDefaultValue($paramName)
 	{

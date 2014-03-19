@@ -2,13 +2,16 @@
 
 namespace LazyDataMapper;
 
-class Suggestor implements ISuggestor
+/**
+ * Suggests parameter names and descendants to Mapper.
+ */
+class Suggestor implements \Iterator
 {
 
-	/** @var IParamMap */
+	/** @var ParamMap */
 	protected $paramMap;
 
-	/** @var ISuggestorCache */
+	/** @var SuggestorCache */
 	protected $cache;
 
 	/** @var array */
@@ -31,14 +34,14 @@ class Suggestor implements ISuggestor
 
 
 	/**
-	 * @param IParamMap $paramMap
-	 * @param ISuggestorCache $cache
+	 * @param ParamMap $paramMap
+	 * @param SuggestorCache $cache
 	 * @param array $suggestions
 	 * @param bool $isContainer
 	 * @param IIdentifier $identifier
 	 * @param array $descendants entityClass => IIdentifier
 	 */
-	public function __construct(IParamMap $paramMap, ISuggestorCache $cache, array $suggestions, $isContainer = FALSE, IIdentifier $identifier = NULL, array $descendants = array())
+	public function __construct(ParamMap $paramMap, SuggestorCache $cache, array $suggestions, $isContainer = FALSE, IIdentifier $identifier = NULL, array $descendants = array())
 	{
 		$this->paramMap = $paramMap;
 		$this->cache = $cache;
@@ -62,6 +65,7 @@ class Suggestor implements ISuggestor
 
 
 	/**
+	 * If grouped but group is omitted, it returns all param names merged.
 	 * @param string $group
 	 * @return string[]
 	 */
@@ -101,6 +105,7 @@ class Suggestor implements ISuggestor
 
 
 	/**
+	 * Says whether has at least one descendant.
 	 * @return bool
 	 */
 	public function hasDescendants()
@@ -244,7 +249,7 @@ class Suggestor implements ISuggestor
 
 
 	/**
-	 * @return IParamMap
+	 * @return ParamMap
 	 */
 	public function getParamMap()
 	{

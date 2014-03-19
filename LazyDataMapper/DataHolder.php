@@ -2,7 +2,10 @@
 
 namespace LazyDataMapper;
 
-class DataHolder implements IDataHolder
+/**
+ * Based on Suggestor gains data from Mapper and gives data to Mapper's method save() and create().
+ */
+class DataHolder implements \Iterator
 {
 
 	/** @var array */
@@ -11,7 +14,7 @@ class DataHolder implements IDataHolder
 	/** @var array */
 	protected $descendants = array();
 
-	/** @var ISuggestor */
+	/** @var Suggestor */
 	protected $suggestor;
 
 	/** @var array */
@@ -19,11 +22,11 @@ class DataHolder implements IDataHolder
 
 
 	/**
-	 * @param ISuggestor $suggestor
+	 * @param Suggestor $suggestor
 	 * @param int[] $ids for container holder
 	 * @throws Exception
 	 */
-	public function __construct(ISuggestor $suggestor, array $ids = NULL)
+	public function __construct(Suggestor $suggestor, array $ids = NULL)
 	{
 		$this->suggestor = $suggestor;
 		if ($suggestor->isContainer() && NULL === $ids) {
@@ -35,7 +38,7 @@ class DataHolder implements IDataHolder
 
 	/**
 	 * @param array|array[] $params array for one; array of arrays for container, indexed by id
-	 * @return self
+	 * @return self provides fluent interface
 	 * @throws Exception on not suggested/unknown parameter
 	 * @throws Exception on unknown id
 	 */
@@ -90,6 +93,7 @@ class DataHolder implements IDataHolder
 	/**
 	 * @param string $group
 	 * @return bool
+	 * @throws Exception on unknown group
 	 */
 	public function isDataInGroup($group)
 	{
@@ -159,7 +163,7 @@ class DataHolder implements IDataHolder
 
 
 	/**
-	 * @return ISuggestor
+	 * @return Suggestor
 	 */
 	public function getSuggestor()
 	{

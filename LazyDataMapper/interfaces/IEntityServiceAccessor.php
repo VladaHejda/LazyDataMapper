@@ -8,7 +8,7 @@ interface IEntityServiceAccessor
 	/**
 	 * Apply solution to gain Entity ParamMap service based on Entity class name.
 	 * @param string $entityClass
-	 * @return IParamMap
+	 * @return ParamMap
 	 */
 	function getParamMap($entityClass);
 
