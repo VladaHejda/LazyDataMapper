@@ -138,15 +138,15 @@ class DriverMapper extends defaultMapper
 
 		if ($suggestor->hasDescendant('LazyDataMapper\Tests\Car')) {
 			$descendant = $suggestor->getDescendant('LazyDataMapper\Tests\Car');
-			$data = array_intersect_key(CarMapper::$data[static::$data[$id]['car']] ,array_flip($descendant->getParamNames()));
-			$descendantHolder = $holder->getDescendant('LazyDataMapper\Tests\Car');
-			$descendantHolder->setParams($data);
-
-			if ($descendant->hasDescendant('LazyDataMapper\Tests\Race')) {
-				$descendant = $descendant->getDescendant('LazyDataMapper\Tests\Race');
-				$data = array_intersect_key(RaceMapper::$data[$data['race']] ,array_flip($descendant->getParamNames()));
-				$descendantHolder->getDescendant('LazyDataMapper\Tests\Race')->setParams($data);
+			$paramNames = array_flip($descendant->getParamNames());
+			$cars = [];
+			foreach (CarMapper::$data as $carId => $car) {
+				if ($car['driver'] == $id) {
+					$cars[$carId] = array_intersect_key($car ,$paramNames);
+				}
 			}
+			$descendantHolder = $holder->getDescendant('LazyDataMapper\Tests\Car', $dummy, array_keys($cars));
+			$descendantHolder->setParams($cars);
 		}
 
 		return $holder;

@@ -20,6 +20,9 @@ class Suggestor implements ISuggestor
 	/** @var array */
 	protected $descendants;
 
+	/** @var bool */
+	protected $isContainer;
+
 	/** @var int */
 	private $pos = 0;
 
@@ -31,10 +34,11 @@ class Suggestor implements ISuggestor
 	 * @param IParamMap $paramMap
 	 * @param ISuggestorCache $cache
 	 * @param array $suggestions
+	 * @param bool $isContainer
 	 * @param IIdentifier $identifier
 	 * @param array $descendants entityClass => IIdentifier
 	 */
-	public function __construct(IParamMap $paramMap, ISuggestorCache $cache, array $suggestions, IIdentifier $identifier = NULL, array $descendants = array())
+	public function __construct(IParamMap $paramMap, ISuggestorCache $cache, array $suggestions, $isContainer = FALSE, IIdentifier $identifier = NULL, array $descendants = array())
 	{
 		$this->paramMap = $paramMap;
 		$this->cache = $cache;
@@ -42,6 +46,7 @@ class Suggestor implements ISuggestor
 		$this->suggestions = $suggestions;
 		$this->identifier = $identifier;
 		$this->descendants = $descendants;
+		$this->isContainer = $isContainer;
 	}
 
 
@@ -89,6 +94,15 @@ class Suggestor implements ISuggestor
 	/**
 	 * @return bool
 	 */
+	public function isContainer()
+	{
+		return $this->isContainer;
+	}
+
+
+	/**
+	 * @return bool
+	 */
 	public function hasDescendants()
 	{
 		$this->rewind();
@@ -108,8 +122,6 @@ class Suggestor implements ISuggestor
 		if (!isset($this->descendants[$entityClass])) {
 			return FALSE;
 		}
-
-		$this->checkCache($entityClass);
 
 		if (NULL === $sourceParam) {
 			if (count($this->descendants[$entityClass]) > 1) {
@@ -139,23 +151,21 @@ class Suggestor implements ISuggestor
 			return NULL;
 		}
 
-		$this->checkCache($entityClass);
-
 		if (NULL === $sourceParam) {
 			if (count($this->descendants[$entityClass]) > 1) {
 				throw new Exception("Descendant $entityClass is ambiguous.");
 			}
-			$identifier = reset($this->descendants[$entityClass]);
+			list($isContainer, $identifier) = reset($this->descendants[$entityClass]);
 			$sourceParam = key($this->descendants[$entityClass]);
 
 		} elseif (array_key_exists($sourceParam, $this->descendants[$entityClass])) {
-			$identifier = $this->descendants[$entityClass][$sourceParam];
+			list($isContainer, $identifier) = $this->descendants[$entityClass][$sourceParam];
 
 		} else {
 			return NULL;
 		}
 
-		return $this->loadDescendant($identifier, $entityClass);
+		return $this->loadDescendant($identifier, $entityClass, $isContainer);
 	}
 
 
@@ -171,22 +181,17 @@ class Suggestor implements ISuggestor
 			throw new Exception("No descendant of class $entityClass.");
 		}
 
-		$this->checkCache($entityClass);
-
 		if (!array_key_exists($sourceParam, $this->descendants[$entityClass])) {
 			throw new Exception("Descendant $entityClass on source parameter $sourceParam does not exist.");
 		}
 
-		return $this->descendants[$entityClass][$sourceParam];
+		return $this->descendants[$entityClass][$sourceParam][1];
 	}
 
 
 	public function rewind()
 	{
 		foreach ($this->descendants as &$descendant) {
-			if (!is_array($descendant)) {
-				throw new Exception('Malformed cache. Clear it and try again.');
-			}
 			reset($descendant);
 		}
 		reset($this->descendants);
@@ -203,9 +208,10 @@ class Suggestor implements ISuggestor
 			return FALSE;
 		}
 		$entityClass = key($this->descendants);
-		$identifier = current($this->descendants[$entityClass]);
+		$descendant = current($this->descendants[$entityClass]);
+		list($isContainer, $identifier) = $descendant;
 
-		$this->currentDescendant = $this->loadDescendant($identifier, $entityClass);
+		$this->currentDescendant = $this->loadDescendant($identifier, $entityClass, $isContainer);
 		if (!$this->currentDescendant) {
 			$this->next();
 			return $this->valid();
@@ -246,17 +252,9 @@ class Suggestor implements ISuggestor
 	}
 
 
-	protected function checkCache($entityClass)
+	protected function loadDescendant(IIdentifier $identifier, $entityClass, $isContainer)
 	{
-		if (!is_array($this->descendants[$entityClass])) {
-			throw new Exception('Malformed cache. Clear it and try again.');
-		}
-	}
-
-
-	protected function loadDescendant(IIdentifier $identifier, $entityClass)
-	{
-		return $this->cache->getCached($identifier, $entityClass);
+		return $this->cache->getCached($identifier, $entityClass, $isContainer);
 	}
 
 

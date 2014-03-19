@@ -30,6 +30,12 @@ interface ISuggestor extends \Iterator
 
 
 	/**
+	 * @return bool
+	 */
+	function isContainer();
+
+
+	/**
 	 * Says whether has at least one descendant.
 	 * @return bool
 	 */

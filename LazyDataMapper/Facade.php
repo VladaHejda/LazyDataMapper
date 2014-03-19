@@ -68,7 +68,7 @@ abstract class Facade
 	 */
 	public function getByRestrictions(IRestrictor $restrictor, $maxCount = 100)
 	{
-		return $this->accessor->getByRestrictions($this->entityClass, $restrictor, NULL, $maxCount);
+		return $this->accessor->getByRestrictions($this->entityClass, $restrictor, NULL, NULL, $maxCount);
 	}
 
 

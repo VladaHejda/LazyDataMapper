@@ -39,12 +39,6 @@ interface IDataHolder extends \Iterator
 
 
 	/**
-	 * @return bool
-	 */
-	public function isContainer();
-
-
-	/**
 	 * @return ISuggestor
 	 */
 	function getSuggestor();

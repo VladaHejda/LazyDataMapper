@@ -82,41 +82,56 @@ final class Accessor
 	 * @param array|string $entityClass
 	 * @param IRestrictor|int[] $restrictions
 	 * @param IOperand $parent
+	 * @param string $sourceParam
 	 * @param int $maxCount
 	 * @return IEntityContainer
 	 * @throws Exception on wrong restrictions
 	 */
-	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL, $maxCount = NULL)
+	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL, $sourceParam = NULL, $maxCount = NULL)
 	{
 		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
 
-		$ids = $this->loadIdsByRestrictions($entityClass, $restrictions, $maxCount);
-
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL);
-
-		if (!empty($ids)) {
-			$suggestor = $this->cache->getCached($identifier, $entityClass);
+		if (($parent && NULL === $sourceParam) || (NULL !== $sourceParam && !$parent)) {
+			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
 
-		if (empty($ids)) {
-			$data = array();
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
-		} elseif (!$suggestor) {
-			// nonexistent ids prevention
-			foreach ($ids as $i => $id) {
-				if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
-					unset($ids[$i]);
-				}
-			}
-			$data = array_fill_keys($ids, array());
+		// for now only Container descendant of single Entity works, because exponential (ids under ids) dependencies does not work in DataHolder
+		if ($parent instanceof IEntity && $data = $this->getLoadedData($identifier)) {
+			// $data set
 
 		} else {
-			$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
-			// todo is there saving descendants possible?
-			$this->saveDescendants($dataHolder);
-			$data = $dataHolder->getParams();
-			$this->sortData($ids, $data);
+			$ids = $this->loadIdsByRestrictions($entityClass, $restrictions, $maxCount);
+
+			if (empty($ids)) {
+				$data = array();
+
+			} elseif ($suggestor = $this->cache->getCached($identifier, $entityClass, TRUE)) {
+				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
+				$this->saveDescendants($dataHolder);
+				$data = $dataHolder->getParams();
+				$this->sortData($ids, $data);
+
+			} else {
+				// nonexistent ids prevention
+				foreach ($ids as $i => $id) {
+					if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
+						unset($ids[$i]);
+					}
+				}
+				if ($parent instanceof IEntity) {
+					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam, TRUE);
+				}
+				$data = array_fill_keys($ids, array());
+			}
 		}
+
+		/* todo vracet Container bez entit nebo jen array ?? (getbyId taky vrátí NULL)
+		if (empty($data)) {
+			return array();
+		}
+		*/
 
 		return $this->createEntityContainer($entityContainerClass, $data, $identifier, $entityClass);
 	}
@@ -367,9 +382,6 @@ final class Accessor
 
 		if (!$dataHolder instanceof IDataHolder) {
 			throw new Exception(get_class($mapper) . "::$m() must return loaded IDataHolder instance.");
-		}
-		if ($isContainer && !$dataHolder->isContainer()) {
-			throw new Exception(get_class($mapper) . "::$m() you forgot to add second argument into IDataHolder (ids array).");
 		}
 		return $dataHolder;
 	}

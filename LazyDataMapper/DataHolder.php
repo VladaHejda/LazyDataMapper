@@ -17,19 +17,19 @@ class DataHolder implements IDataHolder
 	/** @var array */
 	protected $ids;
 
-	/** @var bool */
-	protected $isContainer;
-
 
 	/**
 	 * @param ISuggestor $suggestor
-	 * @param array $ids for container holder
+	 * @param int[] $ids for container holder
+	 * @throws Exception
 	 */
 	public function __construct(ISuggestor $suggestor, array $ids = NULL)
 	{
 		$this->suggestor = $suggestor;
+		if ($suggestor->isContainer() && NULL === $ids) {
+			throw new Exception('Missing second argument for Container Suggestor. Expected array of ids.');
+		}
 		$this->ids = $ids;
-		$this->isContainer = NULL !== $ids;
 	}
 
 
@@ -42,7 +42,7 @@ class DataHolder implements IDataHolder
 	public function setParams(array $params)
 	{
 		$suggestions = array_fill_keys($this->suggestor->getParamNames(), TRUE);
-		if ($this->isContainer) {
+		if ($this->suggestor->isContainer()) {
 			if ($diff = array_diff(array_keys($params), $this->ids)) {
 				if (is_int(current($diff))){
 					throw new Exception("Invalid ids: " . implode(', ', $diff) . ".");
@@ -76,7 +76,7 @@ class DataHolder implements IDataHolder
 		}
 
 		$map = $this->suggestor->getParamMap()->getMap($group);
-		if ($this->isContainer) {
+		if ($this->suggestor->isContainer()) {
 			$containerMap = array();
 			foreach ($this->params as $id => $params) {
 				$containerMap[$id] = $this->fillMap($map, $params);
@@ -94,7 +94,7 @@ class DataHolder implements IDataHolder
 	public function isDataInGroup($group)
 	{
 		$map = $this->suggestor->getParamMap()->getMap($group, FALSE);
-		if ($this->isContainer) {
+		if ($this->suggestor->isContainer()) {
 			foreach ($this->params as $params) {
 				$isDataInGroup = (bool) array_intersect(array_keys($params), $map);
 				if ($isDataInGroup) {
@@ -114,7 +114,7 @@ class DataHolder implements IDataHolder
 	 */
 	public function __get($param)
 	{
-		if ($this->isContainer) {
+		if ($this->suggestor->isContainer()) {
 			throw new Exception("For container DataHolder use method getParams().");
 		}
 
@@ -133,9 +133,11 @@ class DataHolder implements IDataHolder
 	/**
 	 * @param string $entityClass
 	 * @param string $sourceParam
+	 * @param int[] $ids
 	 * @return self|null
+	 * @throws Exception
 	 */
-	public function getDescendant($entityClass, &$sourceParam = NULL)
+	public function getDescendant($entityClass, &$sourceParam = NULL, array $ids = NULL)
 	{
 		if (!$this->suggestor->hasDescendant($entityClass, $sourceParam)) {
 			return NULL;
@@ -147,19 +149,12 @@ class DataHolder implements IDataHolder
 		}
 
 		$suggestor = $this->suggestor->getDescendant($entityClass, $sourceParam);
-		// todo what if descendant has to be container? How to give ids?
-		$descendantHolder = new self($suggestor);
+		if ($suggestor->isContainer() && NULL === $ids) {
+			throw new Exception('Missing third argument for descendant Container Suggestor. Expected array of ids.');
+		}
+		$descendantHolder = new self($suggestor, $ids);
 		$this->descendants[$key] = $descendantHolder;
 		return $descendantHolder;
-	}
-
-
-	/**
-	 * @return bool
-	 */
-	public function isContainer()
-	{
-		return $this->isContainer;
 	}
 
 
