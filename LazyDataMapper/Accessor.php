@@ -127,11 +127,9 @@ final class Accessor
 			}
 		}
 
-		/* todo vracet Container bez entit nebo jen array ?? (getbyId taky vrátí NULL)
 		if (empty($data)) {
 			return array();
 		}
-		*/
 
 		return $this->createEntityContainer($entityContainerClass, $data, $identifier, $entityClass);
 	}
