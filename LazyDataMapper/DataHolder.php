@@ -24,33 +24,55 @@ class DataHolder implements \Iterator
 	/**
 	 * @param Suggestor $suggestor
 	 * @param int[] $ids for container holder
-	 * @throws Exception
+	 * @todo co když $ids bude prázdný array (resp. mapper zjistí že žádní potomci nejsou)
 	 */
 	public function __construct(Suggestor $suggestor, array $ids = NULL)
 	{
 		$this->suggestor = $suggestor;
-		if ($suggestor->isContainer() && NULL === $ids) {
-			throw new Exception('Missing second argument for Container Suggestor. Expected array of ids.');
+
+		if (NULL === $ids && !$suggestor->isContainer()) {
+			$this->ids = FALSE;
+		} elseif (NULL !== $ids && $suggestor->isContainer()) {
+			$this->ids = $ids;
+		}
+	}
+
+
+	/**
+	 * @param array $ids
+	 * @return self
+	 * @throws Exception
+	 */
+	public function setIds(array $ids)
+	{
+		if (NULL !== $this->ids) {
+			throw new Exception('Ids have already been set.');
 		}
 		$this->ids = $ids;
+		return $this;
 	}
 
 
 	/**
 	 * @param array|array[] $params array for one; array of arrays for container, indexed by id
-	 * @return self provides fluent interface
+	 * @return self
 	 * @throws Exception on not suggested/unknown parameter
 	 * @throws Exception on unknown id
 	 */
 	public function setParams(array $params)
 	{
+		if (NULL === $this->ids && $this->suggestor->isContainer()) {
+			throw new Exception('This DataHolder is Container and you did not set ids yet. Use method setIds().');
+		}
+
 		$suggestions = array_fill_keys($this->suggestor->getParamNames(), TRUE);
+
 		if ($this->suggestor->isContainer()) {
 			if ($diff = array_diff(array_keys($params), $this->ids)) {
 				if (is_int(current($diff))){
-					throw new Exception("Invalid ids: " . implode(', ', $diff) . ".");
+					throw new Exception('Invalid ids: ' . implode(', ', $diff) . '.');
 				}
-				throw new Exception("You must set parameters for each id via two-dimensional array.");
+				throw new Exception('You must set parameters for each id via two-dimensional array.');
 			}
 			foreach ($params as $id => $theParams) {
 				$this->checkAgainstSuggestions(array_keys($theParams), $suggestions);
@@ -59,6 +81,7 @@ class DataHolder implements \Iterator
 				}
 				$this->params[$id] = $theParams + $this->params[$id];
 			}
+
 		} else {
 			$this->checkAgainstSuggestions(array_keys($params), $suggestions);
 			$this->params = $params + $this->params;
@@ -112,53 +135,34 @@ class DataHolder implements \Iterator
 
 
 	/**
-	 * @param string $param
-	 * @return mixed
-	 * @throws Exception
-	 */
-	public function __get($param)
-	{
-		if ($this->suggestor->isContainer()) {
-			throw new Exception("For container DataHolder use method getParams().");
-		}
-
-		if (array_key_exists($param, $this->params)) {
-			return $this->params[$param];
-		}
-
-		if ($this->suggestor->getParamMap()->hasParam($param)) {
-			return NULL;
-		}
-
-		throw new Exception("Parameter $param does not exist.");
-	}
-
-
-	/**
-	 * @param string $entityClass
 	 * @param string $sourceParam
 	 * @param int[] $ids
 	 * @return self|null
 	 * @throws Exception
 	 */
-	public function getDescendant($entityClass, &$sourceParam = NULL, array $ids = NULL)
+	public function getDescendant($sourceParam, array $ids = NULL)
 	{
-		if (!$this->suggestor->hasDescendant($entityClass, $sourceParam)) {
+		if (array_key_exists($sourceParam, $this->descendants)) {
+			return $this->descendants[$sourceParam];
+		}
+
+		$suggestor = $this->suggestor->getDescendant($sourceParam);
+		if (!$suggestor) {
 			return NULL;
 		}
 
-		$key = $this->suggestor->getDescendantIdentifier($entityClass, $sourceParam)->getKey();
-		if (isset($this->descendants[$key])) {
-			return $this->descendants[$key];
-		}
+		$descendant = new self($suggestor, $ids);
+		$this->descendants[$sourceParam] = $descendant;
+		return $descendant;
+	}
 
-		$suggestor = $this->suggestor->getDescendant($entityClass, $sourceParam);
-		if ($suggestor->isContainer() && NULL === $ids) {
-			throw new Exception('Missing third argument for descendant Container Suggestor. Expected array of ids.');
-		}
-		$descendantHolder = new self($suggestor, $ids);
-		$this->descendants[$key] = $descendantHolder;
-		return $descendantHolder;
+
+	/**
+	 * @see getDescendant()
+	 */
+	public function __get($sourceParam)
+	{
+		return $this->getDescendant($sourceParam);
 	}
 
 
@@ -185,11 +189,15 @@ class DataHolder implements \Iterator
 
 	public function current()
 	{
-		$suggestor = $this->suggestor->current();
-		$key = $suggestor->getIdentifier()->getKey();
-		if (isset($this->descendants[$key])) {
+		$key = $this->suggestor->key();
+		if (array_key_exists($key, $this->descendants)) {
 			return $this->descendants[$key];
 		}
+		$suggestor = $this->suggestor->current();
+		if (!$suggestor) {
+			return FALSE;
+		}
+
 		return $this->descendants[$key] = new self($suggestor);
 	}
 

@@ -52,9 +52,7 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		// tests suggestions
 		$this->assertEquals(['driver', 'price'], CarMapper::$lastSuggestor->getParamNames());
 		$this->assertTrue(CarMapper::$lastSuggestor->hasDescendants());
-		$this->assertTrue(CarMapper::$lastSuggestor->hasDescendant('LazyDataMapper\Tests\Driver', $source));
-		$this->assertEquals('driver', $source);
-		$descendant = CarMapper::$lastSuggestor->getDescendant('LazyDataMapper\Tests\Driver', $source);
+		$descendant = CarMapper::$lastSuggestor->getDescendant('driver');
 		$this->assertInstanceOf('LazyDataMapper\Suggestor', $descendant);
 		$this->assertEquals(['first_name'], $descendant->getParamNames());
 	}

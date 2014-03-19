@@ -67,16 +67,13 @@ class RaceMapper extends defaultMapper
 	{
 		$holder = parent::getById($id, $suggestor, $holder);
 
-		if ($suggestor->hasDescendant('LazyDataMapper\Tests\Car')) {
-			$descendant = $suggestor->getDescendant('LazyDataMapper\Tests\Car');
-			$data = array_intersect_key(CarMapper::$data[static::$data[$id]['car']] ,array_flip($descendant->getParamNames()));
-			$descendantHolder = $holder->getDescendant('LazyDataMapper\Tests\Car');
-			$descendantHolder->setParams($data);
+		if ($suggestor->car) {
+			$data = array_intersect_key(CarMapper::$data[static::$data[$id]['car']] ,array_flip($suggestor->car->getParamNames()));
+			$holder->car->setParams($data);
 
-			if ($descendant->hasDescendant('LazyDataMapper\Tests\Driver')) {
-				$descendant = $descendant->getDescendant('LazyDataMapper\Tests\Driver');
-				$data = array_intersect_key(DriverMapper::$data[$data['driver']] ,array_flip($descendant->getParamNames()));
-				$descendantHolder->getDescendant('LazyDataMapper\Tests\Driver')->setParams($data);
+			if ($suggestor->car->driver) {
+				$data = array_intersect_key(DriverMapper::$data[$data['driver']] ,array_flip($suggestor->car->driver->getParamNames()));
+				$holder->car->driver->setParams($data);
 			}
 		}
 

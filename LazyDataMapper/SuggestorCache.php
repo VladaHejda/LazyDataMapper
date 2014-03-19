@@ -96,17 +96,14 @@ class SuggestorCache
 		}
 
 		$cachedShortcut = & $cached[self::DESCENDANTS];
-		if (!isset($cachedShortcut[$descendantEntityClass])) {
-			$cachedShortcut[$descendantEntityClass] = array();
+		if (!array_key_exists($sourceParam, $cachedShortcut)) {
+			$cachedShortcut[$sourceParam] = array();
 		} else {
-			$this->checkCache($cachedShortcut[$descendantEntityClass]);
-		}
-
-		$cachedShortcut = & $cachedShortcut[$descendantEntityClass];
-		if (array_key_exists($sourceParam, $cachedShortcut)) {
+			$this->checkCache($cachedShortcut[$sourceParam]);
 			return;
 		}
-		$cachedShortcut[$sourceParam] = array($isContainer);
+
+		$cachedShortcut[$sourceParam] = array($descendantEntityClass, $isContainer);
 		$this->externalCache->save($key, $cached);
 	}
 
@@ -140,11 +137,9 @@ class SuggestorCache
 			$descendants = $cached[self::DESCENDANTS];
 		}
 
-		foreach ($descendants as $descendantClass => &$descendant) {
-			foreach ($descendant as $sourceParam => &$ref) {
-				$this->checkCache($ref);
-				$ref[] = $this->serviceAccessor->composeIdentifier($descendantClass, $ref[0], $identifier, $sourceParam);
-			}
+		foreach ($descendants as $sourceParam => &$descendant) {
+			$this->checkCache($descendant);
+			$descendant[] = $this->serviceAccessor->composeIdentifier($descendant[0], $descendant[1], $identifier, $sourceParam);
 		}
 		$map = $this->serviceAccessor->getParamMap($entityClass);
 		return $this->createSuggestor($map, $identifier, $suggestions, $descendants, $isContainer);

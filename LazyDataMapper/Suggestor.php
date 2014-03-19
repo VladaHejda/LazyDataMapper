@@ -26,12 +26,6 @@ class Suggestor implements \Iterator
 	/** @var bool */
 	protected $isContainer;
 
-	/** @var int */
-	private $pos = 0;
-
-	/** @var self */
-	private $currentDescendant;
-
 
 	/**
 	 * @param ParamMap $paramMap
@@ -68,6 +62,7 @@ class Suggestor implements \Iterator
 	 * If grouped but group is omitted, it returns all param names merged.
 	 * @param string $group
 	 * @return string[]
+	 * @todo rename to getSuggestions() ?
 	 */
 	public function getParamNames($group = NULL)
 	{
@@ -116,135 +111,98 @@ class Suggestor implements \Iterator
 
 
 	/**
-	 * @param string $entityClass
-	 * @param string $sourceParam if there is only one descendant of given class, source parameter can be omitted,
-	 *      then argument reference is set to regular source parameter
-	 * @return bool
-	 * @throws Exception
-	 */
-	public function hasDescendant($entityClass, &$sourceParam = NULL)
-	{
-		if (!isset($this->descendants[$entityClass])) {
-			return FALSE;
-		}
-
-		if (NULL === $sourceParam) {
-			if (count($this->descendants[$entityClass]) > 1) {
-				throw new Exception("Descendant $entityClass is ambiguous.");
-			}
-			reset($this->descendants[$entityClass]);
-			$sourceParam = key($this->descendants[$entityClass]);
-
-		} elseif (!array_key_exists($sourceParam, $this->descendants[$entityClass])) {
-			return FALSE;
-		}
-
-		return TRUE;
-	}
-
-
-	/**
-	 * @param string $entityClass
-	 * @param string $sourceParam if there is only one descendant of given class, source parameter can be omitted,
-	 *      then argument reference is set to regular source parameter
+	 * @param string $sourceParam
 	 * @return self|null returns NULL when descendant does not exist
 	 * @throws Exception
 	 */
-	public function getDescendant($entityClass, &$sourceParam = NULL)
+	public function getDescendant($sourceParam)
 	{
-		if (!isset($this->descendants[$entityClass])) {
+		if (!array_key_exists($sourceParam, $this->descendants)) {
 			return NULL;
 		}
 
-		if (NULL === $sourceParam) {
-			if (count($this->descendants[$entityClass]) > 1) {
-				throw new Exception("Descendant $entityClass is ambiguous.");
-			}
-			list($isContainer, $identifier) = reset($this->descendants[$entityClass]);
-			$sourceParam = key($this->descendants[$entityClass]);
-
-		} elseif (array_key_exists($sourceParam, $this->descendants[$entityClass])) {
-			list($isContainer, $identifier) = $this->descendants[$entityClass][$sourceParam];
-
-		} else {
-			return NULL;
+		if ($this->descendants[$sourceParam] instanceof self) {
+			return $this->descendants[$sourceParam];
 		}
 
+		list($entityClass, $isContainer, $identifier) = $this->descendants[$sourceParam];
+
+		// if descendant does have nothing cached, returns NULL
 		return $this->loadDescendant($identifier, $entityClass, $isContainer);
 	}
 
 
 	/**
-	 * @param string $entityClass
-	 * @param string $sourceParam
-	 * @return IIdentifier
-	 * @throws Exception when descendant does not exist
+	 * @see getDescendant()
 	 */
-	public function getDescendantIdentifier($entityClass, $sourceParam)
+	public function __get($sourceParam)
 	{
-		if (!isset($this->descendants[$entityClass])) {
-			throw new Exception("No descendant of class $entityClass.");
-		}
-
-		if (!array_key_exists($sourceParam, $this->descendants[$entityClass])) {
-			throw new Exception("Descendant $entityClass on source parameter $sourceParam does not exist.");
-		}
-
-		return $this->descendants[$entityClass][$sourceParam][1];
+		return $this->getDescendant($sourceParam);
 	}
 
 
 	public function rewind()
 	{
-		foreach ($this->descendants as &$descendant) {
-			reset($descendant);
-		}
 		reset($this->descendants);
-
-		$this->pos = 0;
 	}
 
 
 	public function valid()
 	{
-		++$this->pos;
+		$current = current($this->descendants);
 
-		if (FALSE === current($this->descendants)) {
+		if (FALSE === $current) {
 			return FALSE;
 		}
-		$entityClass = key($this->descendants);
-		$descendant = current($this->descendants[$entityClass]);
-		list($isContainer, $identifier) = $descendant;
+		if ($current instanceof self) {
+			return TRUE;
+		}
 
-		$this->currentDescendant = $this->loadDescendant($identifier, $entityClass, $isContainer);
-		if (!$this->currentDescendant) {
-			$this->next();
+		list($entityClass, $isContainer, $identifier) = $current;
+		$descendant = $this->loadDescendant($identifier, $entityClass, $isContainer);
+		$key = key($this->descendants);
+
+		// descendant have nothing cached
+		if (!$descendant) {
+			unset($this->descendants[$key]);
 			return $this->valid();
 		}
 
+		$this->descendants[$key] = $descendant;
 		return TRUE;
 	}
 
 
 	public function current()
 	{
-		return $this->currentDescendant;
+		$current = current($this->descendants);
+
+		if ($current instanceof self) {
+			return $current;
+		}
+
+		// when method called individually
+		if ($this->valid()) {
+			return current($this->descendants);
+		}
+
+		return FALSE;
 	}
 
 
 	public function key()
 	{
-		return $this->pos;
+		if (current($this->descendants) instanceof self || $this->valid()) {
+			return key($this->descendants);
+		}
+
+		return FALSE;
 	}
 
 
 	public function next()
 	{
-		$entityClass = key($this->descendants);
-		next($this->descendants[$entityClass]);
-		if (FALSE === current($this->descendants[$entityClass])) {
-			next($this->descendants);
-		}
+		next($this->descendants);
 	}
 
 
