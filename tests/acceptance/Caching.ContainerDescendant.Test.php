@@ -4,6 +4,7 @@ namespace LazyDataMapper\Tests\Caching;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
+	LazyDataMapper\Tests\SuggestorCache,
 	LazyDataMapper\Tests\CarMapper,
 	LazyDataMapper\Tests\DriverMapper;
 
@@ -18,7 +19,7 @@ class ContainerDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$suggestorCache = new SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\DriverFacade($accessor, $serviceAccessor);
 
@@ -26,6 +27,10 @@ class ContainerDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(9, $driver->wins);
 		$this->assertEquals('FORD Mustang', $driver->cars[1]->title);
+
+		$this->assertEquals(2, SuggestorCache::$calledGetCached);
+		$this->assertEquals(3, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
 
 		return [$cache, $facade];
 	}
@@ -44,6 +49,10 @@ class ContainerDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(1, DriverMapper::$calledGetById);
 		$this->assertEquals(0, CarMapper::$calledGetById);
+		// todo fix 3 to 2
+		$this->assertEquals(3, SuggestorCache::$calledGetCached);
+		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
 
 		$this->assertCount(2, $cache->cache);
 	}

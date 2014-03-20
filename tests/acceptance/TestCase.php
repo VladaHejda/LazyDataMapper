@@ -3,6 +3,7 @@
 namespace LazyDataMapper\Tests;
 
 require_once __DIR__ . '/implementations/cache.php';
+require_once __DIR__ . '/implementations/suggestorCache.php';
 
 abstract class AcceptanceTestCase extends TestCase
 {

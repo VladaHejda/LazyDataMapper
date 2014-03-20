@@ -4,6 +4,7 @@ namespace LazyDataMapper\Tests\Caching;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
+	LazyDataMapper\Tests\SuggestorCache,
 	LazyDataMapper\Tests\RaceMapper,
 	LazyDataMapper\Tests\CarMapper;
 
@@ -18,7 +19,7 @@ class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$suggestorCache = new SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\RaceFacade($accessor, $serviceAccessor);
 
@@ -27,6 +28,10 @@ class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals('Oregon', $race->country);
 		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $race->car);
 		$this->assertEquals(10500, $race->car->price);
+
+		$this->assertEquals(2, SuggestorCache::$calledGetCached);
+		$this->assertEquals(3, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
 
 		return $facade;
 	}
@@ -46,5 +51,9 @@ class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		// CarMapper cannot be called, everything solves RaceMapper
 		$this->assertEquals(1, RaceMapper::$calledGetById);
 		$this->assertEquals(0, CarMapper::$calledGetById);
+
+		$this->assertEquals(2, SuggestorCache::$calledGetCached);
+		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
 	}
 }

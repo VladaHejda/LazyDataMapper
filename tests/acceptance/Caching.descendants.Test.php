@@ -4,6 +4,7 @@ namespace LazyDataMapper\Tests\Caching;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
+	LazyDataMapper\Tests\SuggestorCache,
 	LazyDataMapper\Tests\CarMapper,
 	LazyDataMapper\Tests\DriverMapper;
 
@@ -18,7 +19,7 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
 		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$suggestorCache = new SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
 
@@ -26,8 +27,11 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertInstanceOf('LazyDataMapper\Tests\Driver', $car->driver);
 		$this->assertEquals(16250, $car->price);
-
 		$this->assertEquals('John', $car->driver->first_name);
+
+		$this->assertEquals(2, SuggestorCache::$calledGetCached);
+		$this->assertEquals(3, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
 
 		return $facade;
 	}
@@ -44,15 +48,18 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(184000, $car->price);
 		$this->assertEquals('Mike', $car->driver->first_name);
 
-		// tests counts of getById calls
 		$this->assertEquals(1, CarMapper::$calledGetById);
 		$this->assertEquals(1, DriverMapper::$calledGetById);
 
-		// tests suggestions
 		$this->assertEquals(['driver', 'price'], CarMapper::$lastSuggestor->getParamNames());
 		$this->assertTrue(CarMapper::$lastSuggestor->hasDescendants());
 		$descendant = CarMapper::$lastSuggestor->getDescendant('driver');
 		$this->assertInstanceOf('LazyDataMapper\Suggestor', $descendant);
 		$this->assertEquals(['first_name'], $descendant->getParamNames());
+
+		// todo až bude opraveno todo v Accessoru v saveDescendants(), zde se 3 změní na 2
+		$this->assertEquals(3, SuggestorCache::$calledGetCached);
+		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
 	}
 }

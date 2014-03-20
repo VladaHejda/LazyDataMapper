@@ -127,8 +127,14 @@ class Suggestor implements \Iterator
 
 		list($entityClass, $isContainer, $identifier) = $this->descendants[$sourceParam];
 
-		// if descendant does have nothing cached, returns NULL
-		return $this->loadDescendant($identifier, $entityClass, $isContainer);
+		$descendant = $this->loadDescendant($identifier, $entityClass, $isContainer);
+		if (!$descendant) {
+			unset($this->descendants[$sourceParam]);
+			return NULL;
+		}
+
+		$this->descendants[$sourceParam] = $descendant;
+		return $descendant;
 	}
 
 
