@@ -53,7 +53,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testIsContainer()
+	public function testContainer()
 	{
 		$suggestor = new Suggestor($this->paramMap, $this->suggestorCache, ['name', 'age'], TRUE);
 

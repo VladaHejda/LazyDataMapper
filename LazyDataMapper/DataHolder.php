@@ -48,6 +48,10 @@ class DataHolder implements \Iterator
 		if (NULL !== $this->ids) {
 			throw new Exception('Ids have already been set.');
 		}
+		if (!$this->suggestor->isContainer()) {
+			throw new Exception('Ids can be set only for Container DataHolder.');
+		}
+
 		$this->ids = $ids;
 		return $this;
 	}
