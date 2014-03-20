@@ -601,6 +601,7 @@ abstract class Entity implements IEntity
 
 	/**
 	 * Loads wrappers and unwrappers.
+	 * @todo ignore internal IO (e.g. this method)
 	 */
 	private function getIO()
 	{
