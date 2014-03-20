@@ -48,6 +48,7 @@ class RaceMapper extends defaultMapper
 {
 
 	public static $calledGetById = 0;
+	public static $calledGetByRestrictions = 0;
 
 	/** @var LazyDataMapper\Suggestor */
 	public static $lastSuggestor;

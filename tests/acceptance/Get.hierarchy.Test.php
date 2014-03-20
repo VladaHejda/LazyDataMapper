@@ -52,6 +52,45 @@ class HierarchyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	}
 
 
+	public function testEntityUnderContainer()
+	{
+		$requestKey = new LazyDataMapper\RequestKey;
+		$cache = new Tests\Cache\SimpleCache;
+		$serviceAccessor = new Tests\ServiceAccessor;
+		$suggestorCache = new LazyDataMapper\SuggestorCache($cache, $requestKey, $serviceAccessor);
+		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
+		$facade = new Tests\RaceFacade($accessor, $serviceAccessor);
+
+		$race = $facade->getByIdsRange([2, 4]);
+
+		$this->assertEquals('Mustang', $race[0]->car->name);
+
+		return [$cache, $facade];
+	}
+
+
+	/**
+	 * @depends testEntityUnderContainer
+	 */
+	public function testCachingEntityUnderContainer(array $services)
+	{
+		list($cache, $facade) = $services;
+
+		$race = $facade->getByIdsRange([2, 4]);
+
+		$this->assertEquals('Gallardo', $race[1]->car->name);
+
+		$this->assertEquals(0, DriverMapper::$calledGetById);
+		$this->assertEquals(1, CarMapper::$calledGetById);
+		$this->assertEquals(0, RaceMapper::$calledGetById);
+		$this->assertEquals(0, DriverMapper::$calledGetByRestrictions);
+		$this->assertEquals(0, CarMapper::$calledGetByRestrictions);
+		$this->assertEquals(1, RaceMapper::$calledGetByRestrictions);
+
+		$this->assertCount(2, $cache->cache);
+	}
+
+
 	public function testTreeReversed()
 	{
 		$requestKey = new LazyDataMapper\RequestKey;
@@ -76,9 +115,6 @@ class HierarchyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	{
 		list($cache, $facade) = $services;
 
-		// todo solve situation when there is Suggestor with no suggestions (only with descendants) and descendant with nothing cached
-		$this->markTestIncomplete();
-
 		$driver = $facade->getById(5);
 
 		$this->assertEquals('Oregon', $driver->cars[1]->races[0]->country);
@@ -86,7 +122,10 @@ class HierarchyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(0, DriverMapper::$calledGetById);
 		$this->assertEquals(0, CarMapper::$calledGetById);
 		$this->assertEquals(0, RaceMapper::$calledGetById);
+		$this->assertEquals(0, DriverMapper::$calledGetByRestrictions);
+		$this->assertEquals(0, CarMapper::$calledGetByRestrictions);
+		$this->assertEquals(1, RaceMapper::$calledGetByRestrictions);
 
-		$this->assertCount(1, $cache->cache);
+		$this->assertCount(2, $cache->cache);
 	}
 }

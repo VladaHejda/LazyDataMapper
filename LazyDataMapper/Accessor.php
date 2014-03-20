@@ -60,13 +60,23 @@ final class Accessor
 				return NULL;
 			}
 
+			// todo ceaseless descendant caching prevention
+			// suggestorCache->getCached() by ve 4. argumentu vrátilo referenci, kde by dalo seznam kešovaných potomků, Accessor by si je uložil
+			// a pokud by se dostal zde do místa kde se pokouší potomka kešovat a zjistil by že už v cache je, ignoroval by to
 			if ($suggestor = $this->cache->getCached($identifier, $entityClass)) {
-				$dataHolder = $this->loadDataHolderByMapper($entityClass, $id, $suggestor);
-				$this->saveDescendants($dataHolder);
-				$data = $dataHolder->getParams();
+				// when no suggestions, even descendants are ignored, they will be loaded later
+				$paramNames = $suggestor->getParamNames();
+				if (empty($paramNames)) {
+					$data = array();
+
+				} else {
+					$dataHolder = $this->loadDataHolderByMapper($entityClass, $id, $suggestor);
+					$this->saveDescendants($dataHolder);
+					$data = $dataHolder->getParams();
+				}
 
 			} else {
-				if ($parent) {
+				if ($parent instanceof IEntity) {
 					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam);
 				}
 				$data = array();
@@ -108,12 +118,16 @@ final class Accessor
 				$data = array();
 
 			} elseif ($suggestor = $this->cache->getCached($identifier, $entityClass, TRUE)) {
+				// todo jakmile bude moct container mít potomky, bude moct mít i suggestor bez sugescí (jako u getByID())
 				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
-				$this->saveDescendants($dataHolder);
+				// in current concept EntityContainer CANNOT have descendants
+				// $this->saveDescendants($dataHolder);
 				$data = $dataHolder->getParams();
 				$this->sortData($ids, $data);
 
 			} else {
+				// todo zde prevence proti již zakešovaným potomkům nepomůže (jako u getById())
+				// navíc se v takový situaci bude pokaždý kontrolovat idéčka... = moc SQL dotazů
 				// nonexistent ids prevention
 				foreach ($ids as $i => $id) {
 					if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
@@ -400,8 +414,14 @@ final class Accessor
 				$this->saveDescendants($descendant);
 			}
 
+			$data = $descendant->getParams();
+			// todo zbytečně se loadují potomkové suggestory, pokud pro ně žádný data neloadnul
+			// možná může mít Holder metodu zda má nějaká data v potomcích (resp. zda se jej již někdo na potomky dotazoval)
+			if (empty($data)) {
+				continue;
+			}
 			$identifier = $descendant->getSuggestor()->getIdentifier();
-			$this->loadedData[$identifier->getKey()] = $descendant->getParams();
+			$this->loadedData[$identifier->getKey()] = $data;
 		}
 	}
 
