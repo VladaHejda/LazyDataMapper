@@ -24,16 +24,15 @@ class DataHolder implements \Iterator
 	/**
 	 * @param Suggestor $suggestor
 	 * @param int[] $ids for container holder
+	 * @throws Exception
 	 * @todo co když $ids bude prázdný array (resp. mapper zjistí že žádní potomci nejsou)
 	 */
 	public function __construct(Suggestor $suggestor, array $ids = NULL)
 	{
 		$this->suggestor = $suggestor;
 
-		if (NULL === $ids && !$suggestor->isContainer()) {
-			$this->ids = FALSE;
-		} elseif (NULL !== $ids && $suggestor->isContainer()) {
-			$this->ids = $ids;
+		if (NULL !== $ids) {
+			$this->setIds($ids);
 		}
 	}
 
@@ -45,11 +44,12 @@ class DataHolder implements \Iterator
 	 */
 	public function setIds(array $ids)
 	{
-		if (NULL !== $this->ids) {
-			throw new Exception('Ids have already been set.');
-		}
 		if (!$this->suggestor->isContainer()) {
 			throw new Exception('Ids can be set only for Container DataHolder.');
+		}
+
+		if (NULL !== $this->ids) {
+			throw new Exception('Ids have already been set.');
 		}
 
 		$this->ids = $ids;
