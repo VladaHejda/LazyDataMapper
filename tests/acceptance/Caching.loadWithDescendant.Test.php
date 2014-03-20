@@ -7,7 +7,6 @@ use LazyDataMapper,
 	LazyDataMapper\Tests\RaceMapper,
 	LazyDataMapper\Tests\CarMapper;
 
-require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Race.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 

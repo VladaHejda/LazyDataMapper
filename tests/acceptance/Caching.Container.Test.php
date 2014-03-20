@@ -6,7 +6,6 @@ use LazyDataMapper,
 	LazyDataMapper\Tests,
 	LazyDataMapper\Tests\CarMapper;
 
-require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 
 class ContainerTest extends LazyDataMapper\Tests\AcceptanceTestCase

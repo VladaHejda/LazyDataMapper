@@ -5,7 +5,6 @@ namespace LazyDataMapper\Tests\Restrictor;
 use LazyDataMapper,
 	LazyDataMapper\Tests;
 
-require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 require_once __DIR__ . '/implementations/model/Driver.php';
 

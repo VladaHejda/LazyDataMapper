@@ -6,7 +6,6 @@ use LazyDataMapper,
 	LazyDataMapper\Tests,
 	LazyDataMapper\Tests\DriverMapper;
 
-require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Driver.php';
 
 class GroupedParamMapTest extends LazyDataMapper\Tests\AcceptanceTestCase

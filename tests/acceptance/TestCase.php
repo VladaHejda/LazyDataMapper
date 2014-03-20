@@ -2,6 +2,8 @@
 
 namespace LazyDataMapper\Tests;
 
+require_once __DIR__ . '/implementations/cache.php';
+
 abstract class AcceptanceTestCase extends TestCase
 {
 
@@ -10,5 +12,6 @@ abstract class AcceptanceTestCase extends TestCase
 		parent::setUp();
 		ResettableIdentifier::resetCounter();
 		ServiceAccessor::resetCounters();
+		SuggestorCache::resetCounters();
 	}
 }

@@ -5,7 +5,6 @@ namespace LazyDataMapper\Tests\Checker;
 use LazyDataMapper,
 	LazyDataMapper\Tests;
 
-require_once __DIR__ . '/implementations/cache.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 
 class Test extends LazyDataMapper\Tests\AcceptanceTestCase
