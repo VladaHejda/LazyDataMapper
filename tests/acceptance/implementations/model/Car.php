@@ -98,6 +98,13 @@ class Car extends LazyDataMapper\Entity
 	}
 
 
+	// yes, I know, this is weird, but it is for testing purposes
+	protected function getBestDriver()
+	{
+		return $this->getDescendant('LazyDataMapper\Tests\Driver', 5);
+	}
+
+
 	protected function setName($name)
 	{
 		return $name;
