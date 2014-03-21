@@ -113,10 +113,13 @@ class SuggestorCache
 	 * @param IIdentifier $identifier
 	 * @param string $entityClass
 	 * @param bool $isContainer
+	 * @param array $descendantsIdentifierList
 	 * @return Suggestor
 	 */
-	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE)
+	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE, &$descendantsIdentifierList = NULL)
 	{
+		$descendantsIdentifierList = array();
+
 		$cached = $this->externalCache->load($this->key . $identifier->getKey());
 		if (NULL === $cached) {
 			return NULL;
@@ -138,8 +141,10 @@ class SuggestorCache
 		}
 
 		foreach ($descendants as $sourceParam => &$descendant) {
+			// todo check count $this->checkCache($descendant, 2);
 			$this->checkCache($descendant);
-			$descendant[] = $this->serviceAccessor->composeIdentifier($descendant[0], $descendant[1], $identifier, $sourceParam);
+			$descendant[] = $descendantIdentifier = $this->serviceAccessor->composeIdentifier($descendant[0], $descendant[1], $identifier, $sourceParam);
+			$descendantsIdentifierList[] = $descendantIdentifier->getKey();
 		}
 		$map = $this->serviceAccessor->getParamMap($entityClass);
 		return $this->createSuggestor($map, $identifier, $suggestions, $descendants, $isContainer);

@@ -6,15 +6,17 @@ use LazyDataMapper,
 	LazyDataMapper\Tests,
 	LazyDataMapper\Tests\SuggestorCache,
 	LazyDataMapper\Tests\CarMapper,
-	LazyDataMapper\Tests\DriverMapper;
+	LazyDataMapper\Tests\DriverMapper,
+	LazyDataMapper\Tests\RaceMapper;
 
 require_once __DIR__ . '/implementations/model/Car.php';
 require_once __DIR__ . '/implementations/model/Driver.php';
+require_once __DIR__ . '/implementations/model/Race.php';
 
 class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
-	public function testSingle()
+	protected function createServices()
 	{
 		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
@@ -22,6 +24,13 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$suggestorCache = new SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
+		return [$cache, $facade];
+	}
+
+
+	public function testSingle()
+	{
+		list($cache, $facade) = $this->createServices();
 
 		$facade->getById(6);
 
@@ -56,18 +65,13 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(4, SuggestorCache::$calledGetCached); // todo reduce to 3
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant); // todo reduce to 0
+		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
 	}
 
 
 	public function testContainer()
 	{
-		$requestKey = new LazyDataMapper\RequestKey;
-		$cache = new Tests\Cache\SimpleCache;
-		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
+		list($cache, $facade) = $this->createServices();
 
 		$facade->getByIdsRange([1, 2]);
 
@@ -110,14 +114,42 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	}
 
 
+	public function testContainerUnderSingle()
+	{
+		list($cache, $facade) = $this->createServices();
+
+		$facade->getById(3)->races;
+
+		$this->assertEquals(2, SuggestorCache::$calledGetCached);
+		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
+
+		return [$cache, $facade];
+	}
+
+
+	/**
+	 * @depends testContainerUnderSingle
+	 */
+	public function testCachingContainerUnderSingle(array $services)
+	{
+		list(, $facade) = $services;
+
+		$facade->getById(7)->races;
+
+		$this->assertEquals(0, CarMapper::$calledGetById);
+		$this->assertEquals(0, RaceMapper::$calledGetById);
+		$this->assertEquals(0, RaceMapper::$calledGetByRestrictions);
+
+		$this->assertEquals(2, SuggestorCache::$calledGetCached);
+		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+	}
+
+
 	public function testSingleWithNoParam()
 	{
-		$requestKey = new LazyDataMapper\RequestKey;
-		$cache = new Tests\Cache\SimpleCache;
-		$serviceAccessor = new Tests\ServiceAccessor;
-		$suggestorCache = new SuggestorCache($cache, $requestKey, $serviceAccessor);
-		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\CarFacade($accessor, $serviceAccessor);
+		list($cache, $facade) = $this->createServices();
 
 		$facade->getById(3)->bestDriver;
 
@@ -145,6 +177,6 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant); // todo reduce to 0
+		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
 	}
 }

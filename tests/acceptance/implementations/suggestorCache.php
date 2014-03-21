@@ -32,9 +32,9 @@ class SuggestorCache extends \LazyDataMapper\SuggestorCache
 	}
 
 
-	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE)
+	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE, &$descendantsIdentifierList = NULL)
 	{
 		++self::$calledGetCached;
-		return parent::getCached($identifier, $entityClass, $isContainer);
+		return parent::getCached($identifier, $entityClass, $isContainer, $descendantsIdentifierList);
 	}
 }

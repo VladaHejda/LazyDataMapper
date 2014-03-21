@@ -18,6 +18,10 @@ final class Accessor
 	/** @var array */
 	private $loadedData = array();
 
+	// todo rename descendant (everywhere) to something shorter?
+	/** @var array */
+	private $descendantsIdentifierList = array();
+
 
 	/**
 	 * @param SuggestorCache $cache
@@ -60,10 +64,7 @@ final class Accessor
 				return NULL;
 			}
 
-			// todo ceaseless descendant caching prevention
-			// suggestorCache->getCached() by ve 4. argumentu vrátilo referenci, kde by dalo seznam kešovaných potomků, Accessor by si je uložil
-			// a pokud by se dostal zde do místa kde se pokouší potomka kešovat a zjistil by že už v cache je, ignoroval by to
-			if ($suggestor = $this->cache->getCached($identifier, $entityClass)) {
+			if ($suggestor = $this->cache->getCached($identifier, $entityClass, FALSE, $descendantsIdentifierList)) {
 				// when no suggestions, even descendants are ignored, they will be loaded later
 				$paramNames = $suggestor->getParamNames();
 				if (empty($paramNames)) {
@@ -76,10 +77,17 @@ final class Accessor
 				}
 
 			} else {
-				if ($parent instanceof IEntity) {
+				if ($parent instanceof IEntity && !isset($this->descendantsIdentifierList[$identifier->getKey()])) {
 					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam);
 				}
 				$data = array();
+			}
+
+			// todo bude rychlejší s podmínkou if ($parent instanceof IEntity) nebo mazat vždy i kdyby to tam nebylo?
+			unset($this->descendantsIdentifierList[$identifier->getKey()]);
+
+			if (!empty($descendantsIdentifierList)) {
+				$this->descendantsIdentifierList += array_fill_keys($descendantsIdentifierList, TRUE);
 			}
 		}
 
@@ -126,19 +134,23 @@ final class Accessor
 				$this->sortData($ids, $data);
 
 			} else {
-				// todo zde prevence proti již zakešovaným potomkům nepomůže (jako u getById())
-				// navíc se v takový situaci bude pokaždý kontrolovat idéčka... = moc SQL dotazů
+				// todo $mapper->siftIds() (sift = protřídit) místo exists() ? - ale potom možná spouštět sortIds, mapper je může zamíchat
+				// pomohlo by to v situaci, kdy kontejner nemá permanentně nic zakešovanýho. vždy(*) je třeba zkontrolovat existenci ídéček
+				// * když se berou přímo z cizío klíče, nebylo by to třeba, ale to se zde nedozví
+
 				// nonexistent ids prevention
 				foreach ($ids as $i => $id) {
 					if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
 						unset($ids[$i]);
 					}
 				}
-				if ($parent instanceof IEntity) {
+				if ($parent instanceof IEntity && !isset($this->descendantsIdentifierList[$identifier->getKey()])) {
 					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam, TRUE);
 				}
 				$data = array_fill_keys($ids, array());
 			}
+
+			unset($this->descendantsIdentifierList[$identifier->getKey()]);
 		}
 
 		if (empty($data)) {
@@ -402,6 +414,7 @@ final class Accessor
 	private function getLoadedData(IIdentifier $identifier)
 	{
 		$key = $identifier->getKey();
+		// todo jakmile se data loudnou, již nebudou třeba, smazat je
 		return isset($this->loadedData[$key]) ? $this->loadedData[$key] : FALSE;
 	}
 
