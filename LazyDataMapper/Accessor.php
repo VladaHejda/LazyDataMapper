@@ -83,7 +83,6 @@ final class Accessor
 				$data = array();
 			}
 
-			// todo bude rychlejší s podmínkou if ($parent instanceof IEntity) nebo mazat vždy i kdyby to tam nebylo?
 			unset($this->descendantsIdentifierList[$identifier->getKey()]);
 
 			if (!empty($descendantsIdentifierList)) {
