@@ -3,7 +3,7 @@
 namespace LazyDataMapper;
 
 /**
- * The main class leading all dependencies.
+ * The main class leading all dependencies. Everything there is controlled by internally.
  * @todo baseNamespace setting? It could be for example AppName\Entities - will be added during new instance creating, but not stored to cache
  */
 final class Accessor
@@ -38,7 +38,6 @@ final class Accessor
 
 
 	/**
-	 * Do not call this method directly!
 	 * @param array|string $entityClass
 	 * @param int $id
 	 * @param IOperand $parent
@@ -97,7 +96,6 @@ final class Accessor
 
 
 	/**
-	 * Do not call this method directly!
 	 * @param array|string $entityClass
 	 * @param IRestrictor|int[] $restrictions
 	 * @param IOperand $parent
