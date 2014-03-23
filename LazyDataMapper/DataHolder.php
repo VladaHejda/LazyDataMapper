@@ -171,6 +171,16 @@ class DataHolder implements \Iterator
 
 
 	/**
+	 * Says whether descendants was loaded, not whether they exist. For that @see Suggestor::hasDescendants
+	 * @return bool
+	 */
+	public function hasLoadedDescendants()
+	{
+		return !empty($this->descendants);
+	}
+
+
+	/**
 	 * @return Suggestor
 	 */
 	public function getSuggestor()

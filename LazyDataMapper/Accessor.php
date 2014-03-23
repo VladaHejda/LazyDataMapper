@@ -72,7 +72,9 @@ final class Accessor
 
 				} else {
 					$dataHolder = $this->loadDataHolderByMapper($entityClass, $id, $suggestor);
-					$this->saveDescendants($dataHolder);
+					if ($dataHolder->hasLoadedDescendants()) {
+						$this->saveDescendants($dataHolder);
+					}
 					$data = $dataHolder->getParams();
 				}
 
@@ -128,7 +130,9 @@ final class Accessor
 				// todo jakmile bude moct container mít potomky, bude moct mít i suggestor bez sugescí (jako u getByID())
 				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
 				// in current concept EntityContainer CANNOT have descendants
-				// $this->saveDescendants($dataHolder);
+				/*if ($dataHolder->hasLoadedDescendants()) {
+					$this->saveDescendants($dataHolder);
+				}*/
 				$data = $dataHolder->getParams();
 				$this->sortData($ids, $data);
 
@@ -422,17 +426,21 @@ final class Accessor
 	}
 
 
+	/**
+	 * @todo ale stále je tu problém, že pokud je potomků víc, ale data nenaloadoval do všech
+	 * toto proiteruje stejně všechny a ty nenaloadovaný zbytečně
+	 * myslim ale že by to mohlo nabízet metodu (nebo nějakym způsobem) pro iteraci jen loadnutých
+	 * potomků - ty surový jsou potřeba jen v Mapperu
+	 */
 	private function saveDescendants(DataHolder $dataHolder)
 	{
 		/** @var DataHolder $descendant */
 		foreach ($dataHolder as $descendant) {
-			if ($descendant->getSuggestor()->hasDescendants()) {
+			if ($descendant->hasLoadedDescendants()) {
 				$this->saveDescendants($descendant);
 			}
 
 			$data = $descendant->getParams();
-			// todo zbytečně se loadují potomkové suggestory, pokud pro ně žádný data neloadnul
-			// možná může mít Holder metodu zda má nějaká data v potomcích (resp. zda se jej již někdo na potomky dotazoval)
 			if (empty($data)) {
 				continue;
 			}

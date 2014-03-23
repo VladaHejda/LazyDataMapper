@@ -51,15 +51,14 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(1, CarMapper::$calledGetById);
 		$this->assertEquals(1, DriverMapper::$calledGetById);
 
+		$this->assertEquals(2, SuggestorCache::$calledGetCached);
+		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+
 		$this->assertEquals(['driver', 'price'], CarMapper::$lastSuggestor->getParamNames());
 		$this->assertTrue(CarMapper::$lastSuggestor->hasDescendants());
 		$descendant = CarMapper::$lastSuggestor->getDescendant('driver');
 		$this->assertInstanceOf('LazyDataMapper\Suggestor', $descendant);
 		$this->assertEquals(['first_name'], $descendant->getParamNames());
-
-		// todo až bude opraveno todo v Accessoru v saveDescendants(), zde se 3 změní na 2
-		$this->assertEquals(3, SuggestorCache::$calledGetCached);
-		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
 	}
 }

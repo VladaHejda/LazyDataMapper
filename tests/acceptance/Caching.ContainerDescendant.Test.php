@@ -49,8 +49,8 @@ class ContainerDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(1, DriverMapper::$calledGetById);
 		$this->assertEquals(0, CarMapper::$calledGetById);
-		// todo fix 3 to 2
-		$this->assertEquals(3, SuggestorCache::$calledGetCached);
+
+		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
 		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
 
