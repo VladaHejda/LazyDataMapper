@@ -18,9 +18,8 @@ final class Accessor
 	/** @var array */
 	private $loadedData = array();
 
-	// todo rename descendant (everywhere) to something shorter?
 	/** @var array */
-	private $descendantsIdentifierList = array();
+	private $childrenIdentifierList = array();
 
 
 	/**
@@ -63,31 +62,31 @@ final class Accessor
 				return NULL;
 			}
 
-			if ($suggestor = $this->cache->getCached($identifier, $entityClass, FALSE, $descendantsIdentifierList)) {
-				// when no suggestions, even descendants are ignored, they will be loaded later
+			if ($suggestor = $this->cache->getCached($identifier, $entityClass, FALSE, $childrenIdentifierList)) {
+				// when no suggestions, even children are ignored, they will be loaded later
 				$paramNames = $suggestor->getParamNames();
 				if (empty($paramNames)) {
 					$data = array();
 
 				} else {
 					$dataHolder = $this->loadDataHolderByMapper($entityClass, $id, $suggestor);
-					if ($dataHolder->hasLoadedDescendants()) {
-						$this->saveDescendants($dataHolder);
+					if ($dataHolder->hasLoadedChildren()) {
+						$this->saveChildren($dataHolder);
 					}
 					$data = $dataHolder->getParams();
 				}
 
 			} else {
-				if ($parent instanceof IEntity && !isset($this->descendantsIdentifierList[$identifier->getKey()])) {
-					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam);
+				if ($parent instanceof IEntity && !isset($this->childrenIdentifierList[$identifier->getKey()])) {
+					$this->cache->cacheChild($parent->getIdentifier(), $entityClass, $sourceParam);
 				}
 				$data = array();
 			}
 
-			unset($this->descendantsIdentifierList[$identifier->getKey()]);
+			unset($this->childrenIdentifierList[$identifier->getKey()]);
 
-			if (!empty($descendantsIdentifierList)) {
-				$this->descendantsIdentifierList += array_fill_keys($descendantsIdentifierList, TRUE);
+			if (!empty($childrenIdentifierList)) {
+				$this->childrenIdentifierList += array_fill_keys($childrenIdentifierList, TRUE);
 			}
 		}
 
@@ -114,7 +113,7 @@ final class Accessor
 
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
-		// for now only Container descendant of single Entity works, because exponential (ids under ids) dependencies does not work in DataHolder
+		// for now only Container child of single Entity works, because exponential (ids under ids) dependencies does not work in DataHolder
 		if ($parent instanceof IEntity && $data = $this->getLoadedData($identifier)) {
 			// $data set
 
@@ -127,9 +126,9 @@ final class Accessor
 			} elseif ($suggestor = $this->cache->getCached($identifier, $entityClass, TRUE)) {
 				// todo jakmile bude moct container mít potomky, bude moct mít i suggestor bez sugescí (jako u getByID())
 				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
-				// in current concept EntityContainer CANNOT have descendants
-				/*if ($dataHolder->hasLoadedDescendants()) {
-					$this->saveDescendants($dataHolder);
+				// in current concept EntityContainer CANNOT have children
+				/*if ($dataHolder->hasLoadedChildren()) {
+					$this->saveChildren($dataHolder);
 				}*/
 				$data = $dataHolder->getParams();
 				$this->sortData($ids, $data);
@@ -145,13 +144,13 @@ final class Accessor
 						unset($ids[$i]);
 					}
 				}
-				if ($parent instanceof IEntity && !isset($this->descendantsIdentifierList[$identifier->getKey()])) {
-					$this->cache->cacheDescendant($parent->getIdentifier(), $entityClass, $sourceParam, TRUE);
+				if ($parent instanceof IEntity && !isset($this->childrenIdentifierList[$identifier->getKey()])) {
+					$this->cache->cacheChild($parent->getIdentifier(), $entityClass, $sourceParam, TRUE);
 				}
 				$data = array_fill_keys($ids, array());
 			}
 
-			unset($this->descendantsIdentifierList[$identifier->getKey()]);
+			unset($this->childrenIdentifierList[$identifier->getKey()]);
 		}
 
 		if (empty($data)) {
@@ -430,19 +429,19 @@ final class Accessor
 	 * myslim ale že by to mohlo nabízet metodu (nebo nějakym způsobem) pro iteraci jen loadnutých
 	 * potomků - ty surový jsou potřeba jen v Mapperu
 	 */
-	private function saveDescendants(DataHolder $dataHolder)
+	private function saveChildren(DataHolder $dataHolder)
 	{
-		/** @var DataHolder $descendant */
-		foreach ($dataHolder as $descendant) {
-			if ($descendant->hasLoadedDescendants()) {
-				$this->saveDescendants($descendant);
+		/** @var DataHolder $child */
+		foreach ($dataHolder as $child) {
+			if ($child->hasLoadedChildren()) {
+				$this->saveChildren($child);
 			}
 
-			$data = $descendant->getParams();
+			$data = $child->getParams();
 			if (empty($data)) {
 				continue;
 			}
-			$identifier = $descendant->getSuggestor()->getIdentifier();
+			$identifier = $child->getSuggestor()->getIdentifier();
 			$this->loadedData[$identifier->getKey()] = $data;
 		}
 	}

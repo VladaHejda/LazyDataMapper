@@ -3,7 +3,7 @@
 namespace LazyDataMapper;
 
 /**
- * Suggests parameter names and descendants to Mapper.
+ * Suggests parameter names and children to Mapper.
  */
 class Suggestor implements \Iterator
 {
@@ -21,7 +21,7 @@ class Suggestor implements \Iterator
 	protected $identifier;
 
 	/** @var array */
-	protected $descendants;
+	protected $children;
 
 	/** @var bool */
 	protected $isContainer;
@@ -33,16 +33,16 @@ class Suggestor implements \Iterator
 	 * @param array $suggestions
 	 * @param bool $isContainer
 	 * @param IIdentifier $identifier
-	 * @param array $descendants entityClass => IIdentifier
+	 * @param array $children entityClass => IIdentifier
 	 */
-	public function __construct(ParamMap $paramMap, SuggestorCache $cache, array $suggestions, $isContainer = FALSE, IIdentifier $identifier = NULL, array $descendants = array())
+	public function __construct(ParamMap $paramMap, SuggestorCache $cache, array $suggestions, $isContainer = FALSE, IIdentifier $identifier = NULL, array $children = array())
 	{
 		$this->paramMap = $paramMap;
 		$this->cache = $cache;
 		$this->checkAgainstParamMap($suggestions);
 		$this->suggestions = $suggestions;
 		$this->identifier = $identifier;
-		$this->descendants = $descendants;
+		$this->children = $children;
 		$this->isContainer = $isContainer;
 	}
 
@@ -100,10 +100,10 @@ class Suggestor implements \Iterator
 
 
 	/**
-	 * Says whether has at least one descendant.
+	 * Says whether has at least one child.
 	 * @return bool
 	 */
-	public function hasDescendants()
+	public function hasChildren()
 	{
 		$this->rewind();
 		return $this->valid();
@@ -112,50 +112,50 @@ class Suggestor implements \Iterator
 
 	/**
 	 * @param string $sourceParam
-	 * @return self|null returns NULL when descendant does not exist
+	 * @return self|null returns NULL when child does not exist
 	 * @throws Exception
 	 */
-	public function getDescendant($sourceParam)
+	public function getChild($sourceParam)
 	{
-		if (!array_key_exists($sourceParam, $this->descendants)) {
+		if (!array_key_exists($sourceParam, $this->children)) {
 			return NULL;
 		}
 
-		if ($this->descendants[$sourceParam] instanceof self) {
-			return $this->descendants[$sourceParam];
+		if ($this->children[$sourceParam] instanceof self) {
+			return $this->children[$sourceParam];
 		}
 
-		list($entityClass, $isContainer, $identifier) = $this->descendants[$sourceParam];
+		list($entityClass, $isContainer, $identifier) = $this->children[$sourceParam];
 
-		$descendant = $this->loadDescendant($identifier, $entityClass, $isContainer);
-		if (!$descendant) {
-			unset($this->descendants[$sourceParam]);
+		$child = $this->loadChild($identifier, $entityClass, $isContainer);
+		if (!$child) {
+			unset($this->children[$sourceParam]);
 			return NULL;
 		}
 
-		$this->descendants[$sourceParam] = $descendant;
-		return $descendant;
+		$this->children[$sourceParam] = $child;
+		return $child;
 	}
 
 
 	/**
-	 * @see getDescendant()
+	 * @see getChild()
 	 */
 	public function __get($sourceParam)
 	{
-		return $this->getDescendant($sourceParam);
+		return $this->getChild($sourceParam);
 	}
 
 
 	public function rewind()
 	{
-		reset($this->descendants);
+		reset($this->children);
 	}
 
 
 	public function valid()
 	{
-		$current = current($this->descendants);
+		$current = current($this->children);
 
 		if (FALSE === $current) {
 			return FALSE;
@@ -165,23 +165,23 @@ class Suggestor implements \Iterator
 		}
 
 		list($entityClass, $isContainer, $identifier) = $current;
-		$descendant = $this->loadDescendant($identifier, $entityClass, $isContainer);
-		$key = key($this->descendants);
+		$child = $this->loadChild($identifier, $entityClass, $isContainer);
+		$key = key($this->children);
 
-		// descendant have nothing cached
-		if (!$descendant) {
-			unset($this->descendants[$key]);
+		// child have nothing cached
+		if (!$child) {
+			unset($this->children[$key]);
 			return $this->valid();
 		}
 
-		$this->descendants[$key] = $descendant;
+		$this->children[$key] = $child;
 		return TRUE;
 	}
 
 
 	public function current()
 	{
-		$current = current($this->descendants);
+		$current = current($this->children);
 
 		if ($current instanceof self) {
 			return $current;
@@ -189,7 +189,7 @@ class Suggestor implements \Iterator
 
 		// when method called individually
 		if ($this->valid()) {
-			return current($this->descendants);
+			return current($this->children);
 		}
 
 		return FALSE;
@@ -198,8 +198,8 @@ class Suggestor implements \Iterator
 
 	public function key()
 	{
-		if (current($this->descendants) instanceof self || $this->valid()) {
-			return key($this->descendants);
+		if (current($this->children) instanceof self || $this->valid()) {
+			return key($this->children);
 		}
 
 		return FALSE;
@@ -208,7 +208,7 @@ class Suggestor implements \Iterator
 
 	public function next()
 	{
-		next($this->descendants);
+		next($this->children);
 	}
 
 
@@ -221,7 +221,7 @@ class Suggestor implements \Iterator
 	}
 
 
-	protected function loadDescendant(IIdentifier $identifier, $entityClass, $isContainer)
+	protected function loadChild(IIdentifier $identifier, $entityClass, $isContainer)
 	{
 		return $this->cache->getCached($identifier, $entityClass, $isContainer);
 	}

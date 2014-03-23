@@ -35,7 +35,7 @@ class Test extends \LazyDataMapper\Tests\TestCase
 	/**
 	 * @depends testTopEntity
 	 */
-	public function testDescendantEntity()
+	public function testChildEntity()
 	{
 		$parentIdentifier = new Identifier('World\Building');
 

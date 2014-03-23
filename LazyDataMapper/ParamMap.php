@@ -8,7 +8,7 @@ namespace LazyDataMapper;
 abstract class ParamMap
 {
 
-	/** @var array set this map in descendant */
+	/** @var array set this map in child */
 	protected $map = array();
 
 	/** @var array optional default values of parameters */

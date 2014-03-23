@@ -39,7 +39,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 		$this->assertSame($this->identifier, $suggestor->getIdentifier());
 		$this->assertSame($this->paramMap, $suggestor->getParamMap());
 		$this->assertFalse($suggestor->isContainer());
-		$this->assertFalse($suggestor->hasDescendants());
+		$this->assertFalse($suggestor->hasChildren());
 		$this->assertEquals(['name', 'age'], $suggestor->getParamNames());
 
 		$this->paramMap
@@ -58,24 +58,24 @@ class Test extends LazyDataMapper\Tests\TestCase
 		$suggestor = new Suggestor($this->paramMap, $this->suggestorCache, ['name', 'age'], TRUE);
 
 		$this->assertTrue($suggestor->isContainer());
-		$this->assertFalse($suggestor->hasDescendants());
+		$this->assertFalse($suggestor->hasChildren());
 	}
 
 
-	public function testWithDescendant()
+	public function testWithChild()
 	{
 		$this->suggestorCache
 			->shouldReceive('getCached')
 			->once()
 			->andReturn(\Mockery::mock('LazyDataMapper\Suggestor'));
 
-		$descendants = [
+		$children = [
 			'car' => ['Car', FALSE, $this->identifier]
 		];
-		$suggestor = new Suggestor($this->paramMap, $this->suggestorCache, ['name', 'age'], FALSE, NULL, $descendants);
+		$suggestor = new Suggestor($this->paramMap, $this->suggestorCache, ['name', 'age'], FALSE, NULL, $children);
 
 		$this->assertFalse($suggestor->isContainer());
-		$this->assertTrue($suggestor->hasDescendants());
+		$this->assertTrue($suggestor->hasChildren());
 	}
 
 

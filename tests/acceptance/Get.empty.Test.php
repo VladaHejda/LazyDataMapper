@@ -38,7 +38,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
 		$this->assertEquals(1, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
 	}
@@ -65,7 +65,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 
 
@@ -79,7 +79,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
 		$this->assertEquals(1, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
 	}
@@ -110,7 +110,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 
 
@@ -122,7 +122,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
 	}
@@ -143,7 +143,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 
 
@@ -155,7 +155,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
 	}
@@ -177,6 +177,6 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 }

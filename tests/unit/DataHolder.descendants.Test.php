@@ -5,23 +5,23 @@ namespace LazyDataMapper\Tests\DataHolder;
 use LazyDataMapper,
 	LazyDataMapper\DataHolder;
 
-class DescendantsTest extends LazyDataMapper\Tests\TestCase
+class ChildrenTest extends LazyDataMapper\Tests\TestCase
 {
 
-	public function testDescendants()
+	public function testChildren()
 	{
 		$suggestor = \Mockery::mock('LazyDataMapper\Suggestor');
 		$suggestor
 			->shouldReceive('isContainer')
 			->andReturn(FALSE)
 		->getMock()
-			->shouldReceive('getDescendant')
+			->shouldReceive('getChild')
 			->with('whatever')
 			->once()
 			->andReturnNull()
 		;
 
-		$descendants = [
+		$children = [
 			'car' => \Mockery::mock('LazyDataMapper\Suggestor')
 					->shouldReceive('isContainer')
 					->andReturn(FALSE)
@@ -32,20 +32,20 @@ class DescendantsTest extends LazyDataMapper\Tests\TestCase
 					->getMock(),
 		];
 
-		$this->mockArrayIterator($suggestor, $descendants);
+		$this->mockArrayIterator($suggestor, $children);
 
 		$dataHolder = new DataHolder($suggestor);
 
 		// Iterator
 		$i = 0;
-		foreach ($dataHolder as $sourceParam => $descendant) {
-			$this->assertInstanceOf('LazyDataMapper\DataHolder', $descendant);
+		foreach ($dataHolder as $sourceParam => $child) {
+			$this->assertInstanceOf('LazyDataMapper\DataHolder', $child);
 
 			if ($sourceParam === 'car') {
-				$this->assertSame($descendants['car'], $descendant->getSuggestor());
+				$this->assertSame($children['car'], $child->getSuggestor());
 
 			} elseif ($sourceParam === 'drivers') {
-				$this->assertSame($descendants['drivers'], $descendant->getSuggestor());
+				$this->assertSame($children['drivers'], $child->getSuggestor());
 
 			} else {
 				$this->fail("Unexpected source parameter '$sourceParam'.");
@@ -54,38 +54,38 @@ class DescendantsTest extends LazyDataMapper\Tests\TestCase
 		}
 		$this->assertEquals(2, $i);
 
-		// getDescendant()
-		$this->assertInstanceOf('LazyDataMapper\DataHolder', $dataHolder->getDescendant('car'));
-		$this->assertInstanceOf('LazyDataMapper\DataHolder', $dataHolder->getDescendant('drivers'));
+		// getChild()
+		$this->assertInstanceOf('LazyDataMapper\DataHolder', $dataHolder->getChild('car'));
+		$this->assertInstanceOf('LazyDataMapper\DataHolder', $dataHolder->getChild('drivers'));
 
 		// __get()
 		$this->assertInstanceOf('LazyDataMapper\DataHolder', $dataHolder->car);
-		$this->assertSame($descendants['car'], $dataHolder->car->getSuggestor());
+		$this->assertSame($children['car'], $dataHolder->car->getSuggestor());
 
 		$this->assertInstanceOf('LazyDataMapper\DataHolder', $dataHolder->drivers);
-		$this->assertSame($descendants['drivers'], $dataHolder->drivers->getSuggestor());
+		$this->assertSame($children['drivers'], $dataHolder->drivers->getSuggestor());
 
-		// every nonexistent descendant has to return NULL
+		// every nonexistent child has to return NULL
 		$this->assertNull($dataHolder->whatever);
 
-		return [$dataHolder, $descendants];
+		return [$dataHolder, $children];
 	}
 
 
 	/**
-	 * @depends testDescendants
+	 * @depends testChildren
 	 */
 	public function testSetParams($services)
 	{
-		list($dataHolder, $descendants) = $services;
+		list($dataHolder, $children) = $services;
 
-		$descendants['car']->shouldReceive('getParamNames')
+		$children['car']->shouldReceive('getParamNames')
 			->once()
 			->andReturn(['color', 'brand']);
 
 		$dataHolder->car->setParams(['color' => 'blue', 'brand' => 'BMW']);
 
-		$descendants['drivers']->shouldReceive('getParamNames')
+		$children['drivers']->shouldReceive('getParamNames')
 			->once()
 			->andReturn(['name', 'team']);
 

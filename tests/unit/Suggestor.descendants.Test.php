@@ -5,14 +5,14 @@ namespace LazyDataMapper\Tests\Suggestor;
 use LazyDataMapper,
 	LazyDataMapper\Suggestor;
 
-class DescendantsTest extends LazyDataMapper\Tests\TestCase
+class ChildrenTest extends LazyDataMapper\Tests\TestCase
 {
 
 	public function testIterator()
 	{
 		$paramMap = \Mockery::mock('LazyDataMapper\ParamMap');
 
-		$descendants = [
+		$children = [
 			'car' => ['Car', FALSE, \Mockery::mock('LazyDataMapper\IIdentifier')],
 			'fake' => ['Fake', FALSE, \Mockery::mock('LazyDataMapper\IIdentifier')],
 			'drivers' => ['Driver', TRUE, \Mockery::mock('LazyDataMapper\IIdentifier')],
@@ -22,41 +22,41 @@ class DescendantsTest extends LazyDataMapper\Tests\TestCase
 
 		$suggestorCache
 			->shouldReceive('getCached')
-			->with($descendants['car'][2], 'Car', FALSE)
+			->with($children['car'][2], 'Car', FALSE)
 			->once()
-			->andReturn(new Suggestor($paramMap, $suggestorCache, [], FALSE, $descendants['car'][2]))
+			->andReturn(new Suggestor($paramMap, $suggestorCache, [], FALSE, $children['car'][2]))
 		->getMock()
 			->shouldReceive('getCached')
-			->with($descendants['fake'][2], 'Fake', FALSE)
+			->with($children['fake'][2], 'Fake', FALSE)
 			->once()
 			->andReturnNull()
 		->getMock()
 			->shouldReceive('getCached')
-			->with($descendants['drivers'][2], 'Driver', TRUE)
+			->with($children['drivers'][2], 'Driver', TRUE)
 			->once()
-			->andReturn(new Suggestor($paramMap, $suggestorCache, [], TRUE, $descendants['drivers'][2]))
+			->andReturn(new Suggestor($paramMap, $suggestorCache, [], TRUE, $children['drivers'][2]))
 		;
 
 		$identifier = \Mockery::mock('LazyDataMapper\IIdentifier');
 
-		$suggestor = new Suggestor($paramMap, $suggestorCache, [], FALSE, $identifier, $descendants);
+		$suggestor = new Suggestor($paramMap, $suggestorCache, [], FALSE, $identifier, $children);
 
-		$this->assertTrue($suggestor->hasDescendants());
+		$this->assertTrue($suggestor->hasChildren());
 
 		// Iterator
 		$i = 0;
-		foreach ($suggestor as $sourceParam => $descendant) {
-			$this->assertInstanceOf('LazyDataMapper\Suggestor', $descendant);
+		foreach ($suggestor as $sourceParam => $child) {
+			$this->assertInstanceOf('LazyDataMapper\Suggestor', $child);
 
 			if ($sourceParam === 'car') {
-				$this->assertFalse($descendant->hasDescendants());
-				$this->assertSame($descendants['car'][2], $descendant->getIdentifier());
-				$this->assertFalse($descendant->isContainer());
+				$this->assertFalse($child->hasChildren());
+				$this->assertSame($children['car'][2], $child->getIdentifier());
+				$this->assertFalse($child->isContainer());
 
 			} elseif ($sourceParam === 'drivers') {
-				$this->assertFalse($descendant->hasDescendants());
-				$this->assertSame($descendants['drivers'][2], $descendant->getIdentifier());
-				$this->assertTrue($descendant->isContainer());
+				$this->assertFalse($child->hasChildren());
+				$this->assertSame($children['drivers'][2], $child->getIdentifier());
+				$this->assertTrue($child->isContainer());
 
 			} else {
 				$this->fail("Unexpected source parameter '$sourceParam'.");
@@ -65,7 +65,7 @@ class DescendantsTest extends LazyDataMapper\Tests\TestCase
 		}
 		$this->assertEquals(2, $i);
 
-		return [$suggestor, $descendants];
+		return [$suggestor, $children];
 	}
 
 
@@ -74,26 +74,26 @@ class DescendantsTest extends LazyDataMapper\Tests\TestCase
 	 */
 	public function testGet($services)
 	{
-		list($suggestor, $descendants) = $services;
+		list($suggestor, $children) = $services;
 
-		// getDescendant()
-		$this->assertInstanceOf('LazyDataMapper\Suggestor', $suggestor->getDescendant('car'));
-		$this->assertInstanceOf('LazyDataMapper\Suggestor', $suggestor->getDescendant('drivers'));
+		// getChild()
+		$this->assertInstanceOf('LazyDataMapper\Suggestor', $suggestor->getChild('car'));
+		$this->assertInstanceOf('LazyDataMapper\Suggestor', $suggestor->getChild('drivers'));
 
 		// __get()
 		$this->assertInstanceOf('LazyDataMapper\Suggestor', $suggestor->car);
-		$this->assertFalse($suggestor->car->hasDescendants());
-		$this->assertSame($descendants['car'][2], $suggestor->car->getIdentifier());
+		$this->assertFalse($suggestor->car->hasChildren());
+		$this->assertSame($children['car'][2], $suggestor->car->getIdentifier());
 		$this->assertFalse($suggestor->car->isContainer());
 
 		$this->assertInstanceOf('LazyDataMapper\Suggestor', $suggestor->drivers);
-		$this->assertFalse($suggestor->drivers->hasDescendants());
-		$this->assertSame($descendants['drivers'][2], $suggestor->drivers->getIdentifier());
+		$this->assertFalse($suggestor->drivers->hasChildren());
+		$this->assertSame($children['drivers'][2], $suggestor->drivers->getIdentifier());
 		$this->assertTrue($suggestor->drivers->isContainer());
 
 		// "fake" has nothing suggested
 		$this->assertNull($suggestor->fake);
-		// every nonexistent descendant has to return NULL
+		// every nonexistent child has to return NULL
 		$this->assertNull($suggestor->whatever);
 	}
 }

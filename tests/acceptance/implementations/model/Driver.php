@@ -23,26 +23,26 @@ class Driver extends LazyDataMapper\Entity
 	{
 		$restrictor = new CarRestrictor;
 		$restrictor->limitDriver($this);
-		return $this->getDescendant('LazyDataMapper\Tests\Car', $restrictor);
+		return $this->getChild('LazyDataMapper\Tests\Car', $restrictor);
 	}
 
 
 	protected function getFamousCars()
 	{
 		$cars = explode('|', $this->getBase('famous_cars'));
-		return $this->getDescendant('LazyDataMapper\Tests\Car', $cars);
+		return $this->getChild('LazyDataMapper\Tests\Car', $cars);
 	}
 
 
 	protected function getColleague()
 	{
-		return $this->getDescendant();
+		return $this->getChild();
 	}
 
 
 	protected function getNextDriver()
 	{
-		return $this->getDescendant(self::SELF, $this->id + 1);
+		return $this->getChild(self::SELF, $this->id + 1);
 	}
 }
 

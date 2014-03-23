@@ -12,7 +12,7 @@ class DataHolder implements \Iterator
 	protected $params = array();
 
 	/** @var array */
-	protected $descendants = array();
+	protected $children = array();
 
 	/** @var Suggestor */
 	protected $suggestor;
@@ -144,39 +144,39 @@ class DataHolder implements \Iterator
 	 * @return self|null
 	 * @throws Exception
 	 */
-	public function getDescendant($sourceParam, array $ids = NULL)
+	public function getChild($sourceParam, array $ids = NULL)
 	{
-		if (array_key_exists($sourceParam, $this->descendants)) {
-			return $this->descendants[$sourceParam];
+		if (array_key_exists($sourceParam, $this->children)) {
+			return $this->children[$sourceParam];
 		}
 
-		$suggestor = $this->suggestor->getDescendant($sourceParam);
+		$suggestor = $this->suggestor->getChild($sourceParam);
 		if (!$suggestor) {
 			return NULL;
 		}
 
-		$descendant = new self($suggestor, $ids);
-		$this->descendants[$sourceParam] = $descendant;
-		return $descendant;
+		$child = new self($suggestor, $ids);
+		$this->children[$sourceParam] = $child;
+		return $child;
 	}
 
 
 	/**
-	 * @see getDescendant()
+	 * @see getChild()
 	 */
 	public function __get($sourceParam)
 	{
-		return $this->getDescendant($sourceParam);
+		return $this->getChild($sourceParam);
 	}
 
 
 	/**
-	 * Says whether descendants was loaded, not whether they exist. For that @see Suggestor::hasDescendants
+	 * Says whether children was loaded, not whether they exist. For that @see Suggestor::hasChildren
 	 * @return bool
 	 */
-	public function hasLoadedDescendants()
+	public function hasLoadedChildren()
 	{
-		return !empty($this->descendants);
+		return !empty($this->children);
 	}
 
 
@@ -204,15 +204,15 @@ class DataHolder implements \Iterator
 	public function current()
 	{
 		$key = $this->suggestor->key();
-		if (array_key_exists($key, $this->descendants)) {
-			return $this->descendants[$key];
+		if (array_key_exists($key, $this->children)) {
+			return $this->children[$key];
 		}
 		$suggestor = $this->suggestor->current();
 		if (!$suggestor) {
 			return FALSE;
 		}
 
-		return $this->descendants[$key] = new self($suggestor);
+		return $this->children[$key] = new self($suggestor);
 	}
 
 

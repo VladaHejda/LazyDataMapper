@@ -11,7 +11,7 @@ use LazyDataMapper,
 require_once __DIR__ . '/implementations/model/Race.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 
-class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class LoadWithChildTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()
@@ -31,7 +31,7 @@ class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(3, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return $facade;
 	}
@@ -54,6 +54,6 @@ class LoadWithDescendantTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 }

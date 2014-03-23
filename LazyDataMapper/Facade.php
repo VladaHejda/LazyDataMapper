@@ -5,7 +5,7 @@ namespace LazyDataMapper;
 /**
  * Outer cover for getting operands (Entity or EntityContainer).
  * There are two ways of determining Entity / EntityContainer classname:
- * - override property $entityClass in the descendant of this class due to the array pattern:
+ * - override property $entityClass in the child of this class due to the array pattern:
  *   [<EntityClassname>, <EntityContainerClassname>]
  * - apply solution in IEntityServiceAccessor method getEntityClass() and getEntityContainerClass().
  *   There is some default solution.
@@ -100,7 +100,7 @@ abstract class Facade
 
 
 	/**
-	 * For creation create method self::create() in descendant and require mandatory parameters for new Entity.
+	 * For creation create method self::create() in child and require mandatory parameters for new Entity.
 	 * @param array $publicData
 	 * @param array $privateData
 	 * @param bool $throwFirst whether throw first IntegrityException from Checker

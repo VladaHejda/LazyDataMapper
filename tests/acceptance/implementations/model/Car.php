@@ -80,7 +80,7 @@ class Car extends LazyDataMapper\Entity
 
 	protected function getDriver()
 	{
-		return $this->getDescendant('LazyDataMapper\Tests\Driver');
+		return $this->getChild('LazyDataMapper\Tests\Driver');
 	}
 
 
@@ -94,14 +94,14 @@ class Car extends LazyDataMapper\Entity
 	{
 		$restrictor = new RaceRestrictor;
 		$restrictor->limitCar($this);
-		return $this->getDescendant('LazyDataMapper\Tests\Race', $restrictor);
+		return $this->getChild('LazyDataMapper\Tests\Race', $restrictor);
 	}
 
 
 	// yes, I know, this is weird, but it is for testing purposes
 	protected function getBestDriver()
 	{
-		return $this->getDescendant('LazyDataMapper\Tests\Driver', 5);
+		return $this->getChild('LazyDataMapper\Tests\Driver', 5);
 	}
 
 

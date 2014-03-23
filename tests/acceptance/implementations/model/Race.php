@@ -12,7 +12,7 @@ class Race extends LazyDataMapper\Entity
 
 	protected function getCar()
 	{
-		return $this->getDescendant('LazyDataMapper\Tests\Car');
+		return $this->getChild('LazyDataMapper\Tests\Car');
 	}
 }
 

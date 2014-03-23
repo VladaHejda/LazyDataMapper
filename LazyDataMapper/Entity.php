@@ -391,15 +391,15 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * @param string|int $entityClass or self::SELF to get descendant of same class
+	 * @param string|int $entityClass or self::SELF to get child of same class
 	 * @param mixed $arg
-	 *        string       source parameter to get id of descendant Entity
+	 *        string       source parameter to get id of child Entity
 	 *        int          id of Entity, when not accessible from any source parameter
 	 *        IRestrictor  to get EntityContainer by IRestrictor
 	 *        int[]        array of ids to get EntityContainer by ids range
 	 * @return IOperand
 	 */
-	protected function getDescendant($entityClass = self::SELF, $arg = NULL)
+	protected function getChild($entityClass = self::SELF, $arg = NULL)
 	{
 		if ($entityClass === self::SELF) {
 			$entityClass = get_class($this);
@@ -482,7 +482,7 @@ abstract class Entity implements IEntity
 
 
 	/**
-	 * Says if param is private. Descendant can implement another solution.
+	 * Says if param is private. Inherited can implement another solution.
 	 * @param string $param
 	 * @return bool
 	 * @throws EntityException

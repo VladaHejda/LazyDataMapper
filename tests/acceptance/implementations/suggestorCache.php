@@ -7,13 +7,13 @@ use LazyDataMapper\IIdentifier;
 class SuggestorCache extends \LazyDataMapper\SuggestorCache
 {
 
-	static $calledCacheParamName, $calledCacheDescendant, $calledGetCached;
+	static $calledCacheParamName, $calledCacheChild, $calledGetCached;
 
 
 	public static function resetCounters()
 	{
 		self::$calledCacheParamName = 0;
-		self::$calledCacheDescendant = 0;
+		self::$calledCacheChild = 0;
 		self::$calledGetCached = 0;
 	}
 
@@ -25,16 +25,16 @@ class SuggestorCache extends \LazyDataMapper\SuggestorCache
 	}
 
 
-	public function cacheDescendant(IIdentifier $identifier, $descendantEntityClass, $sourceParam, $isContainer = FALSE)
+	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, $isContainer = FALSE)
 	{
-		++self::$calledCacheDescendant;
-		parent::cacheDescendant($identifier, $descendantEntityClass, $sourceParam, $isContainer);
+		++self::$calledCacheChild;
+		parent::cacheChild($identifier, $childEntityClass, $sourceParam, $isContainer);
 	}
 
 
-	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE, &$descendantsIdentifierList = NULL)
+	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE, &$childrenIdentifierList = NULL)
 	{
 		++self::$calledGetCached;
-		return parent::getCached($identifier, $entityClass, $isContainer, $descendantsIdentifierList);
+		return parent::getCached($identifier, $entityClass, $isContainer, $childrenIdentifierList);
 	}
 }

@@ -11,7 +11,7 @@ use LazyDataMapper,
 require_once __DIR__ . '/implementations/model/Driver.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 
-class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class ChildrenTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()
@@ -31,7 +31,7 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(3, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(1, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return $facade;
 	}
@@ -53,12 +53,12 @@ class DescendantsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
-		$this->assertEquals(0, SuggestorCache::$calledCacheDescendant);
+		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 
 		$this->assertEquals(['driver', 'price'], CarMapper::$lastSuggestor->getParamNames());
-		$this->assertTrue(CarMapper::$lastSuggestor->hasDescendants());
-		$descendant = CarMapper::$lastSuggestor->getDescendant('driver');
-		$this->assertInstanceOf('LazyDataMapper\Suggestor', $descendant);
-		$this->assertEquals(['first_name'], $descendant->getParamNames());
+		$this->assertTrue(CarMapper::$lastSuggestor->hasChildren());
+		$child = CarMapper::$lastSuggestor->getChild('driver');
+		$this->assertInstanceOf('LazyDataMapper\Suggestor', $child);
+		$this->assertEquals(['first_name'], $child->getParamNames());
 	}
 }

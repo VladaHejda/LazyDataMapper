@@ -71,14 +71,14 @@ class SuggestorCache
 
 
 	/**
-	 * Adds descendant under one identifier.
+	 * Adds child under one identifier.
 	 * @param IIdentifier $identifier
-	 * @param string $descendantEntityClass
+	 * @param string $childEntityClass
 	 * @param string $sourceParam
 	 * @param bool $isContainer
 	 * @return void
 	 */
-	public function cacheDescendant(IIdentifier $identifier, $descendantEntityClass, $sourceParam, $isContainer = FALSE)
+	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, $isContainer = FALSE)
 	{
 		$key = $this->key . $identifier->getKey();
 		$cached = $this->externalCache->load($key);
@@ -103,7 +103,7 @@ class SuggestorCache
 			return;
 		}
 
-		$cachedShortcut[$sourceParam] = array($descendantEntityClass, $isContainer);
+		$cachedShortcut[$sourceParam] = array($childEntityClass, $isContainer);
 		$this->externalCache->save($key, $cached);
 	}
 
@@ -113,12 +113,12 @@ class SuggestorCache
 	 * @param IIdentifier $identifier
 	 * @param string $entityClass
 	 * @param bool $isContainer
-	 * @param array $descendantsIdentifierList
+	 * @param array $childrenIdentifierList
 	 * @return Suggestor
 	 */
-	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE, &$descendantsIdentifierList = NULL)
+	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE, &$childrenIdentifierList = NULL)
 	{
-		$descendantsIdentifierList = array();
+		$childrenIdentifierList = array();
 
 		$cached = $this->externalCache->load($this->key . $identifier->getKey());
 		if (NULL === $cached) {
@@ -134,20 +134,20 @@ class SuggestorCache
 			$suggestions = $cached[self::PARAM_NAMES];
 		}
 		if (!isset($cached[self::DESCENDANTS])) {
-			$descendants = array();
+			$children = array();
 		} else {
 			$this->checkCache($cached[self::DESCENDANTS]);
-			$descendants = $cached[self::DESCENDANTS];
+			$children = $cached[self::DESCENDANTS];
 		}
 
-		foreach ($descendants as $sourceParam => &$descendant) {
-			// todo check count $this->checkCache($descendant, 2);
-			$this->checkCache($descendant);
-			$descendant[] = $descendantIdentifier = $this->serviceAccessor->composeIdentifier($descendant[0], $descendant[1], $identifier, $sourceParam);
-			$descendantsIdentifierList[] = $descendantIdentifier->getKey();
+		foreach ($children as $sourceParam => &$child) {
+			// todo check count $this->checkCache($child, 2);
+			$this->checkCache($child);
+			$child[] = $childIdentifier = $this->serviceAccessor->composeIdentifier($child[0], $child[1], $identifier, $sourceParam);
+			$childrenIdentifierList[] = $childIdentifier->getKey();
 		}
 		$map = $this->serviceAccessor->getParamMap($entityClass);
-		return $this->createSuggestor($map, $identifier, $suggestions, $descendants, $isContainer);
+		return $this->createSuggestor($map, $identifier, $suggestions, $children, $isContainer);
 	}
 
 
@@ -155,13 +155,13 @@ class SuggestorCache
 	 * @param ParamMap $paramMap
 	 * @param IIdentifier $identifier
 	 * @param array $suggestions
-	 * @param array $descendants
+	 * @param array $children
 	 * @param bool $isContainer
 	 * @return Suggestor
 	 */
-	protected function createSuggestor(ParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $descendants = array(), $isContainer = FALSE)
+	protected function createSuggestor(ParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $children = array(), $isContainer = FALSE)
 	{
-		return new Suggestor($paramMap, $this, $suggestions, $isContainer, $identifier, $descendants);
+		return new Suggestor($paramMap, $this, $suggestions, $isContainer, $identifier, $children);
 	}
 
 
