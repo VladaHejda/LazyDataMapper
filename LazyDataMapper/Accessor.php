@@ -413,8 +413,12 @@ final class Accessor
 	private function getLoadedData(IIdentifier $identifier)
 	{
 		$key = $identifier->getKey();
-		// todo jakmile se data loudnou, již nebudou třeba, smazat je
-		return isset($this->loadedData[$key]) ? $this->loadedData[$key] : FALSE;
+		if (isset($this->loadedData[$key])) {
+			$data = $this->loadedData[$key];
+			unset($this->loadedData[$key]);
+			return $data;
+		}
+		return FALSE;
 	}
 
 
