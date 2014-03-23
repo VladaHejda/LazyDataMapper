@@ -69,11 +69,11 @@ class RaceMapper extends defaultMapper
 		$holder = parent::getById($id, $suggestor, $holder);
 
 		if ($suggestor->car) {
-			$data = array_intersect_key(CarMapper::$data[static::$data[$id]['car']] ,array_flip($suggestor->car->getParamNames()));
+			$data = array_intersect_key(CarMapper::$data[static::$data[$id]['car']] ,array_flip($suggestor->car->getSuggestions()));
 			$holder->car->setParams($data);
 
 			if ($suggestor->car->driver) {
-				$data = array_intersect_key(DriverMapper::$data[$data['driver']] ,array_flip($suggestor->car->driver->getParamNames()));
+				$data = array_intersect_key(DriverMapper::$data[$data['driver']] ,array_flip($suggestor->car->driver->getSuggestions()));
 				$holder->car->driver->setParams($data);
 			}
 		}

@@ -79,13 +79,13 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 	{
 		list($dataHolder, $children) = $services;
 
-		$children['car']->shouldReceive('getParamNames')
+		$children['car']->shouldReceive('getSuggestions')
 			->once()
 			->andReturn(['color', 'brand']);
 
 		$dataHolder->car->setParams(['color' => 'blue', 'brand' => 'BMW']);
 
-		$children['drivers']->shouldReceive('getParamNames')
+		$children['drivers']->shouldReceive('getSuggestions')
 			->once()
 			->andReturn(['name', 'team']);
 

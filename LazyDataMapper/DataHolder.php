@@ -69,7 +69,7 @@ class DataHolder implements \Iterator
 			throw new Exception('This DataHolder is Container and you did not set ids yet. Use method setIds().');
 		}
 
-		$suggestions = array_fill_keys($this->suggestor->getParamNames(), TRUE);
+		$suggestions = array_fill_keys($this->suggestor->getSuggestions(), TRUE);
 
 		if ($this->suggestor->isContainer()) {
 			if ($diff = array_diff(array_keys($params), $this->ids)) {

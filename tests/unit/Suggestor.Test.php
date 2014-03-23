@@ -40,7 +40,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 		$this->assertSame($this->paramMap, $suggestor->getParamMap());
 		$this->assertFalse($suggestor->isContainer());
 		$this->assertFalse($suggestor->hasChildren());
-		$this->assertEquals(['name', 'age'], $suggestor->getParamNames());
+		$this->assertEquals(['name', 'age'], $suggestor->getSuggestions());
 
 		$this->paramMap
 			->shouldReceive('getMap')

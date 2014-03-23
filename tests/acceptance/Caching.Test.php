@@ -29,11 +29,11 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$car = $facade->getById(6);
 
 		$this->assertEquals('R8', $car->name);
-		$this->assertEquals(['name'], CarMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(['name'], CarMapper::$lastSuggestor->getSuggestions());
 		$this->assertEquals(1, SuggestorCache::$calledCacheParamName);
 
 		$this->assertEquals(5320, $car->engine);
-		$this->assertEquals(['engine'], CarMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(['engine'], CarMapper::$lastSuggestor->getSuggestions());
 		$this->assertEquals(2, SuggestorCache::$calledCacheParamName);
 
 		// checks if getById is not called again
@@ -66,13 +66,13 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		// tests if getById called only once with right suggestions
 		$this->assertEquals(1, CarMapper::$calledGetById);
-		$this->assertEquals(['name', 'engine'], CarMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(['name', 'engine'], CarMapper::$lastSuggestor->getSuggestions());
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
 
 		// tries get new data
 		$this->assertEquals(12740, $car->price);
 		$this->assertEquals(2, CarMapper::$calledGetById);
-		$this->assertEquals(['price'], CarMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(['price'], CarMapper::$lastSuggestor->getSuggestions());
 		$this->assertEquals(1, SuggestorCache::$calledCacheParamName);
 
 		// tests if new suggestion cached

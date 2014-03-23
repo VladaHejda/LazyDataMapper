@@ -64,8 +64,8 @@ final class Accessor
 
 			if ($suggestor = $this->cache->getCached($identifier, $entityClass, FALSE, $childrenIdentifierList)) {
 				// when no suggestions, even children are ignored, they will be loaded later
-				$paramNames = $suggestor->getParamNames();
-				if (empty($paramNames)) {
+				$suggestions = $suggestor->getSuggestions();
+				if (empty($suggestions)) {
 					$data = array();
 
 				} else {
@@ -334,12 +334,12 @@ final class Accessor
 
 	/**
 	 * @param string $entityClass
-	 * @param array $paramNames
+	 * @param array $suggestions
 	 * @return DataHolder
 	 */
-	protected function createDataHolder($entityClass, array $paramNames)
+	protected function createDataHolder($entityClass, array $suggestions)
 	{
-		$suggestor = new Suggestor($this->serviceAccessor->getParamMap($entityClass), $this->cache, $paramNames);
+		$suggestor = new Suggestor($this->serviceAccessor->getParamMap($entityClass), $this->cache, $suggestions);
 		return new DataHolder($suggestor);
 	}
 

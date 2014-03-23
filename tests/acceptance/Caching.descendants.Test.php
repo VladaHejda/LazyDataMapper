@@ -55,10 +55,10 @@ class ChildrenTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
 		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 
-		$this->assertEquals(['driver', 'price'], CarMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(['driver', 'price'], CarMapper::$lastSuggestor->getSuggestions());
 		$this->assertTrue(CarMapper::$lastSuggestor->hasChildren());
 		$child = CarMapper::$lastSuggestor->getChild('driver');
 		$this->assertInstanceOf('LazyDataMapper\Suggestor', $child);
-		$this->assertEquals(['first_name'], $child->getParamNames());
+		$this->assertEquals(['first_name'], $child->getSuggestions());
 	}
 }

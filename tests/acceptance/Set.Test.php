@@ -28,7 +28,7 @@ class Test extends LazyDataMapper\Tests\AcceptanceTestCase
 		$car = $facade->getById(4);
 
 		$car->price = 30000;
-		$this->assertEquals(['price'], CarMapper::$lastSuggestor->getParamNames());
+		$this->assertEquals(['price'], CarMapper::$lastSuggestor->getSuggestions());
 
 		$this->assertEquals('Diablo', $car->name);
 		$car->name = 'Urraco';

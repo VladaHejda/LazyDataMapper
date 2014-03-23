@@ -62,9 +62,8 @@ class Suggestor implements \Iterator
 	 * If grouped but group is omitted, it returns all param names merged.
 	 * @param string $group
 	 * @return string[]
-	 * @todo rename to getSuggestions() ?
 	 */
-	public function getParamNames($group = NULL)
+	public function getSuggestions($group = NULL)
 	{
 		if (NULL === $group) {
 			return $this->suggestions;

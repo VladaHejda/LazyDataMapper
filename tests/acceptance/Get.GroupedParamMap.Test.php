@@ -23,10 +23,10 @@ class GroupedParamMapTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$driver = $facade->getById(1);
 
 		$this->assertEquals('Pooh', $driver->last_name);
-		$this->assertEquals(['last_name'], DriverMapper::$lastSuggestor->getParamNames('personal'));
-		$this->assertEquals([], DriverMapper::$lastSuggestor->getParamNames('score'));
+		$this->assertEquals(['last_name'], DriverMapper::$lastSuggestor->getSuggestions('personal'));
+		$this->assertEquals([], DriverMapper::$lastSuggestor->getSuggestions('score'));
 		$this->assertEquals(2, $driver->accidents);
-		$this->assertEquals(['accidents'], DriverMapper::$lastSuggestor->getParamNames('score'));
-		$this->assertEquals([], DriverMapper::$lastSuggestor->getParamNames('personal'));
+		$this->assertEquals(['accidents'], DriverMapper::$lastSuggestor->getSuggestions('score'));
+		$this->assertEquals([], DriverMapper::$lastSuggestor->getSuggestions('personal'));
 	}
 }
