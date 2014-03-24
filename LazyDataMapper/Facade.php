@@ -68,7 +68,7 @@ abstract class Facade
 	 */
 	public function getByRestrictions(IRestrictor $restrictor, $maxCount = 100)
 	{
-		return $this->accessor->getByRestrictions($this->entityClass, $restrictor, NULL, NULL, $maxCount);
+		return $this->accessor->getByRestrictions($this->entityClass, $restrictor, $maxCount);
 	}
 
 
@@ -100,7 +100,7 @@ abstract class Facade
 
 
 	/**
-	 * For creation create method self::create() in child and require mandatory parameters for new Entity.
+	 * For creation create method create() in descendant and require mandatory parameters for new Entity.
 	 * @param array $publicData
 	 * @param array $privateData
 	 * @param bool $throwFirst whether throw first IntegrityException from Checker

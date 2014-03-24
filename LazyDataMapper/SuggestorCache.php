@@ -41,6 +41,7 @@ class SuggestorCache
 	 * @param string $paramName
 	 * @param string $entityClass
 	 * @return Suggestor with one suggestion of cached parameter name
+	 * @todo rename to cacheSuggestion
 	 */
 	public function cacheParamName(IIdentifier $identifier, $paramName, $entityClass)
 	{
@@ -58,15 +59,13 @@ class SuggestorCache
 			$this->checkCache($cached[self::PARAM_NAMES]);
 		}
 
-		$map = $this->serviceAccessor->getParamMap($entityClass);
-		$suggestor = $this->createSuggestor($map, $identifier, array($paramName));
-
 		if (!in_array($paramName, $cached[self::PARAM_NAMES])) {
 			$cached[self::PARAM_NAMES][] = $paramName;
 			$this->externalCache->save($key, $cached);
 		}
 
-		return $suggestor;
+		$map = $this->serviceAccessor->getParamMap($entityClass);
+		return $this->createSuggestor($map, $identifier, array($paramName));
 	}
 
 
@@ -75,10 +74,10 @@ class SuggestorCache
 	 * @param IIdentifier $identifier
 	 * @param string $childEntityClass
 	 * @param string $sourceParam
-	 * @param bool $isContainer
+	 * @param bool[] $hierarchy
 	 * @return void
 	 */
-	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, $isContainer = FALSE)
+	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, array $hierarchy = NULL)
 	{
 		$key = $this->key . $identifier->getKey();
 		$cached = $this->externalCache->load($key);
@@ -103,7 +102,7 @@ class SuggestorCache
 			return;
 		}
 
-		$cachedShortcut[$sourceParam] = array($childEntityClass, $isContainer);
+		$cachedShortcut[$sourceParam] = array($childEntityClass, $this->packHierarchy($hierarchy));
 		$this->externalCache->save($key, $cached);
 	}
 
@@ -112,11 +111,11 @@ class SuggestorCache
 	 * Gets all cached suggestions under one identifier or NULL when nothing cached.
 	 * @param IIdentifier $identifier
 	 * @param string $entityClass
-	 * @param bool $isContainer
+	 * @param bool[] $hierarchy
 	 * @param array $childrenIdentifierList
 	 * @return Suggestor
 	 */
-	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE, &$childrenIdentifierList = NULL)
+	public function getCached(IIdentifier $identifier, $entityClass, array $hierarchy = NULL, &$childrenIdentifierList = NULL)
 	{
 		$childrenIdentifierList = array();
 
@@ -140,14 +139,16 @@ class SuggestorCache
 			$children = $cached[self::DESCENDANTS];
 		}
 
+		// todo toto by mohlo být přesunuto do Suggestoru, ale ten by potom potřeboval serviceAccessor.
 		foreach ($children as $sourceParam => &$child) {
 			// todo check count $this->checkCache($child, 2);
 			$this->checkCache($child);
-			$child[] = $childIdentifier = $this->serviceAccessor->composeIdentifier($child[0], $child[1], $identifier, $sourceParam);
+			$child[1] = $this->unpackHierarchy($child[1]);
+			$child[] = $childIdentifier = $this->serviceAccessor->composeIdentifier($child[0], end($child[1]), $identifier, $sourceParam);
 			$childrenIdentifierList[] = $childIdentifier->getKey();
 		}
 		$map = $this->serviceAccessor->getParamMap($entityClass);
-		return $this->createSuggestor($map, $identifier, $suggestions, $children, $isContainer);
+		return $this->createSuggestor($map, $identifier, $suggestions, $children, $hierarchy);
 	}
 
 
@@ -156,19 +157,53 @@ class SuggestorCache
 	 * @param IIdentifier $identifier
 	 * @param array $suggestions
 	 * @param array $children
-	 * @param bool $isContainer
+	 * @param bool[] $hierarchy
 	 * @return Suggestor
 	 */
-	protected function createSuggestor(ParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $children = array(), $isContainer = FALSE)
+	protected function createSuggestor(ParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $children = array(), array $hierarchy = NULL)
 	{
-		return new Suggestor($paramMap, $this, $suggestions, $isContainer, $identifier, $children);
+		return new Suggestor($paramMap, $this, $suggestions, $hierarchy, $identifier, $children);
+	}
+
+
+	private function packHierarchy($hierarchy)
+	{
+		if (!is_array($hierarchy)) {
+			return '0';
+		}
+
+		$packed = '';
+		foreach ($hierarchy as $bit) {
+			$packed .= $bit ? '1' : '0';
+		}
+		return $packed;
+	}
+
+
+	private function unpackHierarchy($packed)
+	{
+		if (empty($packed)) {
+			$this->throwError();
+		}
+
+		$hierarchy = str_split($packed);
+		foreach ($hierarchy as &$bit) {
+			$bit = (bool) $bit;
+		}
+		return $hierarchy;
 	}
 
 
 	private function checkCache($cache)
 	{
 		if (!is_array($cache)) {
-			throw new Exception('Malformed cache. Clear it and try again.');
+			$this->throwError();
 		}
+	}
+
+
+	private function throwError()
+	{
+		throw new Exception('Malformed cache. Clear it and try again.');
 	}
 }

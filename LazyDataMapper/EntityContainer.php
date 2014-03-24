@@ -5,8 +5,8 @@ namespace LazyDataMapper;
 abstract class EntityContainer implements IEntityContainer
 {
 
-	/** @var IIdentifier */
-	private $identifier;
+	/** @var Hierarchy */
+	private $hierarchy;
 
 	/** @var Accessor */
 	private $accessor;
@@ -32,12 +32,12 @@ abstract class EntityContainer implements IEntityContainer
 
 	/**
 	 * @param array[] $data array of params of each Entity, indexed by id, order dependent
-	 * @param IIdentifier $identifier
 	 * @param Accessor $accessor
 	 * @param string $entityClass
+	 * @param Hierarchy $hierarchy
 	 * @throws Exception
 	 */
-	public function __construct(array $data, IIdentifier $identifier, Accessor $accessor, $entityClass)
+	public function __construct(array $data, Accessor $accessor, $entityClass, Hierarchy $hierarchy)
 	{
 		foreach ($data as $params) {
 			if (!is_array($params)) {
@@ -48,22 +48,34 @@ abstract class EntityContainer implements IEntityContainer
 				$count = count($params);
 
 			} elseif (count($params) != $count) {
-				throw new Exception(get_class($this) . ': One member of data nested array has different count of params.');
+				throw new Exception(get_class($this) . ': One member of data nested array has different count of parameters.');
 			}
 		}
 
 		$this->ids = array_keys($data);
 		$this->data = array_values($data);
 
-		$this->identifier = $identifier;
 		$this->entityClass = $entityClass;
 		$this->accessor = $accessor;
+		$this->hierarchy = $hierarchy;
 	}
 
 
+	/**
+	 * @return IIdentifier
+	 */
 	public function getIdentifier()
 	{
-		return $this->identifier;
+		return $this->hierarchy->getIdentifier();
+	}
+
+
+	/**
+	 * @return Hierarchy
+	 */
+	public function getHierarchy()
+	{
+		return $this->hierarchy;
 	}
 
 
@@ -174,7 +186,7 @@ abstract class EntityContainer implements IEntityContainer
 	protected function createEntity($id, array $params)
 	{
 		$entityClass = $this->entityClass;
-		return new $entityClass($id, $params, $this->accessor, $this->identifier, $this);
+		return new $entityClass($id, $params, $this->accessor, $this);
 	}
 
 

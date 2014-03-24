@@ -17,33 +17,29 @@ class Suggestor implements \Iterator
 	/** @var array */
 	protected $suggestions;
 
-	/** @var IIdentifier  */
-	protected $identifier;
-
 	/** @var array */
 	protected $children;
 
-	/** @var bool */
-	protected $isContainer;
+	/** @var Hierarchy */
+	protected $hierarchy;
 
 
 	/**
 	 * @param ParamMap $paramMap
 	 * @param SuggestorCache $cache
 	 * @param array $suggestions
-	 * @param bool $isContainer
-	 * @param IIdentifier $identifier
+	 * @param Hierarchy $hierarchy
 	 * @param array $children entityClass => IIdentifier
+	 * @throws Exception
 	 */
-	public function __construct(ParamMap $paramMap, SuggestorCache $cache, array $suggestions, $isContainer = FALSE, IIdentifier $identifier = NULL, array $children = array())
+	public function __construct(ParamMap $paramMap, SuggestorCache $cache, array $suggestions, Hierarchy $hierarchy = NULL, array $children = array())
 	{
 		$this->paramMap = $paramMap;
 		$this->cache = $cache;
 		$this->checkAgainstParamMap($suggestions);
 		$this->suggestions = $suggestions;
-		$this->identifier = $identifier;
 		$this->children = $children;
-		$this->isContainer = $isContainer;
+		$this->hierarchy = $hierarchy;
 	}
 
 
@@ -85,16 +81,19 @@ class Suggestor implements \Iterator
 	 */
 	public function getIdentifier()
 	{
-		return $this->identifier;
+		if ($this->hierarchy) {
+			$this->hierarchy->getIdentifier();
+		}
+		return NULL;
 	}
 
 
 	/**
-	 * @return bool
+	 * @return Hierarchy
 	 */
-	public function isContainer()
+	public function getHierarchy()
 	{
-		return $this->isContainer;
+		return $this->hierarchy;
 	}
 
 
@@ -124,9 +123,9 @@ class Suggestor implements \Iterator
 			return $this->children[$sourceParam];
 		}
 
-		list($entityClass, $isContainer, $identifier) = $this->children[$sourceParam];
+		list($entityClass, $hierarchy, $identifier) = $this->children[$sourceParam];
 
-		$child = $this->loadChild($identifier, $entityClass, $isContainer);
+		$child = $this->loadChild($identifier, $entityClass, $hierarchy);
 		if (!$child) {
 			unset($this->children[$sourceParam]);
 			return NULL;
@@ -163,8 +162,8 @@ class Suggestor implements \Iterator
 			return TRUE;
 		}
 
-		list($entityClass, $isContainer, $identifier) = $current;
-		$child = $this->loadChild($identifier, $entityClass, $isContainer);
+		list($entityClass, $hierarchy, $identifier) = $current;
+		$child = $this->loadChild($identifier, $entityClass, $hierarchy);
 		$key = key($this->children);
 
 		// child have nothing cached
@@ -220,9 +219,9 @@ class Suggestor implements \Iterator
 	}
 
 
-	protected function loadChild(IIdentifier $identifier, $entityClass, $isContainer)
+	protected function loadChild(IIdentifier $identifier, $entityClass, $hierarchy)
 	{
-		return $this->cache->getCached($identifier, $entityClass, $isContainer);
+		return $this->cache->getCached($identifier, $entityClass, $hierarchy);
 	}
 
 

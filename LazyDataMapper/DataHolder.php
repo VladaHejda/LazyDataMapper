@@ -4,6 +4,7 @@ namespace LazyDataMapper;
 
 /**
  * Based on Suggestor gains data from Mapper and gives data to Mapper's method save() and create().
+ * @todo rename "params" to "data"
  */
 class DataHolder implements \Iterator
 {
@@ -17,54 +18,87 @@ class DataHolder implements \Iterator
 	/** @var Suggestor */
 	protected $suggestor;
 
-	/** @var array */
-	protected $ids;
-
 
 	/**
 	 * @param Suggestor $suggestor
-	 * @param int[] $ids for container holder
 	 * @throws Exception
 	 * @todo co když $ids bude prázdný array (resp. mapper zjistí že žádní potomci nejsou)
 	 */
-	public function __construct(Suggestor $suggestor, array $ids = NULL)
+	public function __construct(Suggestor $suggestor)
 	{
 		$this->suggestor = $suggestor;
-
-		if (NULL !== $ids) {
-			$this->setIds($ids);
-		}
 	}
 
 
-	/**
-	 * @param array $ids
-	 * @return self
-	 * @throws Exception
-	 */
-	public function setIds(array $ids)
+	private function isFlat(array $data)
 	{
-		if (!$this->suggestor->isContainer()) {
-			throw new Exception('Ids can be set only for Container DataHolder.');
+		$data = reset($data);
+		if (!is_array($data)) {
+			throw new Exception('You must set data via multi-dimensional array.');
 		}
+		$data = reset($data);
+		return !is_array($data);
+	}
 
-		if (NULL !== $this->ids) {
-			throw new Exception('Ids have already been set.');
+	private function checkRecursively(array $zigzag, array $data)
+	{
+		$fork = FALSE;
+		while (count($zigzag)) {
+			$isContainer = array_shift($zigzag);
+			// single entities on top does not fork the tree
+			if (!$fork && !$isContainer) {
+				continue;
+			}
+			$fork = TRUE;
+
+			///// TODO ČEKOVAT
 		}
+	}
 
-		$this->ids = $ids;
-		return $this;
+	private function containsContainer(array $zigzag)
+	{
+		return FALSE !== array_search(TRUE, $zigzag);
 	}
 
 
 	/**
-	 * @param array|array[] $params array for one; array of arrays for container, indexed by id
+	 * @param array|array[] $data array for one; array of arrays for container, indexed by id
 	 * @return self
 	 * @throws Exception on not suggested/unknown parameter
 	 * @throws Exception on unknown id
 	 */
-	public function setParams(array $params)
+	public function setParams(array $data)
 	{
+		$zigzag = $this->suggestor->getHierarchy()->getZigzag();
+
+		$suggestions = array_fill_keys($this->suggestor->getSuggestions(), TRUE);
+
+		// data for single entity
+		if (!$this->containsContainer($zigzag)) {
+			$this->checkAgainstSuggestions(array_keys($data), $suggestions);
+			$this->params = $data + $this->params;
+
+		// flat data based on ids
+		} elseif ($this->isFlat($data)) {
+			// todo isFlat() does not check if all members are arrays
+			foreach ($data as $id => $params) {
+				$this->checkAgainstSuggestions(array_keys($params), $suggestions);
+				if (!isset($this->params[$id])) {
+					$this->params[$id] = array();
+				}
+				$this->params[$id] = $params + $this->params[$id];
+			}
+
+		// tree data
+		} else {
+			$this->checkRecursively($zigzag, $data);
+		}
+
+		return $this;
+
+
+
+
 		if (NULL === $this->ids && $this->suggestor->isContainer()) {
 			throw new Exception('This DataHolder is Container and you did not set ids yet. Use method setIds().');
 		}

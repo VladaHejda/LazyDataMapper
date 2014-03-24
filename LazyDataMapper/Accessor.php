@@ -3,7 +3,7 @@
 namespace LazyDataMapper;
 
 /**
- * The main class leading all dependencies. Everything there is controlled by internally.
+ * The main class leading all dependencies. Everything there is controlled internally.
  * @todo baseNamespace setting? It could be for example AppName\Entities - will be added during new instance creating, but not stored to cache
  */
 final class Accessor
@@ -52,17 +52,22 @@ final class Accessor
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
 
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
+		$parentIdentifier = $parent ? $parent->getIdentifier() : NULL;
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, FALSE, $parentIdentifier, $sourceParam);
 
-		if ($parent && $data = $this->getLoadedData($identifier)) {
-			// $data set
-
+		if ($parent) {
+			$hierarchy = $parent->getHierarchy()->appendAndCreate($id, $identifier);
+			$data = $this->getLoadedData($hierarchy);
 		} else {
+			$hierarchy = Hierarchy::create($id, $identifier);
+		}
+
+		if (!isset($data) || FALSE === $data) {
 			if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
 				return NULL;
 			}
 
-			if ($suggestor = $this->cache->getCached($identifier, $entityClass, FALSE, $childrenIdentifierList)) {
+			if ($suggestor = $this->cache->getCached($identifier, $entityClass, $hierarchy, $childrenIdentifierList)) {
 				// when no suggestions, even children are ignored, they will be loaded later
 				$suggestions = $suggestor->getSuggestions();
 				if (empty($suggestions)) {
@@ -77,7 +82,7 @@ final class Accessor
 				}
 
 			} else {
-				if ($parent instanceof IEntity && !isset($this->childrenIdentifierList[$identifier->getKey()])) {
+				if ($parent && !isset($this->childrenIdentifierList[$identifier->getKey()])) {
 					$this->cache->cacheChild($parent->getIdentifier(), $entityClass, $sourceParam);
 				}
 				$data = array();
@@ -90,48 +95,69 @@ final class Accessor
 			}
 		}
 
-		return $this->createEntity($entityClass, $id, $data, $identifier);
+		return $this->createEntity($entityClass, $id, $data, $hierarchy);
 	}
 
 
 	/**
 	 * @param array|string $entityClass
 	 * @param IRestrictor|int[] $restrictions
+	 * @param int $maxCount
 	 * @param IOperand $parent
 	 * @param string $sourceParam
-	 * @param int $maxCount
+	 * @param int $sourceId
 	 * @return IEntityContainer
 	 * @throws Exception on wrong restrictions
 	 */
-	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL, $sourceParam = NULL, $maxCount = NULL)
+	public function getByRestrictions($entityClass, $restrictions, $maxCount = NULL, IOperand $parent = NULL, $sourceParam = NULL, $sourceId = NULL)
 	{
 		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
 
-		if (($parent && NULL === $sourceParam) || (NULL !== $sourceParam && !$parent)) {
-			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
+		if (!($parent && NULL !== $sourceId && NULL !== $sourceParam)
+			&& !(!$parent &&  NULL === $sourceId && NULL === $sourceParam)) {
+			throw new Exception('All $parent, $sourceParam and $sourceId must be set or omitted.');
 		}
 
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
+		$parentIdentifier = $parent ? $parent->getIdentifier() : NULL;
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parentIdentifier, $sourceParam);
 
-		// for now only Container child of single Entity works, because exponential (ids under ids) dependencies does not work in DataHolder
-		if ($parent instanceof IEntity && $data = $this->getLoadedData($identifier)) {
-			// $data set
+		if ($parent) {
+			// has been data already loaded?
+			$hierarchy = $parent->getHierarchy()->appendAndCreate($sourceId, $identifier);
+			$data = $this->getLoadedData($hierarchy);
 
+			if (FALSE === $data) {
+				// try to filter loaded data by ids
+				$ids = $this->loadIdsByRestrictions($entityClass, $restrictions, $maxCount);
+				$data = $this->getLoadedData($hierarchy, $ids);
+			}
 		} else {
-			$ids = $this->loadIdsByRestrictions($entityClass, $restrictions, $maxCount);
+			$hierarchy = Hierarchy::create($sourceId, $identifier, TRUE);
+		}
+
+		if (!isset($data) || FALSE === $data) {
+			if (!isset($ids)) {
+				$ids = $this->loadIdsByRestrictions($entityClass, $restrictions, $maxCount);
+			}
 
 			if (empty($ids)) {
 				$data = array();
 
 			} elseif ($suggestor = $this->cache->getCached($identifier, $entityClass, TRUE)) {
-				// todo jakmile bude moct container mít potomky, bude moct mít i suggestor bez sugescí (jako u getByID())
-				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
-				// in current concept EntityContainer CANNOT have children
-				/*if ($dataHolder->hasLoadedChildren()) {
-					$this->saveChildren($dataHolder);
-				}*/
-				$data = $dataHolder->getParams();
-				$this->sortData($ids, $data);
+				// when no suggestions, even children are ignored, they will be loaded later
+				$suggestions = $suggestor->getSuggestions();
+				if (empty($suggestions)) {
+					$data = array();
+
+				} else {
+					$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
+
+					if ($dataHolder->hasLoadedChildren()) {
+						$this->saveChildren($dataHolder);
+					}
+					$data = $dataHolder->getParams();
+					$this->sortData($ids, $data);
+				}
 
 			} else {
 				// todo $mapper->siftIds() (sift = protřídit) místo exists() ? - ale potom možná spouštět sortIds, mapper je může zamíchat
@@ -157,7 +183,7 @@ final class Accessor
 			return array();
 		}
 
-		return $this->createEntityContainer($entityContainerClass, $data, $identifier, $entityClass);
+		return $this->createEntityContainer($entityContainerClass, $data, $identifier, $entityClass, $hierarchy);
 	}
 
 
@@ -214,7 +240,7 @@ final class Accessor
 			$data = $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached)->getParams() + $data;
 		}
 
-		return $this->createEntity($entityClass, $id, $data, $identifier);
+		return $this->createEntity($entityClass, $id, $data, $hierarchy);
 	}
 
 
@@ -309,13 +335,13 @@ final class Accessor
 	 * @param string $entityClass
 	 * @param int $id
 	 * @param array $data
-	 * @param IIdentifier $identifier
+	 * @param Hierarchy $hierarchy
 	 * @return IEntity
 	 * @todo conditional Entities (e.g. unit with vendor HTC creates Entity HtcUnit, but with same identifier as other)
 	 */
-	protected function createEntity($entityClass, $id, array $data, IIdentifier $identifier = NULL)
+	protected function createEntity($entityClass, $id, array $data, Hierarchy $hierarchy = NULL)
 	{
-		return new $entityClass($id, $data, $this, $identifier);
+		return new $entityClass($id, $data, $this, $hierarchy);
 	}
 
 
@@ -324,11 +350,12 @@ final class Accessor
 	 * @param array[] $data
 	 * @param IIdentifier $identifier
 	 * @param string $entityClass
+	 * @param bool[] $hierarchy
 	 * @return IEntityContainer
 	 */
-	protected function createEntityContainer($containerClass, array $data, IIdentifier $identifier, $entityClass)
+	protected function createEntityContainer($containerClass, array $data, IIdentifier $identifier, $entityClass, array $hierarchy = NULL)
 	{
-		return new $containerClass($data, $identifier, $this, $entityClass);
+		return new $containerClass($data, $identifier, $this, $entityClass, $hierarchy);
 	}
 
 
@@ -411,15 +438,62 @@ final class Accessor
 	}
 
 
-	private function getLoadedData(IIdentifier $identifier)
+	/**
+	 * @param IIdentifier $identifier
+	 * @param int[] $path
+	 * @return bool
+	 */
+	private function getLoadedData(IIdentifier $identifier, array $path = NULL)
 	{
 		$key = $identifier->getKey();
+
 		if (isset($this->loadedData[$key])) {
 			$data = $this->loadedData[$key];
+
+			if (NULL !== $path) {
+				$found = $this->findData($data, $path);
+				if (FALSE !== $found) {
+					return $found;
+				}
+			}
+
 			unset($this->loadedData[$key]);
 			return $data;
 		}
 		return FALSE;
+	}
+
+
+	/**
+	 * @param IIdentifier $identifier
+	 * @param int[] $ids
+	 * @return bool
+	 */
+	private function getLoadedDataByIds(IIdentifier $identifier, array $ids)
+	{
+		$key = $identifier->getKey();
+
+		if (isset($this->loadedData[$key])) {
+			$data = $this->loadedData[$key];
+
+			// nothing is unset because some parent operands can have common children
+			returnx array_diff_neboněcotakovýho($ids, $data);
+		}
+		return FALSE;
+	}
+
+
+	private function findData(array $stack, array $path)
+	{
+		foreach ($path as $id) {
+			if (!isset($stack[$id])) {
+				return FALSE;
+			}
+
+			$stack = $stack[$id];
+		}
+
+		return $stack;
 	}
 
 

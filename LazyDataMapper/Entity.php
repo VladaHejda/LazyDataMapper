@@ -26,11 +26,11 @@ abstract class Entity implements IEntity
 	/** @var int */
 	private $id;
 
-	/** @var IIdentifier */
-	private $identifier;
-
 	/** @var IOperand */
-	private $parent;
+	private $source;
+
+	/** @var Hierarchy */
+	private $hierarchy;
 
 	/** @var Accessor */
 	private $accessor;
@@ -61,23 +61,30 @@ abstract class Entity implements IEntity
 	 * @param int|NULL $id
 	 * @param array $params
 	 * @param Accessor $accessor
-	 * @param IIdentifier $identifier
-	 * @param IEntityContainer $parentContainer
+	 * @param IEntityContainer|Hierarchy $hierarchySource
 	 * @throws Exception
 	 */
-	public function __construct($id, array $params, Accessor $accessor, IIdentifier $identifier = NULL, IEntityContainer $parentContainer = NULL)
+	public function __construct($id, array $params, Accessor $accessor, $hierarchySource = NULL)
 	{
 		if (NULL !== $id) {
 			$this->id = (int) $id;
-			if (!$identifier) {
-				throw new Exception("Identifier is required in persistent Entity.");
+
+			if ($hierarchySource instanceof Hierarchy) {
+				$this->hierarchy = $hierarchySource;
+				$this->source = $this;
+
+			} elseif ($hierarchySource instanceof IEntityContainer) {
+				$this->source = $hierarchySource;
+
+			} else {
+				throw new Exception('Hierarchy or IEntityContainer is required in persistent Entity.');
 			}
-			$this->identifier = $identifier;
+
 			$this->persistent = TRUE;
 		}
+
 		$this->params = $params;
 		$this->accessor = $accessor;
-		$this->parent = $parentContainer ?: $this;
 	}
 
 
@@ -86,7 +93,25 @@ abstract class Entity implements IEntity
 	 */
 	public function getIdentifier()
 	{
-		return $this->identifier;
+		if (!$this->persistent) {
+			return NULL;
+		}
+		return $this->getHierarchy()->getIdentifier();
+	}
+
+
+	/**
+	 * @return Hierarchy
+	 */
+	public function getHierarchy()
+	{
+		if (!$this->persistent) {
+			return NULL;
+		}
+		if ($this->hierarchy) {
+			return $this->hierarchy;
+		}
+		return $this->source->getHierarchy();
 	}
 
 
@@ -397,7 +422,12 @@ abstract class Entity implements IEntity
 	 *        int          id of Entity, when not accessible from any source parameter
 	 *        IRestrictor  to get EntityContainer by IRestrictor
 	 *        int[]        array of ids to get EntityContainer by ids range
-	 * @return IOperand
+	 * @return IOperand`
+	 * todo pokud je child už v Accessoru loadnutý, zbytečně to zde bude tvořit restrictor - přeskočit nějak takovýto wrapper?
+	 * todo s předchozim souvisí - wrapper bude getAuto() a jako source param pošle 'car', zatimco v metodě getCar() bude vracet úplně jinýho potomka
+	 *      možná úplně sourceParam vstup zrušit - vždy musí dát ID a sourceParam bude vždy poslední z $this->getting
+	 * todo a taky ochrana aby nebyla get metoda volaná přímo (MUSÍ BÝT PROTECTED - viz getIO) - pak by totiž mohlo být $this->getting prázdný
+	 * todo co má metoda vrátit v NEperzistentní metodě?
 	 */
 	protected function getChild($entityClass = self::SELF, $arg = NULL)
 	{
@@ -407,7 +437,7 @@ abstract class Entity implements IEntity
 
 		// Entity container
 		if (is_array($arg) || $arg instanceof IRestrictor) {
-			return $this->accessor->getByRestrictions($entityClass, $arg, $this->parent, end($this->getting));
+			return $this->accessor->getByRestrictions($entityClass, $arg, NULL, $this->source, end($this->getting), $this->id);
 		}
 
 		// single Entity
@@ -421,11 +451,11 @@ abstract class Entity implements IEntity
 		if (is_numeric($arg)) {
 			$id = $arg;
 			$arg = end($this->getting);
-		// arg = source param
+		// $arg = source param
 		} else {
 			$id = $this->getBase($arg);
 		}
-		return $this->accessor->getById($entityClass, $id, $this->parent, $arg);
+		return $this->accessor->getById($entityClass, $id, $this->source, $arg);
 	}
 
 
