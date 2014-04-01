@@ -6,13 +6,13 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 {
 
 	/** @var ParamMap[] */
-	private $paramMaps = array();
+	protected $paramMaps = array();
 
 	/** @var IMapper[] */
-	private $mappers = array();
+	protected $mappers = array();
 
 	/** @var IChecker[] */
-	private $checkers = array();
+	protected $checkers = array();
 
 
 	/**
@@ -20,7 +20,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return ParamMap
 	 */
-	final public function getParamMap($entityClass)
+	public function getParamMap($entityClass)
 	{
 		$mapName = $this->getParamMapClass($entityClass);
 		if (!isset($this->paramMaps[$mapName])) {
@@ -35,7 +35,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return IMapper
 	 */
-	final public function getMapper($entityClass)
+	public function getMapper($entityClass)
 	{
 		$mapperName = $this->getMapperClass($entityClass);
 		if (!isset($this->mappers[$mapperName])) {
@@ -51,7 +51,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return IChecker|null
 	 */
-	final public function getChecker($entityClass)
+	public function getChecker($entityClass)
 	{
 		$checkerName = $this->getCheckerClass($entityClass);
 		if (!array_key_exists($checkerName, $this->checkers)) {
@@ -66,6 +66,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param Facade $facade
 	 * @return string
 	 * @throws Exception
+	 * @todo work both EntityFacade and Entity\Facade too
 	 */
 	public function getEntityClass(Facade $facade)
 	{
