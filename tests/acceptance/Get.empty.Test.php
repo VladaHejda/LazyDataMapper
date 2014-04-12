@@ -69,7 +69,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	}
 
 
-	public function testContainer()
+	public function testCollection()
 	{
 		list($cache, $facade) = $this->createServices();
 
@@ -86,9 +86,9 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 
 	/**
-	 * @depends testContainer
+	 * @depends testCollection
 	 */
-	public function testCachingContainer(array $services)
+	public function testCachingCollection(array $services)
 	{
 		list($cache, $facade) = $services;
 
@@ -114,7 +114,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	}
 
 
-	public function testContainerUnderSingle()
+	public function testCollectionUnderSingle()
 	{
 		list($cache, $facade) = $this->createServices();
 
@@ -129,9 +129,9 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 
 	/**
-	 * @depends testContainerUnderSingle
+	 * @depends testCollectionUnderSingle
 	 */
-	public function testCachingContainerUnderSingle(array $services)
+	public function testCachingCollectionUnderSingle(array $services)
 	{
 		list(, $facade) = $services;
 

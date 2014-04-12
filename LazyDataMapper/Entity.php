@@ -65,10 +65,10 @@ abstract class Entity implements IEntity
 	 * @param array $params
 	 * @param Accessor $accessor
 	 * @param IIdentifier $identifier
-	 * @param IEntityContainer $parentContainer
+	 * @param IEntityCollection $parentCollection
 	 * @throws Exception
 	 */
-	public function __construct($id, array $params, Accessor $accessor, IIdentifier $identifier = NULL, IEntityContainer $parentContainer = NULL)
+	public function __construct($id, array $params, Accessor $accessor, IIdentifier $identifier = NULL, IEntityCollection $parentCollection = NULL)
 	{
 		if (NULL !== $id) {
 			$this->id = (int) $id;
@@ -80,7 +80,7 @@ abstract class Entity implements IEntity
 		}
 		$this->params = $params;
 		$this->accessor = $accessor;
-		$this->parent = $parentContainer ?: $this;
+		$this->parent = $parentCollection ?: $this;
 	}
 
 
@@ -398,8 +398,8 @@ abstract class Entity implements IEntity
 	 * @param mixed $arg
 	 *        NULL         id of child Entity in current base parameter
 	 *        int          id of child Entity
-	 *        IRestrictor  to get EntityContainer by IRestrictor
-	 *        int[]        array of ids to get EntityContainer by ids range
+	 *        IRestrictor  to get EntityCollection by IRestrictor
+	 *        int[]        array of ids to get EntityCollection by ids range
 	 * @return IOperand
 	 * todo pokud je child už v Accessoru loadnutý, zbytečně to zde bude tvořit restrictor - přeskočit nějak takovýto wrapper?
 	 * todo a taky ochrana aby nebyla get metoda volaná přímo (MUSÍ BÝT PROTECTED - viz getIO) - pak by totiž mohlo být $this->getting prázdný
@@ -411,7 +411,7 @@ abstract class Entity implements IEntity
 			$entityClass = get_class($this);
 		}
 
-		// Entity container
+		// Entity collection
 		if (is_array($arg) || $arg instanceof IRestrictor) {
 			return $this->accessor->getByRestrictions($entityClass, $arg, $this->parent, end($this->getting));
 		}

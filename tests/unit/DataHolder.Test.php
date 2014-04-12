@@ -23,7 +23,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 		->getMock();
 
 		$suggestor = \Mockery::mock('LazyDataMapper\Suggestor')
-			->shouldReceive('isContainer')
+			->shouldReceive('isCollection')
 			->andReturn(FALSE)
 		->getMock()
 			->shouldReceive('getSuggestions')
@@ -61,10 +61,10 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testContainer()
+	public function testCollection()
 	{
 		$suggestor = \Mockery::mock('LazyDataMapper\Suggestor')
-			->shouldReceive('isContainer')
+			->shouldReceive('isCollection')
 			->andReturn(TRUE)
 		->getMock()
 			->shouldReceive('getSuggestions')
@@ -142,7 +142,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 		->getMock();
 
 		$suggestor = \Mockery::mock('LazyDataMapper\Suggestor')
-			->shouldReceive('isContainer')
+			->shouldReceive('isCollection')
 			->andReturn(FALSE)
 		->getMock()
 			->shouldReceive('getParamMap')
@@ -179,7 +179,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testContainerGroupedMap()
+	public function testCollectionGroupedMap()
 	{
 		$map = [
 			'personal' => ['name', 'age'],
@@ -209,7 +209,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 		->getMock();
 
 		$suggestor = \Mockery::mock('LazyDataMapper\Suggestor')
-			->shouldReceive('isContainer')
+			->shouldReceive('isCollection')
 			->andReturn(TRUE)
 		->getMock()
 			->shouldReceive('getParamMap')

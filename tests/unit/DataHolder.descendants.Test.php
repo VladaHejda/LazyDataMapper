@@ -12,7 +12,7 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 	{
 		$suggestor = \Mockery::mock('LazyDataMapper\Suggestor');
 		$suggestor
-			->shouldReceive('isContainer')
+			->shouldReceive('isCollection')
 			->andReturn(FALSE)
 		->getMock()
 			->shouldReceive('getChild')
@@ -23,11 +23,11 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 
 		$children = [
 			'car' => \Mockery::mock('LazyDataMapper\Suggestor')
-					->shouldReceive('isContainer')
+					->shouldReceive('isCollection')
 					->andReturn(FALSE)
 					->getMock(),
 			'drivers' => \Mockery::mock('LazyDataMapper\Suggestor')
-					->shouldReceive('isContainer')
+					->shouldReceive('isCollection')
 					->andReturn(TRUE)
 					->getMock(),
 		];

@@ -38,7 +38,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 
 		$this->assertSame($this->identifier, $suggestor->getIdentifier());
 		$this->assertSame($this->paramMap, $suggestor->getParamMap());
-		$this->assertFalse($suggestor->isContainer());
+		$this->assertFalse($suggestor->isCollection());
 		$this->assertFalse($suggestor->hasChildren());
 		$this->assertEquals(['name', 'age'], $suggestor->getSuggestions());
 
@@ -53,11 +53,11 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testContainer()
+	public function testCollection()
 	{
 		$suggestor = new Suggestor($this->paramMap, $this->suggestorCache, ['name', 'age'], TRUE);
 
-		$this->assertTrue($suggestor->isContainer());
+		$this->assertTrue($suggestor->isCollection());
 		$this->assertFalse($suggestor->hasChildren());
 	}
 
@@ -74,7 +74,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 		];
 		$suggestor = new Suggestor($this->paramMap, $this->suggestorCache, ['name', 'age'], FALSE, NULL, $children);
 
-		$this->assertFalse($suggestor->isContainer());
+		$this->assertFalse($suggestor->isCollection());
 		$this->assertTrue($suggestor->hasChildren());
 	}
 

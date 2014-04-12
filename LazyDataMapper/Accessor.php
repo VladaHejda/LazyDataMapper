@@ -100,12 +100,12 @@ final class Accessor
 	 * @param IOperand $parent
 	 * @param string $sourceParam
 	 * @param int $maxCount
-	 * @return IEntityContainer
+	 * @return IEntityCollection
 	 * @throws Exception on wrong restrictions
 	 */
 	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL, $sourceParam = NULL, $maxCount = NULL)
 	{
-		list($entityClass, $entityContainerClass) = $this->extractEntityClasses($entityClass);
+		list($entityClass, $EntityCollectionClass) = $this->extractEntityClasses($entityClass);
 
 		if (($parent && NULL === $sourceParam) || (NULL !== $sourceParam && !$parent)) {
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
@@ -113,7 +113,7 @@ final class Accessor
 
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
 
-		// for now only Container child of single Entity works, because exponential (ids under ids) dependencies does not work in DataHolder
+		// for now only Collection child of single Entity works, because exponential (ids under ids) dependencies does not work in DataHolder
 		if ($parent instanceof IEntity && $data = $this->getLoadedData($identifier)) {
 			// $data set
 
@@ -124,9 +124,9 @@ final class Accessor
 				$data = array();
 
 			} elseif ($suggestor = $this->cache->getCached($identifier, $entityClass, TRUE)) {
-				// todo jakmile bude moct container mít potomky, bude moct mít i suggestor bez sugescí (jako u getByID())
+				// todo jakmile bude moct collection mít potomky, bude moct mít i suggestor bez sugescí (jako u getByID())
 				$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
-				// in current concept EntityContainer CANNOT have children
+				// in current concept EntityCollection CANNOT have children
 				/*if ($dataHolder->hasLoadedChildren()) {
 					$this->saveChildren($dataHolder);
 				}*/
@@ -157,7 +157,7 @@ final class Accessor
 			return array();
 		}
 
-		return $this->createEntityContainer($entityContainerClass, $data, $identifier, $entityClass);
+		return $this->createEntityCollection($EntityCollectionClass, $data, $identifier, $entityClass);
 	}
 
 
@@ -320,15 +320,15 @@ final class Accessor
 
 
 	/**
-	 * @param string $containerClass
+	 * @param string $collectionClass
 	 * @param array[] $data
 	 * @param IIdentifier $identifier
 	 * @param string $entityClass
-	 * @return IEntityContainer
+	 * @return IEntityCollection
 	 */
-	protected function createEntityContainer($containerClass, array $data, IIdentifier $identifier, $entityClass)
+	protected function createEntityCollection($collectionClass, array $data, IIdentifier $identifier, $entityClass)
 	{
-		return new $containerClass($data, $identifier, $this, $entityClass);
+		return new $collectionClass($data, $identifier, $this, $entityClass);
 	}
 
 
@@ -392,9 +392,9 @@ final class Accessor
 	 */
 	private function loadDataHolderByMapper($entityClass, $id, Suggestor $suggestor, $maxCount = NULL)
 	{
-		$isContainer = is_array($id);
+		$isCollecion = is_array($id);
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
-		if ($isContainer) {
+		if ($isCollecion) {
 			$m = 'getByIdsRange';
 			$datHolder = new DataHolder($suggestor, $id);
 			$dataHolder = $mapper->getByIdsRange($id, $suggestor, $datHolder, $maxCount);
@@ -479,6 +479,7 @@ final class Accessor
 	 */
 	private function extractEntityClasses($entityClass)
 	{
-		return is_array($entityClass) ? $entityClass : array($entityClass, $this->serviceAccessor->getEntityContainerClass($entityClass));
+		// todo getEntityCollectionClass by mělo brát ve facadě, ne tady (ve facadě to vezme JEDNOU, zde pokaždý!)
+		return is_array($entityClass) ? $entityClass : array($entityClass, $this->serviceAccessor->getEntityCollectionClass($entityClass));
 	}
 }

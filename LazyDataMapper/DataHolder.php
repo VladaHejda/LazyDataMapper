@@ -23,7 +23,7 @@ class DataHolder implements \Iterator
 
 	/**
 	 * @param Suggestor $suggestor
-	 * @param int[] $ids for container holder
+	 * @param int[] $ids for collection holder
 	 * @throws Exception
 	 * @todo co když $ids bude prázdný array (resp. mapper zjistí že žádní potomci nejsou)
 	 */
@@ -44,8 +44,8 @@ class DataHolder implements \Iterator
 	 */
 	public function setIds(array $ids)
 	{
-		if (!$this->suggestor->isContainer()) {
-			throw new Exception('Ids can be set only for Container DataHolder.');
+		if (!$this->suggestor->isCollection()) {
+			throw new Exception('Ids can be set only for Collection DataHolder.');
 		}
 
 		if (NULL !== $this->ids) {
@@ -58,20 +58,20 @@ class DataHolder implements \Iterator
 
 
 	/**
-	 * @param array|array[] $params array for one; array of arrays for container, indexed by id
+	 * @param array|array[] $params array for one; array of arrays for collection, indexed by id
 	 * @return self
 	 * @throws Exception on not suggested/unknown parameter
 	 * @throws Exception on unknown id
 	 */
 	public function setParams(array $params)
 	{
-		if (NULL === $this->ids && $this->suggestor->isContainer()) {
-			throw new Exception('This DataHolder is Container and you did not set ids yet. Use method setIds().');
+		if (NULL === $this->ids && $this->suggestor->isCollection()) {
+			throw new Exception('This DataHolder is Collection and you did not set ids yet. Use method setIds().');
 		}
 
 		$suggestions = array_fill_keys($this->suggestor->getSuggestions(), TRUE);
 
-		if ($this->suggestor->isContainer()) {
+		if ($this->suggestor->isCollection()) {
 			if ($diff = array_diff(array_keys($params), $this->ids)) {
 				if (is_int(current($diff))){
 					throw new Exception('Invalid ids: ' . implode(', ', $diff) . '.');
@@ -106,12 +106,12 @@ class DataHolder implements \Iterator
 		}
 
 		$map = $this->suggestor->getParamMap()->getMap($group);
-		if ($this->suggestor->isContainer()) {
-			$containerMap = array();
+		if ($this->suggestor->isCollection()) {
+			$collectionMap = array();
 			foreach ($this->params as $id => $params) {
-				$containerMap[$id] = $this->fillMap($map, $params);
+				$collectionMap[$id] = $this->fillMap($map, $params);
 			}
-			return $containerMap;
+			return $collectionMap;
 		}
 		return $this->fillMap($map, $this->params);
 	}
@@ -125,7 +125,7 @@ class DataHolder implements \Iterator
 	public function isDataInGroup($group)
 	{
 		$map = $this->suggestor->getParamMap()->getMap($group, FALSE);
-		if ($this->suggestor->isContainer()) {
+		if ($this->suggestor->isCollection()) {
 			foreach ($this->params as $params) {
 				$isDataInGroup = (bool) array_intersect(array_keys($params), $map);
 				if ($isDataInGroup) {

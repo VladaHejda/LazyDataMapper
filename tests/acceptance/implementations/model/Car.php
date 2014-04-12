@@ -162,7 +162,7 @@ class Car extends LazyDataMapper\Entity
 }
 
 
-class Cars extends LazyDataMapper\EntityContainer
+class Cars extends LazyDataMapper\EntityCollection
 {
 
 	protected function getPrice()

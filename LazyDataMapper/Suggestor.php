@@ -24,18 +24,18 @@ class Suggestor implements \Iterator
 	protected $children;
 
 	/** @var bool */
-	protected $isContainer;
+	protected $isCollection;
 
 
 	/**
 	 * @param ParamMap $paramMap
 	 * @param SuggestorCache $cache
 	 * @param array $suggestions
-	 * @param bool $isContainer
+	 * @param bool $isCollection
 	 * @param IIdentifier $identifier
 	 * @param array $children entityClass => IIdentifier
 	 */
-	public function __construct(ParamMap $paramMap, SuggestorCache $cache, array $suggestions, $isContainer = FALSE, IIdentifier $identifier = NULL, array $children = array())
+	public function __construct(ParamMap $paramMap, SuggestorCache $cache, array $suggestions, $isCollection = FALSE, IIdentifier $identifier = NULL, array $children = array())
 	{
 		$this->paramMap = $paramMap;
 		$this->cache = $cache;
@@ -43,7 +43,7 @@ class Suggestor implements \Iterator
 		$this->suggestions = $suggestions;
 		$this->identifier = $identifier;
 		$this->children = $children;
-		$this->isContainer = $isContainer;
+		$this->isCollection = $isCollection;
 	}
 
 
@@ -92,9 +92,9 @@ class Suggestor implements \Iterator
 	/**
 	 * @return bool
 	 */
-	public function isContainer()
+	public function isCollection()
 	{
-		return $this->isContainer;
+		return $this->isCollection;
 	}
 
 
@@ -124,9 +124,9 @@ class Suggestor implements \Iterator
 			return $this->children[$sourceParam];
 		}
 
-		list($entityClass, $isContainer, $identifier) = $this->children[$sourceParam];
+		list($entityClass, $isCollection, $identifier) = $this->children[$sourceParam];
 
-		$child = $this->loadChild($identifier, $entityClass, $isContainer);
+		$child = $this->loadChild($identifier, $entityClass, $isCollection);
 		if (!$child) {
 			unset($this->children[$sourceParam]);
 			return NULL;
@@ -163,8 +163,8 @@ class Suggestor implements \Iterator
 			return TRUE;
 		}
 
-		list($entityClass, $isContainer, $identifier) = $current;
-		$child = $this->loadChild($identifier, $entityClass, $isContainer);
+		list($entityClass, $isCollection, $identifier) = $current;
+		$child = $this->loadChild($identifier, $entityClass, $isCollection);
 		$key = key($this->children);
 
 		// child have nothing cached
@@ -220,9 +220,9 @@ class Suggestor implements \Iterator
 	}
 
 
-	protected function loadChild(IIdentifier $identifier, $entityClass, $isContainer)
+	protected function loadChild(IIdentifier $identifier, $entityClass, $isCollection)
 	{
-		return $this->cache->getCached($identifier, $entityClass, $isContainer);
+		return $this->cache->getCached($identifier, $entityClass, $isCollection);
 	}
 
 

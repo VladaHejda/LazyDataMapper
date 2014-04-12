@@ -20,10 +20,10 @@ class Test extends LazyDataMapper\Tests\TestCase
 	}
 
 
-	public function testGetEntityContainerClass()
+	public function testGetEntityCollectionClass()
 	{
-		$this->assertEquals('worlds', $this->serviceAccessor->getEntityContainerClass('world'));
-		$this->assertEquals('stories', $this->serviceAccessor->getEntityContainerClass('story'));
+		$this->assertEquals('worlds', $this->serviceAccessor->getEntityCollectionClass('world'));
+		$this->assertEquals('stories', $this->serviceAccessor->getEntityCollectionClass('story'));
 	}
 
 

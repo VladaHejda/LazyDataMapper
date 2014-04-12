@@ -11,7 +11,7 @@ use LazyDataMapper,
 require_once __DIR__ . '/implementations/model/Car.php';
 require_once __DIR__ . '/implementations/model/Driver.php';
 
-class ContainerChildTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class CollectionChildTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()

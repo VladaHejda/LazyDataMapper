@@ -25,5 +25,5 @@ similar.*
 - [Entity reading](DOC/3.Entity-reading.md)
 - [Entity modifying](DOC/4.Entity-modifying.md)
 - [Entity creation and remove](DOC/5.Entity-creation-and-remove.md)
-- [EntityContainer](DOC/6.EntityContainer.md)
+- [EntityCollection](DOC/6.EntityCollection.md)
 - [Restrictors](DOC/7.Restrictors.md)

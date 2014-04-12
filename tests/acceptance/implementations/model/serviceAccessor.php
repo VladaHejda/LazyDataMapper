@@ -38,8 +38,8 @@ class ServiceAccessor extends LazyDataMapper\EntityServiceAccessor
 	}
 
 
-	public function composeIdentifier($entityClass, $isContainer = FALSE, LazyDataMapper\IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	public function composeIdentifier($entityClass, $isCollection = FALSE, LazyDataMapper\IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
-		return new ResettableIdentifier($entityClass, $isContainer, $parentIdentifier, $sourceParam);
+		return new ResettableIdentifier($entityClass, $isCollection, $parentIdentifier, $sourceParam);
 	}
 }

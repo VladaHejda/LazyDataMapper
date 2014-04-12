@@ -84,7 +84,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param string $entityClass
 	 * @return string
 	 */
-	public function getEntityContainerClass($entityClass)
+	public function getEntityCollectionClass($entityClass)
 	{
 		$len = strlen($entityClass);
 		if ('y' === $entityClass[$len-1]) {
@@ -97,14 +97,14 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 	/**
 	 * @param string $entityClass
-	 * @param bool $isContainer
+	 * @param bool $isCollection
 	 * @param IIdentifier $parentIdentifier
 	 * @param string $sourceParam
 	 * @return IIdentifier
 	 */
-	public function composeIdentifier($entityClass, $isContainer = FALSE, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	public function composeIdentifier($entityClass, $isCollection = FALSE, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
-		return new Identifier($entityClass, $isContainer, $parentIdentifier, $sourceParam);
+		return new Identifier($entityClass, $isCollection, $parentIdentifier, $sourceParam);
 	}
 
 

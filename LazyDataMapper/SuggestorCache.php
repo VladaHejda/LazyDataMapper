@@ -75,10 +75,10 @@ class SuggestorCache
 	 * @param IIdentifier $identifier
 	 * @param string $childEntityClass
 	 * @param string $sourceParam
-	 * @param bool $isContainer
+	 * @param bool $isCollection
 	 * @return void
 	 */
-	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, $isContainer = FALSE)
+	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, $isCollection = FALSE)
 	{
 		$key = $this->key . $identifier->getKey();
 		$cached = $this->externalCache->load($key);
@@ -103,7 +103,7 @@ class SuggestorCache
 			return;
 		}
 
-		$cachedShortcut[$sourceParam] = array($childEntityClass, $isContainer);
+		$cachedShortcut[$sourceParam] = array($childEntityClass, $isCollection);
 		$this->externalCache->save($key, $cached);
 	}
 
@@ -112,11 +112,11 @@ class SuggestorCache
 	 * Gets all cached suggestions under one identifier or NULL when nothing cached.
 	 * @param IIdentifier $identifier
 	 * @param string $entityClass
-	 * @param bool $isContainer
+	 * @param bool $isCollection
 	 * @param array $childrenIdentifierList
 	 * @return Suggestor
 	 */
-	public function getCached(IIdentifier $identifier, $entityClass, $isContainer = FALSE, &$childrenIdentifierList = NULL)
+	public function getCached(IIdentifier $identifier, $entityClass, $isCollection = FALSE, &$childrenIdentifierList = NULL)
 	{
 		$childrenIdentifierList = array();
 
@@ -147,7 +147,7 @@ class SuggestorCache
 			$childrenIdentifierList[] = $childIdentifier->getKey();
 		}
 		$map = $this->serviceAccessor->getParamMap($entityClass);
-		return $this->createSuggestor($map, $identifier, $suggestions, $children, $isContainer);
+		return $this->createSuggestor($map, $identifier, $suggestions, $children, $isCollection);
 	}
 
 
@@ -156,12 +156,12 @@ class SuggestorCache
 	 * @param IIdentifier $identifier
 	 * @param array $suggestions
 	 * @param array $children
-	 * @param bool $isContainer
+	 * @param bool $isCollection
 	 * @return Suggestor
 	 */
-	protected function createSuggestor(ParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $children = array(), $isContainer = FALSE)
+	protected function createSuggestor(ParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $children = array(), $isCollection = FALSE)
 	{
-		return new Suggestor($paramMap, $this, $suggestions, $isContainer, $identifier, $children);
+		return new Suggestor($paramMap, $this, $suggestions, $isCollection, $identifier, $children);
 	}
 
 

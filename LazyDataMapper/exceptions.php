@@ -11,7 +11,7 @@ class Exception extends \Exception
 
 
 /**
- * Exception thrown by Entity / EntityContainer.
+ * Exception thrown by Entity / EntityCollection.
  */
 class EntityException extends \Exception
 {

@@ -51,12 +51,12 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 			if ($sourceParam === 'car') {
 				$this->assertFalse($child->hasChildren());
 				$this->assertSame($children['car'][2], $child->getIdentifier());
-				$this->assertFalse($child->isContainer());
+				$this->assertFalse($child->isCollection());
 
 			} elseif ($sourceParam === 'drivers') {
 				$this->assertFalse($child->hasChildren());
 				$this->assertSame($children['drivers'][2], $child->getIdentifier());
-				$this->assertTrue($child->isContainer());
+				$this->assertTrue($child->isCollection());
 
 			} else {
 				$this->fail("Unexpected source parameter '$sourceParam'.");
@@ -84,12 +84,12 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 		$this->assertInstanceOf('LazyDataMapper\Suggestor', $suggestor->car);
 		$this->assertFalse($suggestor->car->hasChildren());
 		$this->assertSame($children['car'][2], $suggestor->car->getIdentifier());
-		$this->assertFalse($suggestor->car->isContainer());
+		$this->assertFalse($suggestor->car->isCollection());
 
 		$this->assertInstanceOf('LazyDataMapper\Suggestor', $suggestor->drivers);
 		$this->assertFalse($suggestor->drivers->hasChildren());
 		$this->assertSame($children['drivers'][2], $suggestor->drivers->getIdentifier());
-		$this->assertTrue($suggestor->drivers->isContainer());
+		$this->assertTrue($suggestor->drivers->isCollection());
 
 		// "fake" has nothing suggested
 		$this->assertNull($suggestor->fake);

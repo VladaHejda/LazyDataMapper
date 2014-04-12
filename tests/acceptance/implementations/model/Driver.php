@@ -52,7 +52,7 @@ class DriverFacade extends LazyDataMapper\Facade
 }
 
 
-class Drivers extends LazyDataMapper\EntityContainer
+class Drivers extends LazyDataMapper\EntityCollection
 {
 }
 

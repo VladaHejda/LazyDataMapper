@@ -51,7 +51,7 @@ class HierarchyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 	}
 
 
-	public function testEntityUnderContainer()
+	public function testEntityUnderCollection()
 	{
 		$requestKey = new LazyDataMapper\RequestKey;
 		$cache = new Tests\Cache\SimpleCache;
@@ -69,9 +69,9 @@ class HierarchyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 
 	/**
-	 * @depends testEntityUnderContainer
+	 * @depends testEntityUnderCollection
 	 */
-	public function testCachingEntityUnderContainer(array $services)
+	public function testCachingEntityUnderCollection(array $services)
 	{
 		list($cache, $facade) = $services;
 

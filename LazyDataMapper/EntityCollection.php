@@ -2,7 +2,7 @@
 
 namespace LazyDataMapper;
 
-abstract class EntityContainer implements IEntityContainer
+abstract class EntityCollection implements IEntityCollection
 {
 
 	/** @var IIdentifier */

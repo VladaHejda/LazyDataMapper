@@ -17,7 +17,7 @@ class Race extends LazyDataMapper\Entity
 }
 
 
-class Races extends LazyDataMapper\EntityContainer
+class Races extends LazyDataMapper\EntityCollection
 {
 }
 

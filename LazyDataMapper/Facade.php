@@ -3,11 +3,11 @@
 namespace LazyDataMapper;
 
 /**
- * Outer cover for getting operands (Entity or EntityContainer).
- * There are two ways of determining Entity / EntityContainer classname:
+ * Outer cover for getting operands (Entity or EntityCollection).
+ * There are two ways of determining Entity / EntityCollection classname:
  * - override property $entityClass in the child of this class due to the array pattern:
- *   [<EntityClassname>, <EntityContainerClassname>]
- * - apply solution in IEntityServiceAccessor method getEntityClass() and getEntityContainerClass().
+ *   [<EntityClassname>, <EntityCollectionClassname>]
+ * - apply solution in IEntityServiceAccessor method getEntityClass() and getEntityCollectionClass().
  *   There is some default solution.
  */
 abstract class Facade
@@ -53,7 +53,7 @@ abstract class Facade
 
 	/**
 	 * @param int[] $ids
-	 * @return IEntityContainer
+	 * @return IEntityCollection
 	 */
 	public function getByIdsRange(array $ids)
 	{
@@ -64,7 +64,7 @@ abstract class Facade
 	/**
 	 * @param IRestrictor $restrictor
 	 * @param int $maxCount
-	 * @return IEntityContainer
+	 * @return IEntityCollection
 	 */
 	public function getByRestrictions(IRestrictor $restrictor, $maxCount = 100)
 	{

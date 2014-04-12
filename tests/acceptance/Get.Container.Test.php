@@ -1,6 +1,6 @@
 <?php
 
-namespace LazyDataMapper\Tests\GetContainer;
+namespace LazyDataMapper\Tests\GetCollection;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests;
