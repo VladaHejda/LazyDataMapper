@@ -56,6 +56,9 @@ abstract class Entity implements IEntity
 	/** @var array classes getters and setters */
 	private static $IO = array();
 
+	/** @var array */
+	private static $internalIO;
+
 
 	/**
 	 * @param int|NULL $id
@@ -393,11 +396,14 @@ abstract class Entity implements IEntity
 	/**
 	 * @param string|int $entityClass or self::SELF to get child of same class
 	 * @param mixed $arg
-	 *        string       source parameter to get id of child Entity
-	 *        int          id of Entity, when not accessible from any source parameter
+	 *        NULL         id of child Entity in current base parameter
+	 *        int          id of child Entity
 	 *        IRestrictor  to get EntityContainer by IRestrictor
 	 *        int[]        array of ids to get EntityContainer by ids range
 	 * @return IOperand
+	 * todo pokud je child už v Accessoru loadnutý, zbytečně to zde bude tvořit restrictor - přeskočit nějak takovýto wrapper?
+	 * todo a taky ochrana aby nebyla get metoda volaná přímo (MUSÍ BÝT PROTECTED - viz getIO) - pak by totiž mohlo být $this->getting prázdný
+	 * todo co má metoda vrátit v NEperzistentní entitě?
 	 */
 	protected function getChild($entityClass = self::SELF, $arg = NULL)
 	{
@@ -412,19 +418,15 @@ abstract class Entity implements IEntity
 
 		// single Entity
 
-		// source param = currently taken param
 		if (NULL === $arg) {
+			$arg = end($this->getting);
+			$id = $this->getBase($arg);
+		} else {
+			// $arg = id
+			$id = $arg;
 			$arg = end($this->getting);
 		}
 
-		// $arg = id
-		if (is_numeric($arg)) {
-			$id = $arg;
-			$arg = end($this->getting);
-		// arg = source param
-		} else {
-			$id = $this->getBase($arg);
-		}
 		return $this->accessor->getById($entityClass, $id, $this->parent, $arg);
 	}
 
@@ -601,7 +603,7 @@ abstract class Entity implements IEntity
 
 	/**
 	 * Loads wrappers and unwrappers.
-	 * @todo ignore internal IO (e.g. this method)
+	 * @todo control if wrapper/unwrapper is protected?
 	 */
 	private function getIO()
 	{
@@ -614,7 +616,19 @@ abstract class Entity implements IEntity
 				'unwrappers' => array(),
 			);
 
+			if (!self::$internalIO) {
+				self::$internalIO = array();
+				foreach (get_class_methods(__CLASS__) as $m) {
+					if (0 === strpos($m, 'get') || 0 === strpos($m, 'set')) {
+						self::$internalIO[] = $m;
+					}
+				}
+			}
+
 			foreach (get_class_methods($class) as $m) {
+				if (in_array($m, self::$internalIO)) {
+					continue;
+				}
 				if (0 === strpos($m, 'get')) {
 					self::$IO[$class]->wrappers[strtolower($m[3]) . substr($m, 4)] = TRUE;
 
