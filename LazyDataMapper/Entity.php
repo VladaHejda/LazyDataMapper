@@ -477,7 +477,7 @@ abstract class Entity implements IEntity
 	 * @param string $param
 	 * @param mixed $value
 	 */
-	protected function setReadOnlyOrPrivate($param, $value)
+	protected function setImmutable($param, $value)
 	{
 		$this->setVar($param, $value, FALSE);
 	}

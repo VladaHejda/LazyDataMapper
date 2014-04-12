@@ -125,7 +125,7 @@ class Car extends LazyDataMapper\Entity
 		$separator = strpos($title, ' ');
 		$brand = substr($title, 0, $separator);
 		$name = substr($title, $separator +1);
-		$this->setReadOnlyOrPrivate('brand', $brand);
+		$this->setImmutable('brand', $brand);
 		$this->name = $name;
 	}
 
@@ -144,20 +144,20 @@ class Car extends LazyDataMapper\Entity
 	{
 		$engine = explode('|', $this->getBase('engine'));
 		$volume = $volume  * $engine[0];
-		$this->setReadOnlyOrPrivate('engine', "$engine[0]|$volume");
+		$this->setImmutable('engine', "$engine[0]|$volume");
 	}
 
 
 	protected function setVendor($vendor)
 	{
-		$this->setReadOnlyOrPrivate('brand', $vendor);
+		$this->setImmutable('brand', $vendor);
 	}
 
 
 	public function addRepair()
 	{
 		$repairs = $this->getBase('repairs');
-		$this->setReadOnlyOrPrivate('repairs', $repairs +1);
+		$this->setImmutable('repairs', $repairs +1);
 	}
 }
 
