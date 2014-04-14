@@ -26,4 +26,4 @@ similar.*
 - [Entity modifying](DOC/4.Entity-modifying.md)
 - [Entity creation and removal](DOC/5.Entity-creation-and-removal.md)
 - [EntityCollection](DOC/6.EntityCollection.md)
-- [Restrictors](DOC/7.Restrictors.md)
+- [Restrictor](DOC/7.Restrictor.md)
