@@ -24,6 +24,6 @@ similar.*
 - [Classname conventions and customization](DOC/2.Classname-conventions-and-customization.md)
 - [Entity reading](DOC/3.Entity-reading.md)
 - [Entity modifying](DOC/4.Entity-modifying.md)
-- [Entity creation and remove](DOC/5.Entity-creation-and-remove.md)
+- [Entity creation and removal](DOC/5.Entity-creation-and-removal.md)
 - [EntityCollection](DOC/6.EntityCollection.md)
 - [Restrictors](DOC/7.Restrictors.md)
