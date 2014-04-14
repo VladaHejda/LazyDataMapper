@@ -27,3 +27,4 @@ similar.*
 - [Entity creation and removal](DOC/5.Entity-creation-and-removal.md)
 - [EntityCollection](DOC/6.EntityCollection.md)
 - [Restrictor](DOC/7.Restrictor.md)
+- [Aggregating data queries](DOC/8.Aggregating-data-queries.md)

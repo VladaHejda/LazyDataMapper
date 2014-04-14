@@ -2,6 +2,10 @@
 
 namespace LazyDataMapper;
 
+/**
+ * @todo probably it should be better that default RequestKey does not take into account query string
+ * // předělat to, v doc píšu že to tak je
+ */
 class RequestKey implements IRequestKey
 {
 
@@ -33,6 +37,8 @@ class RequestKey implements IRequestKey
 		if (!empty($extra)) {
 			$input .= $extra;
 		}
-		return substr(md5($input), 8, 16);
+
+		// hashing (md5, etc.) is not necessary
+		return $input;
 	}
 }
