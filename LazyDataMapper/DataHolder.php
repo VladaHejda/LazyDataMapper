@@ -4,6 +4,7 @@ namespace LazyDataMapper;
 
 /**
  * Based on Suggestor gains data from Mapper and gives data to Mapper's method save() and create().
+ * @todo rename "params" to "data"
  */
 class DataHolder implements \Iterator
 {

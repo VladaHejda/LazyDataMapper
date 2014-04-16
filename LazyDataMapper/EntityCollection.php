@@ -48,7 +48,7 @@ abstract class EntityCollection implements IEntityCollection
 				$count = count($params);
 
 			} elseif (count($params) != $count) {
-				throw new Exception(get_class($this) . ': One member of data nested array has different count of params.');
+				throw new Exception(get_class($this) . ': One member of data nested array has different count of parameters.');
 			}
 		}
 

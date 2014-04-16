@@ -41,6 +41,7 @@ class SuggestorCache
 	 * @param string $paramName
 	 * @param string $entityClass
 	 * @return Suggestor with one suggestion of cached parameter name
+	 * @todo rename to cacheSuggestion
 	 */
 	public function cacheParamName(IIdentifier $identifier, $paramName, $entityClass)
 	{
@@ -58,15 +59,13 @@ class SuggestorCache
 			$this->checkCache($cached[self::PARAM_NAMES]);
 		}
 
-		$map = $this->serviceAccessor->getParamMap($entityClass);
-		$suggestor = $this->createSuggestor($map, $identifier, array($paramName));
-
 		if (!in_array($paramName, $cached[self::PARAM_NAMES])) {
 			$cached[self::PARAM_NAMES][] = $paramName;
 			$this->externalCache->save($key, $cached);
 		}
 
-		return $suggestor;
+		$map = $this->serviceAccessor->getParamMap($entityClass);
+		return $this->createSuggestor($map, $identifier, array($paramName));
 	}
 
 
@@ -140,6 +139,7 @@ class SuggestorCache
 			$children = $cached[self::DESCENDANTS];
 		}
 
+		// todo toto by mohlo být přesunuto do Suggestoru, ale ten by potom potřeboval serviceAccessor.
 		foreach ($children as $sourceParam => &$child) {
 			// todo check count $this->checkCache($child, 2);
 			$this->checkCache($child);

@@ -3,7 +3,7 @@
 namespace LazyDataMapper;
 
 /**
- * The main class leading all dependencies. Everything there is controlled by internally.
+ * The main class leading all dependencies. Everything there is controlled internally.
  * @todo baseNamespace setting? It could be for example AppName\Entities - will be added during new instance creating, but not stored to cache
  */
 final class Accessor
@@ -392,9 +392,9 @@ final class Accessor
 	 */
 	private function loadDataHolderByMapper($entityClass, $id, Suggestor $suggestor, $maxCount = NULL)
 	{
-		$isCollecion = is_array($id);
+		$isCollection = is_array($id);
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
-		if ($isCollecion) {
+		if ($isCollection) {
 			$m = 'getByIdsRange';
 			$datHolder = new DataHolder($suggestor, $id);
 			$dataHolder = $mapper->getByIdsRange($id, $suggestor, $datHolder, $maxCount);

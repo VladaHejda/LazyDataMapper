@@ -18,7 +18,7 @@ class SuggestorHelpers
 
 
 	/**
-	 * Encapsulates parameter names into 'column', 'another_column' ...
+	 * Encapsulates parameter names into 'parameter', 'another_parameter' ...
 	 */
 	static function wrapParams(array $paramNames)
 	{
