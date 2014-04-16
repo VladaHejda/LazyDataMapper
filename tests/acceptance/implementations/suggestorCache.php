@@ -7,21 +7,21 @@ use LazyDataMapper\IIdentifier;
 class SuggestorCache extends \LazyDataMapper\SuggestorCache
 {
 
-	static $calledCacheParamName, $calledCacheChild, $calledGetCached;
+	static $calledCacheSuggestion, $calledCacheChild, $calledGetCached;
 
 
 	public static function resetCounters()
 	{
-		self::$calledCacheParamName = 0;
+		self::$calledCacheSuggestion = 0;
 		self::$calledCacheChild = 0;
 		self::$calledGetCached = 0;
 	}
 
 
-	public function cacheParamName(IIdentifier $identifier, $paramName, $entityClass)
+	public function cacheSuggestion(IIdentifier $identifier, $paramName, $entityClass)
 	{
-		++self::$calledCacheParamName;
-		return parent::cacheParamName($identifier, $paramName, $entityClass);
+		++self::$calledCacheSuggestion;
+		return parent::cacheSuggestion($identifier, $paramName, $entityClass);
 	}
 
 

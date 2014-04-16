@@ -73,6 +73,6 @@ class SeveralTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertCount(4, $cache->cache);
 
 		$this->assertEquals(4, SuggestorCache::$calledGetCached);
-		$this->assertEquals(4, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(4, SuggestorCache::$calledCacheSuggestion);
 	}
 }

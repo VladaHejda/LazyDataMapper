@@ -36,7 +36,7 @@ class CollectionTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(['name', 'engine'], reset($cached));
 
 		$this->assertEquals(1, SuggestorCache::$calledGetCached);
-		$this->assertEquals(4, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(4, SuggestorCache::$calledCacheSuggestion);
 
 		return [$cache, $facade];
 	}
@@ -65,6 +65,6 @@ class CollectionTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(['name', 'engine', 'repairs'], reset($cached));
 
 		$this->assertEquals(1, SuggestorCache::$calledGetCached);
-		$this->assertEquals(1, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(1, SuggestorCache::$calledCacheSuggestion);
 	}
 }

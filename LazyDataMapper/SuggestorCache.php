@@ -41,9 +41,8 @@ class SuggestorCache
 	 * @param string $paramName
 	 * @param string $entityClass
 	 * @return Suggestor with one suggestion of cached parameter name
-	 * @todo rename to cacheSuggestion
 	 */
-	public function cacheParamName(IIdentifier $identifier, $paramName, $entityClass)
+	public function cacheSuggestion(IIdentifier $identifier, $paramName, $entityClass)
 	{
 		$key = $this->key . $identifier->getKey();
 		$cached = $this->externalCache->load($key);

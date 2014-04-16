@@ -29,7 +29,7 @@ class CollectionChildTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals('FORD Mustang', $driver->cars[1]->title);
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
-		$this->assertEquals(3, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(3, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
@@ -51,7 +51,7 @@ class CollectionChildTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(0, CarMapper::$calledGetById);
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
-		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 
 		$this->assertCount(2, $cache->cache);

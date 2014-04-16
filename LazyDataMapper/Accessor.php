@@ -264,7 +264,7 @@ final class Accessor
 	public function getParam(IEntity $entity, $paramName)
 	{
 		$entityClass = get_class($entity);
-		$suggestor = $this->cache->cacheParamName($entity->getIdentifier(), $paramName, $entityClass);
+		$suggestor = $this->cache->cacheSuggestion($entity->getIdentifier(), $paramName, $entityClass);
 		$dataHolder = $this->loadDataHolderByMapper($entityClass, $entity->getId(), $suggestor);
 		$params = $dataHolder->getParams();
 		return array_shift($params);

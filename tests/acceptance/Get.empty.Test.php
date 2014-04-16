@@ -37,7 +37,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$facade->getById(3)->driver;
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
-		$this->assertEquals(1, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(1, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
@@ -64,7 +64,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertCount(1, $cache->cache);
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
-		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 
@@ -78,7 +78,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$facade->getByIdsRange([6, 3])[0]->driver;
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
-		$this->assertEquals(1, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(1, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
@@ -109,7 +109,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertCount(1, $cache->cache);
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
-		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 
@@ -121,7 +121,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$facade->getById(3)->races;
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
-		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
@@ -142,7 +142,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(0, RaceMapper::$calledGetByRestrictions);
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
-		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 
@@ -154,7 +154,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$facade->getById(3)->bestDriver;
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
-		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
 		return [$cache, $facade];
@@ -176,7 +176,7 @@ class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertCount(1, $cache->cache);
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
-		$this->assertEquals(0, SuggestorCache::$calledCacheParamName);
+		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 }
