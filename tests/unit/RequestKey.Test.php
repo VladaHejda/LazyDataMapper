@@ -40,7 +40,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	 */
 	public function testGetKeyFromRequestUri($key)
 	{
-		$_SERVER['REQUEST_URI'] = 'some/request/uri';
+		$_SERVER['REQUEST_URI'] = 'some/request/uri.html';
 		$newKey = $this->requestKey->getKey();
 		$this->assertTrue(is_string($newKey));
 		$this->assertNotEquals($key, $newKey);
@@ -53,7 +53,52 @@ class Test extends LazyDataMapper\Tests\TestCase
 	 */
 	public function testGetKeyFromRequestUriEquality($key)
 	{
-		$_SERVER['REQUEST_URI'] = 'some/request/uri';
-		$this->assertEquals($key, $this->requestKey->getKey());
+		$_SERVER['REQUEST_URI'] = 'some/request/uri.html';
+		$uriKey = $this->requestKey->getKey();
+		$this->assertEquals($key, $uriKey);
+	}
+
+
+	/**
+	 * @depends testGetKeyFromRequestUri
+	 */
+	public function testCuttingQueryString($key)
+	{
+		$_SERVER['REQUEST_URI'] = 'some/request/uri.html?one=two&three_four';
+		$newKey = $this->requestKey->getKey();
+		$this->assertEquals($newKey, $key);
+	}
+
+
+	/**
+	 * @depends testGetKeyFromRequestUri
+	 */
+	public function testCuttingAnchor($key)
+	{
+		$_SERVER['REQUEST_URI'] = 'some/request/uri.html#five';
+		$newKey = $this->requestKey->getKey();
+		$this->assertEquals($newKey, $key);
+	}
+
+
+	/**
+	 * @depends testGetKeyFromRequestUri
+	 */
+	public function testCuttingQueryStringAndAnchor($key)
+	{
+		$_SERVER['REQUEST_URI'] = 'some/request/uri.html?six=seven#eight';
+		$newKey = $this->requestKey->getKey();
+		$this->assertEquals($newKey, $key);
+	}
+
+
+	/**
+	 * @depends testGetKeyFromRequestUri
+	 */
+	public function testAnotherUriInequality($key)
+	{
+		$_SERVER['REQUEST_URI'] = 'some/request/uri.php?one=two&three_four';
+		$newKey = $this->requestKey->getKey();
+		$this->assertNotEquals($newKey, $key);
 	}
 }

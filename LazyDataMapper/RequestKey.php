@@ -2,10 +2,6 @@
 
 namespace LazyDataMapper;
 
-/**
- * @todo probably it should be better that default RequestKey does not take into account query string
- * // předělat to, v doc píšu že to tak je
- */
 class RequestKey implements IRequestKey
 {
 
@@ -22,7 +18,7 @@ class RequestKey implements IRequestKey
 		}
 
 		if (isset($_SERVER['REQUEST_URI'])) {
-			$input = $_SERVER['REQUEST_URI'];
+			$input = preg_replace('/(\?[\w&=]+)?(#[\w]+)?$/i', '', $_SERVER['REQUEST_URI']);
 
 		} elseif (isset($_SERVER['PHP_SELF'])) {
 			$input = $_SERVER['PHP_SELF'];
