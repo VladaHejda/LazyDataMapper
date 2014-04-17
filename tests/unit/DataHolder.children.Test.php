@@ -93,11 +93,6 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 			3 => ['name' => 'John', 'team' => 'Storms'],
 			7 => ['name' => 'George', 'team' => 'Eagle'],
 		];
-		$this->assertException(function () use ($dataHolder, $data) {
-			$dataHolder->drivers->setParams($data);
-		}, 'LazyDataMapper\Exception');
-
-		$dataHolder->drivers->setIds([3, 7]);
 		$dataHolder->drivers->setParams($data);
 	}
 }

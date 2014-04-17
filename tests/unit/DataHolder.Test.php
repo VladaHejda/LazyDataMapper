@@ -43,16 +43,11 @@ class Test extends LazyDataMapper\Tests\TestCase
 		$dataHolder->setParams($data);
 		$this->assertEquals($data, $dataHolder->getParams());
 
-		$this->assertException(function () use ($dataHolder){
-			$dataHolder->setParams(['unknown' => 123]);
-		}, 'LazyDataMapper\Exception');
+		$dataHolder->setParams($data + ['extra' => 'whatever']);
+		$this->assertEquals($data, $dataHolder->getParams());
 
 		$this->assertException(function () use ($dataHolder){
 			$dataHolder->isDataInGroup('whatever');
-		}, 'LazyDataMapper\Exception');
-
-		$this->assertException(function () use ($dataHolder){
-			$dataHolder->setIds([1]);
 		}, 'LazyDataMapper\Exception');
 
 		$this->assertException(function () use ($dataHolder){
@@ -68,7 +63,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 			->andReturn(TRUE)
 		->getMock()
 			->shouldReceive('getSuggestions')
-			->times(6)
+			->times(3)
 			->andReturn(['name', 'age'])
 		->getMock()
 		;
@@ -80,30 +75,16 @@ class Test extends LazyDataMapper\Tests\TestCase
 			7 => ['name' => 'John', 'age' => 17],
 		];
 
-		$this->assertException(function () use ($dataHolder, $data) {
-			$dataHolder->setParams($data);
-		}, 'LazyDataMapper\Exception');
-
-		$dataHolder->setIds([3, 7]);
-
-		$this->assertException(function () use ($dataHolder, $data) {
-			$dataHolder->setParams($data[3]);
-		}, 'LazyDataMapper\Exception');
-
 		$dataHolder->setParams($data);
-
 		$this->assertEquals($data, $dataHolder->getParams());
 
-		$this->assertException(function () use ($dataHolder){
-			$dataHolder->setParams([4 => ['unknown' => 123]]);
-		}, 'LazyDataMapper\Exception');
-
-		$this->assertException(function () use ($dataHolder){
-			$dataHolder->setParams([3 => ['unknown' => 123]]);
-		}, 'LazyDataMapper\Exception');
-
 		$dataHolder->setParams([3 => $data[3]]);
-		$dataHolder->setParams([7 => $data[7]]);
+		$this->assertEquals($data, $dataHolder->getParams());
+
+		$modifiedData = $data;
+		$modifiedData[3]['extra'] = 'whatever';
+		$dataHolder->setParams($modifiedData);
+		$this->assertEquals($data, $dataHolder->getParams());
 	}
 
 
@@ -150,7 +131,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 		->getMock()
 			->shouldReceive('getSuggestions')
 			->with()
-			->times(3)
+			->times(2)
 			->andReturn(['name', 'power'])
 		->getMock();
 
@@ -171,10 +152,6 @@ class Test extends LazyDataMapper\Tests\TestCase
 
 		$this->assertException(function () use ($dataHolder) {
 			$dataHolder->isDataInGroup('unknown');
-		}, 'LazyDataMapper\Exception');
-
-		$this->assertException(function () use ($dataHolder) {
-			$dataHolder->setParams(['unknown' => 123]);
 		}, 'LazyDataMapper\Exception');
 	}
 
@@ -230,7 +207,6 @@ class Test extends LazyDataMapper\Tests\TestCase
 			2 => ['name' => 'George', 'power' => 225],
 			9 => ['name' => 'John', 'power' => 280],
 		];
-		$dataHolder->setIds([2, 9]);
 
 		$this->assertException(function () use ($dataHolder, $data) {
 			$dataHolder->setParams($data[2]);

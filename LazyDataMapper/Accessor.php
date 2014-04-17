@@ -396,7 +396,7 @@ final class Accessor
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		if ($isCollection) {
 			$m = 'getByIdsRange';
-			$datHolder = new DataHolder($suggestor, $id);
+			$datHolder = new DataHolder($suggestor);
 			$dataHolder = $mapper->getByIdsRange($id, $suggestor, $datHolder, $maxCount);
 		} else {
 			$m = 'getById';

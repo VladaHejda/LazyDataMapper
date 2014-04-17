@@ -5,12 +5,13 @@ namespace LazyDataMapper;
 /**
  * Based on Suggestor gains data from Mapper and gives data to Mapper's method save() and create().
  * @todo rename "params" to "data"
+ * @todo asi se zbavit Holderu v Mapperu (stejně už data nekontroluje, jen ořezává, mohl by si ho Accessor nastavovat sám
  */
 class DataHolder implements \Iterator
 {
 
 	/** @var array */
-	protected $params = array();
+	protected $data = array();
 
 	/** @var array */
 	protected $children = array();
@@ -18,78 +19,169 @@ class DataHolder implements \Iterator
 	/** @var Suggestor */
 	protected $suggestor;
 
+	/** @var self */
+	protected $parent;
+
+	/** @var string */
+	protected $idSource, $parentIdSource;
+
 	/** @var array */
-	protected $ids;
+	protected $parentIds;
 
 
 	/**
 	 * @param Suggestor $suggestor
-	 * @param int[] $ids for collection holder
+	 * @param self $parent
 	 * @throws Exception
+	 * @todo zajistit: jakmile je jedinej parent collection, je již collection vše následující
 	 * @todo co když $ids bude prázdný array (resp. mapper zjistí že žádní potomci nejsou)
 	 */
-	public function __construct(Suggestor $suggestor, array $ids = NULL)
+	public function __construct(Suggestor $suggestor, self $parent = NULL)
 	{
 		$this->suggestor = $suggestor;
-
-		if (NULL !== $ids) {
-			$this->setIds($ids);
-		}
+		$this->parent = $parent;
 	}
 
 
 	/**
-	 * @param array $ids
+	 * @param string $source
 	 * @return self
 	 * @throws Exception
 	 */
-	public function setIds(array $ids)
+	public function setIdSource($source)
 	{
-		if (!$this->suggestor->isCollection()) {
-			throw new Exception('Ids can be set only for Collection DataHolder.');
+		if (!$this->getSuggestor()->isCollection()) {
+			throw new Exception('Simple DataHolder does not need ids.');
 		}
-
-		if (NULL !== $this->ids) {
-			throw new Exception('Ids have already been set.');
-		}
-
-		$this->ids = $ids;
+		$this->idSource = $source;
 		return $this;
 	}
 
 
 	/**
-	 * @param array|array[] $params array for one; array of arrays for collection, indexed by id
-	 * @return self
-	 * @throws Exception on not suggested/unknown parameter
-	 * @throws Exception on unknown id
+	 * @return string
 	 */
-	public function setParams(array $params)
+	public function getIdSource()
 	{
-		if (NULL === $this->ids && $this->suggestor->isCollection()) {
-			throw new Exception('This DataHolder is Collection and you did not set ids yet. Use method setIds().');
-		}
+		return $this->idSource;
+	}
 
+
+	/**
+	 * @param $source string
+	 * @return self
+	 * @throws Exception
+	 */
+	public function setParentIdSource($source)
+	{
+		if ($this->parentIds !== NULL) {
+			throw new Exception('Parent ids are already set.');
+		}
+		if (!$this->parent || !$this->parent->getSuggestor()->isCollection()) {
+			throw new Exception('Root DataHolder or DataHolder with simple parent does not need parent ids.');
+		}
+		$this->parentIdSource = $source;
+		return $this;
+	}
+
+
+	/**
+	 * @param array $idsVsIds id => parent_id
+	 * @return self
+	 */
+	public function setParentIds(array $idsVsIds)
+	{
+		$this->parentIds = $idsVsIds;
+		return $this;
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getParentIds()
+	{
+		return $this->parentIds;
+	}
+
+
+	/**
+	 * @param array|array[] $data when no id source, id is expected in index
+	 * @return self
+	 * @throws Exception
+	 */
+	public function setParams(array $data)
+	{
 		$suggestions = array_fill_keys($this->suggestor->getSuggestions(), TRUE);
 
+		// collective
+		// TODO solve n:n id relations
 		if ($this->suggestor->isCollection()) {
-			if ($diff = array_diff(array_keys($params), $this->ids)) {
-				if (is_int(current($diff))){
-					throw new Exception('Invalid ids: ' . implode(', ', $diff) . '.');
+			// parent id source
+			$parentSource = NULL;
+			$needParentIds = $this->parent && $this->parent->getSuggestor()->isCollection();
+
+			if ($this->parentIds === NULL && $needParentIds) {
+				if ($this->parentIdSource !== NULL) {
+					$parentSource = $this->parentIdSource;
+				} else {
+					$parentSource = $this->parent->getIdSource();
+
+					if ($parentSource === NULL) {
+						throw new Exception('You need to set parent ids or parent id source before you set data to collective DataHolder');
+					}
 				}
-				throw new Exception('You must set parameters for each id via two-dimensional array.');
-			}
-			foreach ($params as $id => $theParams) {
-				$this->checkAgainstSuggestions(array_keys($theParams), $suggestions);
-				if (!isset($this->params[$id])) {
-					$this->params[$id] = array();
-				}
-				$this->params[$id] = $theParams + $this->params[$id];
 			}
 
+			foreach ($data as $id => $subdata) {
+				if (!is_array($subdata)) {
+					throw new Exception('Only array of data arrays can be given to collective DataHolder.');
+				}
+
+				// id
+				if ($this->idSource !== NULL) {
+					if (!isset($subdata[$this->idSource])) {
+						throw new Exception("One of array members does not have id source column ($this->idSource).");
+					}
+					$id = $subdata[$this->idSource];
+				}
+
+				if (!is_numeric($id)) {
+					throw new Exception("Id '$id' does not seem to be id.");
+				}
+
+				// parent id
+				if ($needParentIds) {
+					if ($parentSource !== NULL) {
+						if (!isset($subdata[$parentSource])) {
+							throw new Exception("One of array members does not have parent id source column ($parentSource).");
+						}
+
+						$parentId = $subdata[$parentSource];
+						if (!is_numeric($parentId)) {
+							throw new Exception("Parent id '$parentId' does not seem to be id.");
+						}
+						$this->parentIds[$id] = $parentId;
+
+					} else {
+						if (!isset($this->parentIds[$id])) {
+							throw new Exception("Id $id does not exist in id list.");
+						}
+					}
+				}
+
+				// set data
+				if (!isset($this->data[$id])) {
+					$this->data[$id] = array();
+				}
+				$subdata = array_intersect_key($subdata, $suggestions);
+				$this->data[$id] = $subdata + $this->data[$id];
+			}
+
+		// simple
 		} else {
-			$this->checkAgainstSuggestions(array_keys($params), $suggestions);
-			$this->params = $params + $this->params;
+			$data = array_intersect_key($data, $suggestions);
+			$this->data = $data + $this->data;
 		}
 
 		return $this;
@@ -103,18 +195,18 @@ class DataHolder implements \Iterator
 	public function getParams($group = NULL)
 	{
 		if (NULL === $group) {
-			return $this->params;
+			return $this->data;
 		}
 
 		$map = $this->suggestor->getParamMap()->getMap($group);
 		if ($this->suggestor->isCollection()) {
 			$collectionMap = array();
-			foreach ($this->params as $id => $params) {
-				$collectionMap[$id] = $this->fillMap($map, $params);
+			foreach ($this->data as $id => $data) {
+				$collectionMap[$id] = $this->fillMap($map, $data);
 			}
 			return $collectionMap;
 		}
-		return $this->fillMap($map, $this->params);
+		return $this->fillMap($map, $this->data);
 	}
 
 
@@ -127,25 +219,24 @@ class DataHolder implements \Iterator
 	{
 		$map = $this->suggestor->getParamMap()->getMap($group, FALSE);
 		if ($this->suggestor->isCollection()) {
-			foreach ($this->params as $params) {
-				$isDataInGroup = (bool) array_intersect(array_keys($params), $map);
+			foreach ($this->data as $data) {
+				$isDataInGroup = (bool) array_intersect(array_keys($data), $map);
 				if ($isDataInGroup) {
 					return TRUE;
 				}
 			}
 			return FALSE;
 		}
-		return (bool) array_intersect(array_keys($this->params), $map);
+		return (bool) array_intersect(array_keys($this->data), $map);
 	}
 
 
 	/**
 	 * @param string $sourceParam
-	 * @param int[] $ids
 	 * @return self|null
 	 * @throws Exception
 	 */
-	public function getChild($sourceParam, array $ids = NULL)
+	public function getChild($sourceParam)
 	{
 		if (array_key_exists($sourceParam, $this->children)) {
 			return $this->children[$sourceParam];
@@ -156,7 +247,7 @@ class DataHolder implements \Iterator
 			return NULL;
 		}
 
-		$child = new self($suggestor, $ids);
+		$child = new self($suggestor, $this);
 		$this->children[$sourceParam] = $child;
 		return $child;
 	}
@@ -213,7 +304,7 @@ class DataHolder implements \Iterator
 			return FALSE;
 		}
 
-		return $this->children[$key] = new self($suggestor);
+		return $this->children[$key] = new self($suggestor, $this);
 	}
 
 
@@ -229,21 +320,11 @@ class DataHolder implements \Iterator
 	}
 
 
-	private function checkAgainstSuggestions(array $paramNames, array $suggestions)
-	{
-		foreach ($paramNames as $paramName) {
-			if (!isset($suggestions[$paramName])) {
-				throw new Exception("Parameter $paramName is unknown or is not suggested.");
-			}
-		}
-	}
-
-
-	private function fillMap(array $map, array $params)
+	private function fillMap(array $map, array $data)
 	{
 		foreach ($map as $paramName => & $value) {
-			if (array_key_exists($paramName, $params)) {
-				$value = $params[$paramName];
+			if (array_key_exists($paramName, $data)) {
+				$value = $data[$paramName];
 			} else {
 				unset ($map[$paramName]);
 			}
