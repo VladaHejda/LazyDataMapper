@@ -25,8 +25,11 @@ class DataHolder implements \Iterator
 	/** @var string */
 	protected $idSource, $parentIdSource;
 
+	/** @var array[] parent_id => [child_id, child_id, ...] */
+	protected $relations;
+
 	/** @var array */
-	protected $parentIds;
+	private $idList;
 
 
 	/**
@@ -40,6 +43,15 @@ class DataHolder implements \Iterator
 	{
 		$this->suggestor = $suggestor;
 		$this->parent = $parent;
+	}
+
+
+	/**
+	 * @return self
+	 */
+	public function getParent()
+	{
+		return $this->parent;
 	}
 
 
@@ -74,7 +86,7 @@ class DataHolder implements \Iterator
 	 */
 	public function setParentIdSource($source)
 	{
-		if ($this->parentIds !== NULL) {
+		if ($this->relations !== NULL) {
 			throw new Exception('Parent ids are already set.');
 		}
 		if (!$this->parent || !$this->parent->getSuggestor()->isCollection()) {
@@ -86,12 +98,45 @@ class DataHolder implements \Iterator
 
 
 	/**
-	 * @param array $idsVsIds id => parent_id
+	 * @param int $childId
+	 * @param int $parentId
+	 * @return self
+	 */
+	public function setRelation($childId, $parentId)
+	{
+		if (!isset($this->relations[$parentId])) {
+			$this->relations[$parentId] = array();
+		}
+		if (!in_array($childId, $this->relations[$parentId])) {
+			$this->relations[$parentId][] = $childId;
+			$this->idList[$childId] = TRUE;
+		}
+		return $this;
+	}
+
+
+	/**
+	 * @param array $idsVsIds child_id => parent_id
 	 * @return self
 	 */
 	public function setParentIds(array $idsVsIds)
 	{
-		$this->parentIds = $idsVsIds;
+		foreach ($idsVsIds as $childId => $parentId) {
+			$this->setRelation($childId, $parentId);
+		}
+		return $this;
+	}
+
+
+	/**
+	 * @param array $idsVsIds parent_id => child_id
+	 * @return self
+	 */
+	public function setChildIds(array $idsVsIds)
+	{
+		foreach ($idsVsIds as $parentId => $childId) {
+			$this->setRelation($childId, $parentId);
+		}
 		return $this;
 	}
 
@@ -99,9 +144,9 @@ class DataHolder implements \Iterator
 	/**
 	 * @return array
 	 */
-	public function getParentIds()
+	public function getRelations()
 	{
-		return $this->parentIds;
+		return $this->relations;
 	}
 
 
@@ -115,13 +160,12 @@ class DataHolder implements \Iterator
 		$suggestions = array_fill_keys($this->suggestor->getSuggestions(), TRUE);
 
 		// collective
-		// TODO solve n:n id relations
 		if ($this->suggestor->isCollection()) {
 			// parent id source
 			$parentSource = NULL;
 			$needParentIds = $this->parent && $this->parent->getSuggestor()->isCollection();
 
-			if ($this->parentIds === NULL && $needParentIds) {
+			if ($this->relations === NULL && $needParentIds) {
 				if ($this->parentIdSource !== NULL) {
 					$parentSource = $this->parentIdSource;
 				} else {
@@ -161,10 +205,10 @@ class DataHolder implements \Iterator
 						if (!is_numeric($parentId)) {
 							throw new Exception("Parent id '$parentId' does not seem to be id.");
 						}
-						$this->parentIds[$id] = $parentId;
+						$this->setRelation($id, $parentId);
 
 					} else {
-						if (!isset($this->parentIds[$id])) {
+						if (!isset($this->idList[$id])) {
 							throw new Exception("Id $id does not exist in id list.");
 						}
 					}
