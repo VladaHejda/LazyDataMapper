@@ -37,16 +37,16 @@ final class Accessor
 
 
 	/**
-	 * @param array|string $entityClass
+	 * @param array $entityClass
 	 * @param int $id
 	 * @param IOperand $parent
 	 * @param string $sourceParam
 	 * @return IEntity
 	 * @throws Exception
 	 */
-	public function getById($entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
+	public function getById(array $entityClass, $id, IOperand $parent = NULL, $sourceParam = NULL)
 	{
-		list($entityClass) = $this->extractEntityClasses($entityClass);
+		$entityClass = reset($entityClass);
 
 		if (($parent && NULL === $sourceParam) || (NULL !== $sourceParam && !$parent)) {
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
@@ -95,7 +95,7 @@ final class Accessor
 
 
 	/**
-	 * @param array|string $entityClass
+	 * @param array $entityClasses
 	 * @param IRestrictor|int[] $restrictions
 	 * @param IOperand $parent
 	 * @param string $sourceParam
@@ -103,9 +103,14 @@ final class Accessor
 	 * @return IEntityCollection
 	 * @throws Exception on wrong restrictions
 	 */
-	public function getByRestrictions($entityClass, $restrictions, IOperand $parent = NULL, $sourceParam = NULL, $maxCount = NULL)
+	public function getByRestrictions(array $entityClasses, $restrictions, IOperand $parent = NULL, $sourceParam = NULL, $maxCount = NULL)
 	{
-		list($entityClass, $EntityCollectionClass) = $this->extractEntityClasses($entityClass);
+		$entityClass = array_shift($entityClasses);
+		if (!count($entityClasses)) {
+			$entityCollectionClass = $this->serviceAccessor->getEntityCollectionClass($entityClass);
+		} else {
+			$entityCollectionClass = array_shift($entityClasses);
+		}
 
 		if (($parent && NULL === $sourceParam) || (NULL !== $sourceParam && !$parent)) {
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
@@ -157,21 +162,21 @@ final class Accessor
 			return array();
 		}
 
-		return $this->createEntityCollection($EntityCollectionClass, $data, $identifier, $entityClass);
+		return $this->createEntityCollection($entityCollectionClass, $data, $identifier, $entityClass);
 	}
 
 
 	/**
-	 * @param array|string $entityClass
+	 * @param array $entityClass
 	 * @param array $publicData
 	 * @param array $privateData
 	 * @param bool $throwFirst
 	 * @return IEntity
 	 * @throws Exception
 	 */
-	public function create($entityClass, array $publicData, array $privateData = array(), $throwFirst = TRUE)
+	public function create(array $entityClass, array $publicData, array $privateData = array(), $throwFirst = TRUE)
 	{
-		list($entityClass) = $this->extractEntityClasses($entityClass);
+		$entityClass = reset($entityClass);
 
 		$entity = $this->createEntity($entityClass, NULL, $privateData);
 
@@ -219,24 +224,24 @@ final class Accessor
 
 
 	/**
-	 * @param array|string $entityClass
+	 * @param array $entityClass
 	 * @param int $id
 	 */
-	public function remove($entityClass, $id)
+	public function remove(array $entityClass, $id)
 	{
-		list($entityClass) = $this->extractEntityClasses($entityClass);
+		$entityClass = reset($entityClass);
 		$this->serviceAccessor->getMapper($entityClass)->remove($id);
 	}
 
 
 	/**
-	 * @param string $entityClass
+	 * @param array $entityClass
 	 * @param IRestrictor|int[] $restrictions
 	 * @throws Exception
 	 */
-	public function removeByRestrictions($entityClass, $restrictions)
+	public function removeByRestrictions(array $entityClass, $restrictions)
 	{
-		list($entityClass) = $this->extractEntityClasses($entityClass);
+		$entityClass = reset($entityClass);
 
 		$ids = $this->loadIdsByRestrictions($entityClass, $restrictions);
 
@@ -469,16 +474,5 @@ final class Accessor
 			return $checker;
 		}
 		return NULL;
-	}
-
-
-	/**
-	 * @param array|string $entityClass
-	 * @return array
-	 */
-	private function extractEntityClasses($entityClass)
-	{
-		// todo getEntityCollectionClass by mělo brát ve facadě, ne tady (ve facadě to vezme JEDNOU, zde pokaždý!)
-		return is_array($entityClass) ? $entityClass : array($entityClass, $this->serviceAccessor->getEntityCollectionClass($entityClass));
 	}
 }
