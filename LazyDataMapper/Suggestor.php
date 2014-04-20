@@ -91,6 +91,7 @@ class Suggestor implements \Iterator
 
 	/**
 	 * @return bool
+	 * @todo rename to isCollective ? or completely different?
 	 */
 	public function isCollection()
 	{

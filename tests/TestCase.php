@@ -95,5 +95,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
 			$mock->shouldReceive('count')
 				->andReturn(count($items));
 		}
+
+		return $mock;
 	}
 }

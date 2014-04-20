@@ -109,6 +109,56 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 
 	/**
+	 * @param Accessor $accessor
+	 * @param string $entityClass
+	 * @param int $id
+	 * @param array $data
+	 * @param IIdentifier $identifier
+	 * @return mixed
+	 */
+	public function createEntity(Accessor $accessor, $entityClass, $id, array $data, IIdentifier $identifier = NULL)
+	{
+		return new $entityClass($id, $data, $accessor, $identifier);
+	}
+
+
+	/**
+	 * @param Accessor $accessor
+	 * @param string $collectionClass
+	 * @param array[] $data
+	 * @param IIdentifier $identifier
+	 * @param string $entityClass
+	 * @return IEntityCollection
+	 */
+	public function createEntityCollection(Accessor $accessor, $collectionClass, array $data, IIdentifier $identifier, $entityClass)
+	{
+		return new $collectionClass($data, $identifier, $accessor, $entityClass);
+	}
+
+
+	/**
+	 * @param string $entityClass
+	 * @param SuggestorCache $suggestorCache
+	 * @param array $suggestions
+	 * @return Suggestor
+	 */
+	public function createSuggestor($entityClass, SuggestorCache $suggestorCache, array $suggestions)
+	{
+		return new Suggestor($this->getParamMap($entityClass), $suggestorCache, $suggestions);
+	}
+
+
+	/**
+	 * @param Suggestor $suggestor
+	 * @return DataHolder
+	 */
+	public function createDataHolder(Suggestor $suggestor)
+	{
+		return new DataHolder($suggestor);
+	}
+
+
+	/**
 	 * Adds "ParamMap" at the end of Entity classname.
 	 * @param string $entityClass
 	 * @return string

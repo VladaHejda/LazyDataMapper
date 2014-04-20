@@ -16,7 +16,7 @@ final class Accessor
 	protected $serviceAccessor;
 
 	/** @var array */
-	private $loadedData = array();
+	private $loadedData = array(), $dataRelations = array();
 
 	/** @var array */
 	private $childrenIdentifierList = array();
@@ -90,7 +90,8 @@ final class Accessor
 			}
 		}
 
-		return $this->createEntity($entityClass, $id, $data, $identifier);
+		// todo conditional Entities (e.g. unit with vendor HTC creates Entity HtcUnit, but with same identifier as other)
+		return $this->serviceAccessor->createEntity($this, $entityClass, $id, $data, $identifier);
 	}
 
 
@@ -162,7 +163,7 @@ final class Accessor
 			return array();
 		}
 
-		return $this->createEntityCollection($entityCollectionClass, $data, $identifier, $entityClass);
+		return $this->serviceAccessor->createEntityCollection($this, $entityCollectionClass, $data, $identifier, $entityClass);
 	}
 
 
@@ -178,7 +179,7 @@ final class Accessor
 	{
 		$entityClass = reset($entityClass);
 
-		$entity = $this->createEntity($entityClass, NULL, $privateData);
+		$entity = $this->serviceAccessor->createEntity($this, $entityClass, NULL, $privateData);
 
 		$cachedException = NULL;
 		foreach ($publicData as $paramName => $value) {
@@ -205,7 +206,9 @@ final class Accessor
 		}
 
 		$data = $entity->getChanges() + $privateData;
-		$dataHolder = $this->createDataHolder($entityClass, array_keys($data));
+		$dataHolder = $this->serviceAccessor->createDataHolder(
+			$this->serviceAccessor->createSuggestor($entityClass, $this->cache, array_keys($data))
+		);
 		$dataHolder->setParams($data);
 
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
@@ -219,7 +222,7 @@ final class Accessor
 			$data = $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached)->getParams() + $data;
 		}
 
-		return $this->createEntity($entityClass, $id, $data, $identifier);
+		return $this->serviceAccessor->createEntity($this, $entityClass, $id, $data, $identifier);
 	}
 
 
@@ -300,52 +303,12 @@ final class Accessor
 		}
 
 		$data = $entity->getChanges();
-		$dataHolder = $this->createDataHolder($entityClass, array_keys($data));
+		$dataHolder = $this->serviceAccessor->createDataHolder(
+			$this->serviceAccessor->createSuggestor($entityClass, $this->cache, array_keys($data))
+		);
 		$dataHolder->setParams($data);
 
 		$this->serviceAccessor->getMapper($entityClass)->save($entity->getId(), $dataHolder);
-	}
-
-
-	/********************* factories *********************/
-
-
-	/**
-	 * @param string $entityClass
-	 * @param int $id
-	 * @param array $data
-	 * @param IIdentifier $identifier
-	 * @return IEntity
-	 * @todo conditional Entities (e.g. unit with vendor HTC creates Entity HtcUnit, but with same identifier as other)
-	 */
-	protected function createEntity($entityClass, $id, array $data, IIdentifier $identifier = NULL)
-	{
-		return new $entityClass($id, $data, $this, $identifier);
-	}
-
-
-	/**
-	 * @param string $collectionClass
-	 * @param array[] $data
-	 * @param IIdentifier $identifier
-	 * @param string $entityClass
-	 * @return IEntityCollection
-	 */
-	protected function createEntityCollection($collectionClass, array $data, IIdentifier $identifier, $entityClass)
-	{
-		return new $collectionClass($data, $identifier, $this, $entityClass);
-	}
-
-
-	/**
-	 * @param string $entityClass
-	 * @param array $suggestions
-	 * @return DataHolder
-	 */
-	protected function createDataHolder($entityClass, array $suggestions)
-	{
-		$suggestor = new Suggestor($this->serviceAccessor->getParamMap($entityClass), $this->cache, $suggestions);
-		return new DataHolder($suggestor);
 	}
 
 
@@ -399,7 +362,7 @@ final class Accessor
 	{
 		$isCollection = is_array($id);
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
-		$datHolder = new DataHolder($suggestor);
+		$datHolder = $this->serviceAccessor->createDataHolder($suggestor);
 		if ($isCollection) {
 			$m = 'getByIdsRange';
 			$dataHolder = $mapper->getByIdsRange($id, $suggestor, $datHolder, $maxCount);
@@ -415,12 +378,18 @@ final class Accessor
 	}
 
 
-	private function getLoadedData(IIdentifier $identifier)
+	private function getLoadedData(IIdentifier $identifier, $parentId = NULL)
 	{
 		$key = $identifier->getKey();
 		if (isset($this->loadedData[$key])) {
-			$data = $this->loadedData[$key];
-			unset($this->loadedData[$key]);
+			if (isset($this->dataRelations[$key])) {
+				$childrenIds = $this->dataRelations[$key][$parentId];
+				$data = array_intersect_key($this->loadedData[$key], array_flip($childrenIds));
+				// todo uklidit (ale jedno child může mít víc rodičů - na to bacha)
+			} else {
+				$data = $this->loadedData[$key];
+				unset($this->loadedData[$key]);
+			}
 			return $data;
 		}
 		return FALSE;
@@ -435,7 +404,6 @@ final class Accessor
 	 */
 	private function saveChildren(DataHolder $dataHolder)
 	{
-		/** @var DataHolder $child */
 		foreach ($dataHolder as $child) {
 			if ($child->hasLoadedChildren()) {
 				$this->saveChildren($child);
@@ -446,7 +414,12 @@ final class Accessor
 				continue;
 			}
 			$identifier = $child->getSuggestor()->getIdentifier();
-			$this->loadedData[$identifier->getKey()] = $data;
+			$key = $identifier->getKey();
+			$this->loadedData[$key] = $data;
+			$relations = $child->getRelations();
+			if ($relations) {
+				$this->dataRelations[$key] = $relations;
+			}
 		}
 	}
 

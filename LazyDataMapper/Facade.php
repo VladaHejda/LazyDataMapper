@@ -41,6 +41,7 @@ abstract class Facade
 
 			if (!$predefinedCount) {
 				$entityClass = $serviceAccessor->getEntityClass($this);
+				// todo check this globally - even if classnames set by Facade descendant
 				if (!is_string($entityClass) || empty($entityClass)) {
 					throw new Exception(get_class($this) . ": IEntityServiceAccessor::getEntityClass() does not return classname.");
 				}

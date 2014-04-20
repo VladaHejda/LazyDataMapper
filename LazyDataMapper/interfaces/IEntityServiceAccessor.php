@@ -57,4 +57,42 @@ interface IEntityServiceAccessor
 	 * @return IIdentifier
 	 */
 	function composeIdentifier($entityClass, $isCollection = FALSE, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL);
+
+
+	/**
+	 * @param Accessor $accessor
+	 * @param string $entityClass
+	 * @param int $id
+	 * @param array $data
+	 * @param IIdentifier $identifier
+	 * @return mixed
+	 */
+	function createEntity(Accessor $accessor, $entityClass, $id, array $data, IIdentifier $identifier = NULL);
+
+
+	/**
+	 * @param Accessor $accessor
+	 * @param string $collectionClass
+	 * @param array[] $data
+	 * @param IIdentifier $identifier
+	 * @param string $entityClass
+	 * @return IEntityCollection
+	 */
+	function createEntityCollection(Accessor $accessor, $collectionClass, array $data, IIdentifier $identifier, $entityClass);
+
+
+	/**
+	 * @param string $entityClass
+	 * @param SuggestorCache $suggestorCache
+	 * @param array $suggestions
+	 * @return Suggestor
+	 */
+	function createSuggestor($entityClass, SuggestorCache $suggestorCache, array $suggestions);
+
+
+	/**
+	 * @param Suggestor $suggestor
+	 * @return DataHolder
+	 */
+	function createDataHolder(Suggestor $suggestor);
 }
