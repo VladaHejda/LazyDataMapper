@@ -354,22 +354,16 @@ final class Accessor
 	 * @param string $entityClass
 	 * @param int|int[] $id or ids
 	 * @param Suggestor $suggestor
-	 * @param int $maxCount
 	 * @return DataHolder
 	 * @throws Exception
 	 */
-	private function loadDataHolderByMapper($entityClass, $id, Suggestor $suggestor, $maxCount = NULL)
+	private function loadDataHolderByMapper($entityClass, $id, Suggestor $suggestor)
 	{
 		$isCollection = is_array($id);
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		$datHolder = $this->serviceAccessor->createDataHolder($suggestor);
-		if ($isCollection) {
-			$m = 'getByIdsRange';
-			$dataHolder = $mapper->getByIdsRange($id, $suggestor, $datHolder, $maxCount);
-		} else {
-			$m = 'getById';
-			$dataHolder = $mapper->getById($id, $suggestor, $datHolder);
-		}
+		$m = $isCollection ? 'getByIdsRange' : 'getById';
+		$dataHolder = $mapper->$m($id, $suggestor, $datHolder);
 
 		if (!$dataHolder instanceof DataHolder) {
 			throw new Exception(get_class($mapper) . "::$m() must return loaded DataHolder instance.");
