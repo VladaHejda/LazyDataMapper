@@ -4,15 +4,25 @@ namespace LazyDataMapper\Tests\Accessor;
 
 use LazyDataMapper;
 
-class GetByIdTest extends LazyDataMapper\Tests\TestCase
+class GetByRestrictionsTest extends LazyDataMapper\Tests\TestCase
 {
 
-	private $data = ['brand' => 'Suzuki', 'color' => 'red'];
+	private $data = [
+		13 => ['brand' => 'Suzuki', 'color' => 'red'],
+		23 => ['brand' => 'Ford', 'color' => 'blue'],
+		33 => ['brand' => 'Subaru', 'color' => 'grey'],
+	];
 
-	private $childData = ['name' => 'John'];
+	private $childData = [
+		55 => ['name' => 'George'],
+		65 => ['name' => 'Jack'],
+		75 => ['name' => 'Marvin'],
+	];
+
+	private $relations = [13 => [55], 23 => [65], 33 => [75]];
 
 	/** @var \Mockery\Mock */
-	private $entity, $childEntity;
+	private $collection, $entity, $childEntity;
 
 	/** @var LazyDataMapper\Accessor */
 	private $accessor;
@@ -38,13 +48,13 @@ class GetByIdTest extends LazyDataMapper\Tests\TestCase
 			->shouldReceive('getSuggestions')
 			->once()
 			->withNoArgs()
-			->andReturn(array_keys($this->data))
+			->andReturn(array_keys(reset($this->data)))
 		->getMock();
 
 		$cache = \Mockery::mock('LazyDataMapper\SuggestorCache')
 			->shouldReceive('getCached')
 			->once()
-			->with($identifier, 'Some\Entity', FALSE, NULL)
+			->with($identifier, 'Some\Entity', TRUE)
 			->andReturn($suggestor)
 		->getMock();
 
@@ -60,7 +70,7 @@ class GetByIdTest extends LazyDataMapper\Tests\TestCase
 		->getMock()
 			->shouldReceive('getRelations')
 			->once()
-			->andReturnNull()
+			->andReturn($this->relations)
 		->getMock();
 
 		$childDataHolder
@@ -81,39 +91,35 @@ class GetByIdTest extends LazyDataMapper\Tests\TestCase
 		->getMock();
 
 		$mapper = \Mockery::mock('LazyDataMapper\IMapper')
-			->shouldReceive('exists')
+			->shouldReceive('getByIdsRange')
 			->once()
-			->with(11)
-			->andReturn(TRUE)
-		->getMock()
-			->shouldReceive('getById')
-			->once()
-			->with(11, $suggestor, $dataHolder)
+			->with([13, 23, 33], $suggestor, $dataHolder)
 			->andReturn($dataHolder)
 		->getMock();
+
+		$this->collection = \Mockery::mock('LazyDataMapper\IEntityCollection');
 
 		$this->entity = \Mockery::mock('LazyDataMapper\IEntity')
 			->shouldReceive('getIdentifier')
 			->once()
-			->withNoArgs()
 			->andReturn($identifier)
 		->getMock()
 			->shouldReceive('getId')
 			->once()
-			->andReturn(11)
+			->andReturn(13)
 		->getMock();
 
 		$this->childEntity = \Mockery::mock('LazyDataMapper\IEntity');
 
 		$services = \Mockery::mock('LazyDataMapper\IEntityServiceAccessor')
 			->shouldReceive('getMapper')
-			->twice()
+			->once()
 			->with('Some\Entity')
 			->andReturn($mapper)
 		->getMock()
 			->shouldReceive('composeIdentifier')
 			->once()
-			->with('Some\Entity', FALSE, NULL, NULL)
+			->with('Some\Entity', TRUE, NULL, NULL)
 			->andReturn($identifier)
 		->getMock()
 			->shouldReceive('createDataHolder')
@@ -130,14 +136,14 @@ class GetByIdTest extends LazyDataMapper\Tests\TestCase
 		$this->accessor = new LazyDataMapper\Accessor($cache, $services);
 
 		$services
-			->shouldReceive('createEntity')
+			->shouldReceive('createEntityCollection')
 			->once()
-			->with($this->accessor, 'Some\Entity', 11, $this->data, $identifier)
-			->andReturn($this->entity)
+			->with($this->accessor, 'Some\Entities', $this->data, $identifier, 'Some\Entity')
+			->andReturn($this->collection)
 		->getMock()
 			->shouldReceive('createEntity')
 			->once()
-			->with($this->accessor, 'Child\Entity', 21, $this->childData, $childIdentifier)
+			->with($this->accessor, 'Child\Entity', 55, $this->childData[55], $childIdentifier)
 			->andReturn($this->childEntity)
 		->getMock();
 	}
@@ -145,10 +151,10 @@ class GetByIdTest extends LazyDataMapper\Tests\TestCase
 
 	public function testGetById()
 	{
-		$entity = $this->accessor->getById(['Some\Entity'], 11);
-		$this->assertSame($this->entity, $entity);
+		$collection = $this->accessor->getByRestrictions(['Some\Entity', 'Some\Entities'], [13, 23, 33]);
+		$this->assertSame($this->collection, $collection);
 
-		$childEntity = $this->accessor->getById(['Child\Entity'], 21, $entity, 'child');
+		$childEntity = $this->accessor->getById(['Child\Entity'], 55, $this->entity, 'child');
 		$this->assertSame($this->childEntity, $childEntity);
 	}
 }

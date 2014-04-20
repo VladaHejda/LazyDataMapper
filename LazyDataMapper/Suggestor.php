@@ -126,6 +126,9 @@ class Suggestor implements \Iterator
 		}
 
 		list($entityClass, $isCollection, $identifier) = $this->children[$sourceParam];
+		if ($this->isCollection) {
+			$isCollection = TRUE;
+		}
 
 		$child = $this->loadChild($identifier, $entityClass, $isCollection);
 		if (!$child) {
@@ -165,6 +168,10 @@ class Suggestor implements \Iterator
 		}
 
 		list($entityClass, $isCollection, $identifier) = $current;
+		if ($this->isCollection) {
+			$isCollection = TRUE;
+		}
+
 		$child = $this->loadChild($identifier, $entityClass, $isCollection);
 		$key = key($this->children);
 

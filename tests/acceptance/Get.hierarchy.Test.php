@@ -125,6 +125,6 @@ class HierarchyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals(0, CarMapper::$calledGetByRestrictions);
 		$this->assertEquals(1, RaceMapper::$calledGetByRestrictions);
 
-		$this->assertCount(2, $cache->cache);
+		$this->assertCount(3, $cache->cache);
 	}
 }

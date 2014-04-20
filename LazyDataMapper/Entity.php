@@ -29,9 +29,6 @@ abstract class Entity implements IEntity
 	/** @var IIdentifier */
 	private $identifier;
 
-	/** @var IOperand */
-	private $parent;
-
 	/** @var Accessor */
 	private $accessor;
 
@@ -65,10 +62,9 @@ abstract class Entity implements IEntity
 	 * @param array $params
 	 * @param Accessor $accessor
 	 * @param IIdentifier $identifier
-	 * @param IEntityCollection $parentCollection
 	 * @throws Exception
 	 */
-	public function __construct($id, array $params, Accessor $accessor, IIdentifier $identifier = NULL, IEntityCollection $parentCollection = NULL)
+	public function __construct($id, array $params, Accessor $accessor, IIdentifier $identifier = NULL)
 	{
 		if (NULL !== $id) {
 			$this->id = (int) $id;
@@ -80,7 +76,6 @@ abstract class Entity implements IEntity
 		}
 		$this->params = $params;
 		$this->accessor = $accessor;
-		$this->parent = $parentCollection ?: $this;
 	}
 
 
@@ -413,7 +408,7 @@ abstract class Entity implements IEntity
 
 		// Entity collection
 		if (is_array($arg) || $arg instanceof IRestrictor) {
-			return $this->accessor->getByRestrictions(array($entityClass), $arg, $this->parent, end($this->getting));
+			return $this->accessor->getByRestrictions(array($entityClass), $arg, $this, end($this->getting));
 		}
 
 		// single Entity
@@ -427,7 +422,7 @@ abstract class Entity implements IEntity
 			$arg = end($this->getting);
 		}
 
-		return $this->accessor->getById(array($entityClass), $id, $this->parent, $arg);
+		return $this->accessor->getById(array($entityClass), $id, $this, $arg);
 	}
 
 

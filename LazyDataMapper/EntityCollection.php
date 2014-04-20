@@ -174,7 +174,7 @@ abstract class EntityCollection implements IEntityCollection
 	protected function createEntity($id, array $params)
 	{
 		$entityClass = $this->entityClass;
-		return new $entityClass($id, $params, $this->accessor, $this->identifier, $this);
+		return new $entityClass($id, $params, $this->accessor, $this->identifier);
 	}
 
 
@@ -188,6 +188,7 @@ abstract class EntityCollection implements IEntityCollection
 		if (!count($this)) {
 			return array();
 		}
+		// todo probably problem when some Entity is changed it does not affect here
 		if (isset($this->data[0][$paramName])) {
 			$seeker = function ($entityData) use ($paramName) {
 				return $entityData[$paramName];
