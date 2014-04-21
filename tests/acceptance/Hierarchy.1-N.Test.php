@@ -49,6 +49,7 @@ class OneManyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(1, DriverMapper::$calledGetById);
 		$this->assertEquals(0, CarMapper::$calledGetById);
+		$this->assertEquals(0, CarMapper::$calledGetByRestrictions);
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
