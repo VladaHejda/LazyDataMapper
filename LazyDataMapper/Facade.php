@@ -63,7 +63,7 @@ abstract class Facade
 	 */
 	public function getById($id)
 	{
-		return $this->accessor->getById($this->entityClass, $id);
+		return $this->accessor->getOne($this->entityClass, $id);
 	}
 
 
@@ -73,7 +73,7 @@ abstract class Facade
 	 */
 	public function getByIdsRange(array $ids)
 	{
-		return $this->accessor->getByRestrictions($this->entityClass, $ids);
+		return $this->accessor->getCollection($this->entityClass, $ids);
 	}
 
 
@@ -84,7 +84,7 @@ abstract class Facade
 	 */
 	public function getByRestrictions(IRestrictor $restrictor, $maxCount = 100)
 	{
-		return $this->accessor->getByRestrictions($this->entityClass, $restrictor, NULL, NULL, $maxCount);
+		return $this->accessor->getCollection($this->entityClass, $restrictor, NULL, NULL, $maxCount);
 	}
 
 
@@ -94,7 +94,7 @@ abstract class Facade
 	 */
 	public function getOneByRestrictions(IRestrictor $restrictor)
 	{
-		return $this->accessor->getById($this->entityClass, $restrictor);
+		return $this->accessor->getOne($this->entityClass, $restrictor);
 	}
 
 

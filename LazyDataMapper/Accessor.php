@@ -44,9 +44,8 @@ final class Accessor
 	 * @param string $sourceParam
 	 * @return IEntity
 	 * @throws Exception
-	 * @todo rename getById - it is not only by id, so as getByRestrictions...
 	 */
-	public function getById(array $entityClass, $id, IEntity $parent = NULL, $sourceParam = NULL)
+	public function getOne(array $entityClass, $id, IEntity $parent = NULL, $sourceParam = NULL)
 	{
 		$entityClass = reset($entityClass);
 
@@ -129,7 +128,7 @@ final class Accessor
 	 * @return IEntityCollection
 	 * @throws Exception on wrong restrictions
 	 */
-	public function getByRestrictions(array $entityClasses, $restrictions, IEntity $parent = NULL, $sourceParam = NULL, $maxCount = NULL)
+	public function getCollection(array $entityClasses, $restrictions, IEntity $parent = NULL, $sourceParam = NULL, $maxCount = NULL)
 	{
 		$entityClass = array_shift($entityClasses);
 		if (!count($entityClasses)) {

@@ -408,7 +408,7 @@ abstract class Entity implements IEntity
 
 		// Entity collection
 		if (is_array($arg) || $arg instanceof IRestrictor) {
-			return $this->accessor->getByRestrictions(array($entityClass), $arg, $this, end($this->getting));
+			return $this->accessor->getCollection(array($entityClass), $arg, $this, end($this->getting));
 		}
 
 		// single Entity
@@ -422,7 +422,7 @@ abstract class Entity implements IEntity
 			$arg = end($this->getting);
 		}
 
-		return $this->accessor->getById(array($entityClass), $id, $this, $arg);
+		return $this->accessor->getOne(array($entityClass), $id, $this, $arg);
 	}
 
 

@@ -151,10 +151,10 @@ class GetByRestrictionsTest extends LazyDataMapper\Tests\TestCase
 
 	public function testGetById()
 	{
-		$collection = $this->accessor->getByRestrictions(['Some\Entity', 'Some\Entities'], [13, 23, 33]);
+		$collection = $this->accessor->getCollection(['Some\Entity', 'Some\Entities'], [13, 23, 33]);
 		$this->assertSame($this->collection, $collection);
 
-		$childEntity = $this->accessor->getById(['Child\Entity'], 55, $this->entity, 'child');
+		$childEntity = $this->accessor->getOne(['Child\Entity'], 55, $this->entity, 'child');
 		$this->assertSame($this->childEntity, $childEntity);
 	}
 }

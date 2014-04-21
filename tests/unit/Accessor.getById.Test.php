@@ -145,10 +145,10 @@ class GetByIdTest extends LazyDataMapper\Tests\TestCase
 
 	public function testGetById()
 	{
-		$entity = $this->accessor->getById(['Some\Entity'], 11);
+		$entity = $this->accessor->getOne(['Some\Entity'], 11);
 		$this->assertSame($this->entity, $entity);
 
-		$childEntity = $this->accessor->getById(['Child\Entity'], 21, $entity, 'child');
+		$childEntity = $this->accessor->getOne(['Child\Entity'], 21, $entity, 'child');
 		$this->assertSame($this->childEntity, $childEntity);
 	}
 }
