@@ -51,12 +51,12 @@ interface IEntityServiceAccessor
 	/**
 	 * Compose persistent identifier based on input arguments. It should be arbitrary distinctive string key.
 	 * @param string $entityClass
-	 * @param bool $isCollection
+	 * @param string $origin
 	 * @param IIdentifier $parentIdentifier
 	 * @param string $sourceParam
 	 * @return IIdentifier
 	 */
-	function composeIdentifier($entityClass, $isCollection = FALSE, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL);
+	function composeIdentifier($entityClass, $origin = IIdentifier::BY_ID, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL);
 
 
 	/**

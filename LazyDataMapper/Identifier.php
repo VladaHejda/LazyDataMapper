@@ -15,19 +15,19 @@ class Identifier implements IIdentifier
 	/**
 	 * Computes output identifier based on inputs.
 	 * @param string $entityClass
-	 * @param bool $isCollection
+	 * @param string $origin one of IIdentifier constants
 	 * @param IIdentifier $parentIdentifier
 	 * @param string $sourceParam
 	 */
-	public function __construct($entityClass, $isCollection = FALSE,  IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	public function __construct($entityClass, $origin = self::BY_ID,  IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
 		$identifier = $entityClass;
-		$identifier .= $isCollection ? '*' : '';
+		$identifier .= $origin;
 		$identifier .= NULL !== $sourceParam ? "|$sourceParam" : '';
 		if ($parentIdentifier) {
 			$identifier .= '>' . $parentIdentifier->getKey();
 		} else {
-			$counterKey = $isCollection ? "$entityClass*" : $entityClass;
+			$counterKey = $entityClass . $origin;
 			if (!isset(static::$counter[$counterKey])) {
 				static::$counter[$counterKey] = 0;
 			}

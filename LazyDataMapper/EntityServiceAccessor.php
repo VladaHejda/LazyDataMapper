@@ -97,14 +97,14 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 	/**
 	 * @param string $entityClass
-	 * @param bool $isCollection
+	 * @param string $origin
 	 * @param IIdentifier $parentIdentifier
 	 * @param string $sourceParam
 	 * @return IIdentifier
 	 */
-	public function composeIdentifier($entityClass, $isCollection = FALSE, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	public function composeIdentifier($entityClass, $origin = IIdentifier::BY_ID, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
-		return new Identifier($entityClass, $isCollection, $parentIdentifier, $sourceParam);
+		return new Identifier($entityClass, $origin, $parentIdentifier, $sourceParam);
 	}
 
 

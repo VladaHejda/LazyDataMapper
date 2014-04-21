@@ -54,9 +54,9 @@ final class Accessor
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
 
-		// todo $origin = $id instanceof IRestrictor ? IIdentifier::ONE_BY_RESTRICTIONS : IIdentifier::BY_ID;
+		$origin = $id instanceof IRestrictor ? IIdentifier::ONE_BY_RESTRICTIONS : IIdentifier::BY_ID;
 		$parentIdentifier = $parent ? $parent->getIdentifier() : NULL;
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, FALSE, $parentIdentifier, $sourceParam);
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $origin, $parentIdentifier, $sourceParam);
 
 		if ($parent && $data = $this->getLoadedData($identifier, $parent->getId())) {
 			// $data set
@@ -103,7 +103,7 @@ final class Accessor
 
 			} else {
 				if ($parent && !isset($this->childrenIdentifierList[$identifier->getKey()])) {
-					$this->cache->cacheChild($parentIdentifier, $entityClass, $sourceParam);
+					$this->cache->cacheChild($parentIdentifier, $entityClass, $sourceParam, $origin);
 				}
 				$data = array();
 			}
@@ -142,7 +142,9 @@ final class Accessor
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
 
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, TRUE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
+		$origin = $restrictions instanceof IRestrictor ? IIdentifier::BY_RESTRICTIONS : IIdentifier::BY_IDS_RANGE;
+		$parentIdentifier = $parent ? $parent->getIdentifier() : NULL;
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $origin, $parentIdentifier, $sourceParam);
 
 		if ($parent && $data = $this->getLoadedData($identifier, $parent->getId(), TRUE)) {
 			// $data set
@@ -180,7 +182,7 @@ final class Accessor
 					}
 				}
 				if ($parent && !isset($this->childrenIdentifierList[$identifier->getKey()])) {
-					$this->cache->cacheChild($parent->getIdentifier(), $entityClass, $sourceParam, TRUE);
+					$this->cache->cacheChild($parentIdentifier, $entityClass, $sourceParam, $origin);
 				}
 				$data = array_fill_keys($ids, array());
 			}
@@ -245,7 +247,7 @@ final class Accessor
 		if (!is_int($id)) {
 			throw new Exception(get_class($mapper) . '::create() must return integer id.');
 		}
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass);
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, IIdentifier::CREATE);
 
 		if ($suggestorCached = $this->cache->getCached($identifier, $entityClass)) {
 			$data = $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached)->getParams() + $data;

@@ -3,6 +3,7 @@
 namespace LazyDataMapper\Tests;
 
 use LazyDataMapper;
+use LazyDataMapper\IIdentifier;
 
 class ResettableIdentifier extends LazyDataMapper\Identifier
 {
@@ -38,8 +39,8 @@ class ServiceAccessor extends LazyDataMapper\EntityServiceAccessor
 	}
 
 
-	public function composeIdentifier($entityClass, $isCollection = FALSE, LazyDataMapper\IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
+	public function composeIdentifier($entityClass, $origin = IIdentifier::BY_ID, IIdentifier $parentIdentifier = NULL, $sourceParam = NULL)
 	{
-		return new ResettableIdentifier($entityClass, $isCollection, $parentIdentifier, $sourceParam);
+		return new ResettableIdentifier($entityClass, $origin, $parentIdentifier, $sourceParam);
 	}
 }

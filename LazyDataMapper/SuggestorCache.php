@@ -73,10 +73,10 @@ class SuggestorCache
 	 * @param IIdentifier $identifier
 	 * @param string $childEntityClass
 	 * @param string $sourceParam
-	 * @param bool $isCollection
+	 * @param string $origin
 	 * @return void
 	 */
-	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, $isCollection = FALSE)
+	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, $origin = IIdentifier::BY_ID)
 	{
 		$key = $this->key . $identifier->getKey();
 		$cached = $this->externalCache->load($key);
@@ -101,7 +101,7 @@ class SuggestorCache
 			return;
 		}
 
-		$cachedShortcut[$sourceParam] = array($childEntityClass, $isCollection);
+		$cachedShortcut[$sourceParam] = array($childEntityClass, $origin);
 		$this->externalCache->save($key, $cached);
 	}
 
