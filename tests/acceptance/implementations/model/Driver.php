@@ -142,11 +142,25 @@ class DriverMapper extends defaultMapper
 			$cars = $relations = [];
 			foreach (CarMapper::$data as $carId => $car) {
 				if ($car['driver'] == $id) {
-					$relations[$carId] = $id;
+					$relations[] = $carId;
 					$cars[$carId] = array_intersect_key($car ,$suggestions);
 				}
 			}
-			$holder->cars->setParentIds($relations)->setParams($cars);
+			$holder->cars->setParams($cars);
+
+			if ($suggestor->cars->races) {
+				$suggestions = array_flip($suggestor->cars->races->getSuggestions());
+				$races = [];
+				foreach ($relations as $carId) {
+					foreach (RaceMapper::$data as $raceId => $race) {
+						if ($race['car'] == $carId) {
+							$holder->cars->races->setRelation($raceId, $carId);
+							$races[$raceId] = array_intersect_key($race ,$suggestions);
+						}
+					}
+				}
+				$holder->cars->races->setParams($races);
+			}
 		}
 
 		return $holder;

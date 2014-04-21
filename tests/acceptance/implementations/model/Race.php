@@ -61,6 +61,7 @@ class RaceMapper extends defaultMapper
 		3 => ['car' => '1', 'country' => 'Ontario'],
 		4 => ['car' => '2', 'country' => 'Texas'],
 		5 => ['car' => '7', 'country' => 'Oregon'],
+		6 => ['car' => '7', 'country' => 'Buffalo'],
 	];
 
 

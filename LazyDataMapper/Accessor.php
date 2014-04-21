@@ -58,7 +58,11 @@ final class Accessor
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $origin, $parentIdentifier, $sourceParam);
 
 		if ($parent && $data = $this->getLoadedData($identifier, $parent->getId())) {
-			// $data set
+			if ($data === TRUE) {
+				// data loaded, but empty
+				return NULL;
+			}
+			// else $data set
 
 		} else {
 			if ($id instanceof IRestrictor) {
@@ -146,7 +150,11 @@ final class Accessor
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $origin, $parentIdentifier, $sourceParam);
 
 		if ($parent && $data = $this->getLoadedData($identifier, $parent->getId(), TRUE)) {
-			// $data set
+			if ($data === TRUE) {
+				// data loaded, but empty
+				return array();
+			}
+			// else $data set
 
 		} else {
 			$ids = $this->loadIdsByRestrictions($entityClass, $restrictions, $maxCount);
@@ -408,6 +416,10 @@ final class Accessor
 		$key = $identifier->getKey();
 		if (isset($this->loadedData[$key])) {
 			if (isset($this->dataRelations[$key])) {
+				if (!isset($this->dataRelations[$key][$parentId])) {
+					// empty
+					return TRUE;
+				}
 				$childrenIds = $this->dataRelations[$key][$parentId];
 				$data = array_intersect_key($this->loadedData[$key], array_flip($childrenIds));
 				if (!$isCollection) {
@@ -429,6 +441,8 @@ final class Accessor
 	 * toto proiteruje stejně všechny a ty nenaloadovaný zbytečně
 	 * myslim ale že by to mohlo nabízet metodu (nebo nějakym způsobem) pro iteraci jen loadnutých
 	 * potomků - ty surový jsou potřeba jen v Mapperu
+	 *
+	 * CO KDYBY TEN ITERÁTOR ITEROVAL JEN LOADNUTÝ? je možnost že by ho použil v Mapperu?
 	 */
 	private function saveChildren(DataHolder $dataHolder)
 	{
@@ -437,6 +451,11 @@ final class Accessor
 				$this->saveChildren($child);
 			}
 
+			// todo - viz todo nad tímto todo
+			// může dojít k tomu, že sice child načte ale neexistují pro něj žádná data
+			// potom je zde vráceno prázné array a nic neuloženo
+			// ovšem nyní nerozezná od neloadnutých holdrů a prázdných holdrů - kdyby se implementovalo to todo nad tim
+			// mohlo by to klidně kešovat i prázná data - ušetřilo by se dvojí tahání (při prázdnym výsledku)
 			$data = $child->getParams();
 			if (empty($data)) {
 				continue;

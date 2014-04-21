@@ -89,7 +89,6 @@ class DataHolder implements \Iterator
 		if ($this->relations !== NULL) {
 			throw new Exception('Parent ids are already set.');
 		}
-		// todo this condition should be in setRelation() and others method too!
 		if (!$this->parent || !$this->parent->getSuggestor()->isCollection()) {
 			throw new Exception('Root DataHolder or DataHolder with simple parent does not need parent ids.');
 		}
@@ -102,9 +101,13 @@ class DataHolder implements \Iterator
 	 * @param int $childId
 	 * @param int $parentId
 	 * @return self
+	 * @throws Exception
 	 */
 	public function setRelation($childId, $parentId)
 	{
+		if (!$this->parent || !$this->parent->getSuggestor()->isCollection()) {
+			throw new Exception('Root DataHolder or DataHolder with simple parent does not need parent ids.');
+		}
 		if (!isset($this->relations[$parentId])) {
 			$this->relations[$parentId] = array();
 		}
@@ -365,6 +368,12 @@ class DataHolder implements \Iterator
 	public function next()
 	{
 		$this->suggestor->next();
+	}
+
+
+	public function checkCompleteness()
+	{
+		// todo - Accessor will call this method to test if all relations have data loaded
 	}
 
 
