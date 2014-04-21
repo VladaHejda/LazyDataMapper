@@ -232,6 +232,15 @@ class CarRestrictor extends LazyDataMapper\FilterRestrictor
 	{
 		$this->equals('driver', $driver->id);
 	}
+
+
+	public function limitCarName($brand, $name = NULL)
+	{
+		$this->equals('brand', $brand);
+		if ($name !== NULL) {
+			$this->equals('name', $name);
+		}
+	}
 }
 
 

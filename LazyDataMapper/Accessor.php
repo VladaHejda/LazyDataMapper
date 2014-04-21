@@ -4,6 +4,7 @@ namespace LazyDataMapper;
 
 /**
  * The main class leading all dependencies. Everything there is controlled internally.
+ * @todo why id must necessary be integer?
  * @todo baseNamespace setting? It could be for example AppName\Entities - will be added during new instance creating, but not stored to cache
  */
 final class Accessor
@@ -38,11 +39,12 @@ final class Accessor
 
 	/**
 	 * @param array $entityClass
-	 * @param int $id
+	 * @param int|IRestrictor $id
 	 * @param IEntity $parent
 	 * @param string $sourceParam
 	 * @return IEntity
 	 * @throws Exception
+	 * @todo rename getById - it is not only by id, so as getByRestrictions...
 	 */
 	public function getById(array $entityClass, $id, IEntity $parent = NULL, $sourceParam = NULL)
 	{
@@ -52,13 +54,36 @@ final class Accessor
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
 
-		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, FALSE, $parent ? $parent->getIdentifier() : NULL, $sourceParam);
+		// todo $origin = $id instanceof IRestrictor ? IIdentifier::ONE_BY_RESTRICTIONS : IIdentifier::BY_ID;
+		$parentIdentifier = $parent ? $parent->getIdentifier() : NULL;
+		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, FALSE, $parentIdentifier, $sourceParam);
 
 		if ($parent && $data = $this->getLoadedData($identifier, $parent->getId())) {
 			// $data set
 
 		} else {
-			if (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
+			if ($id instanceof IRestrictor) {
+				$mapper = $this->serviceAccessor->getMapper($entityClass);
+				$id = $mapper->getIdsByRestrictions($id);
+				if ($id === NULL) {
+					return NULL;
+
+				} elseif (!is_array($id)) {
+					// todo aggregate with loadIdsByRestrictions() method
+					throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
+				}
+				$count = count($id);
+				if (!$count) {
+					return NULL;
+
+				} elseif ($count > 1) {
+					throw new Exception("If given to Facade's getOneByRestrictions() method,"
+						. " Restrictor must match at most one item. However $count items returned.");
+				}
+
+				$id = reset($id);
+
+			} elseif (!$this->serviceAccessor->getMapper($entityClass)->exists($id)) {
 				return NULL;
 			}
 
@@ -78,7 +103,7 @@ final class Accessor
 
 			} else {
 				if ($parent && !isset($this->childrenIdentifierList[$identifier->getKey()])) {
-					$this->cache->cacheChild($parent->getIdentifier(), $entityClass, $sourceParam);
+					$this->cache->cacheChild($parentIdentifier, $entityClass, $sourceParam);
 				}
 				$data = array();
 			}
@@ -326,6 +351,7 @@ final class Accessor
 	 * @return int[]
 	 * @throws Exception
 	 * @throws TooManyItemsException
+	 * @todo podívat se na $maxCount jestli je to s nim vpořádku
 	 */
 	private function loadIdsByRestrictions($entityClass, $restrictions, $maxCount = NULL)
 	{

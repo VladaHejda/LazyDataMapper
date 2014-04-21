@@ -89,6 +89,16 @@ abstract class Facade
 
 
 	/**
+	 * @param IRestrictor $restrictor
+	 * @return IEntity
+	 */
+	public function getOneByRestrictions(IRestrictor $restrictor)
+	{
+		return $this->accessor->getById($this->entityClass, $restrictor);
+	}
+
+
+	/**
 	 * @param int $id
 	 */
 	public function remove($id)
