@@ -44,7 +44,7 @@ class ManyOneTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$this->assertEquals('Gallardo', $race[1]->car->name);
 
 		$this->assertEquals(0, DriverMapper::$calledGetById);
-		$this->assertEquals(1, CarMapper::$calledGetById);
+		$this->assertEquals(0, CarMapper::$calledGetById);
 		$this->assertEquals(0, RaceMapper::$calledGetById);
 		$this->assertEquals(0, DriverMapper::$calledGetByRestrictions);
 		$this->assertEquals(0, CarMapper::$calledGetByRestrictions);

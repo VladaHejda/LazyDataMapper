@@ -80,4 +80,21 @@ class RaceMapper extends defaultMapper
 
 		return $holder;
 	}
+
+
+	public function getByIdsRange(array $ids, LazyDataMapper\Suggestor $suggestor, LazyDataMapper\DataHolder $holder = NULL)
+	{
+		$holder = parent::getByIdsRange($ids, $suggestor, $holder);
+
+		if ($suggestor->car) {
+			$suggestions = array_flip($suggestor->car->getSuggestions());
+			foreach ($ids as $id) {
+				$carId = static::$data[$id]['car'];
+				$data = array_intersect_key(CarMapper::$data[$carId] ,$suggestions);
+				$holder->car->setRelation($carId, $id)->setParams([$carId => $data]);
+			}
+		}
+
+		return $holder;
+	}
 }
