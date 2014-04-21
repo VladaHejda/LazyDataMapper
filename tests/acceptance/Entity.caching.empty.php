@@ -1,6 +1,6 @@
 <?php
 
-namespace LazyDataMapper\Tests\Get;
+namespace LazyDataMapper\Tests\Entity;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
@@ -13,7 +13,7 @@ require_once __DIR__ . '/implementations/model/Car.php';
 require_once __DIR__ . '/implementations/model/Driver.php';
 require_once __DIR__ . '/implementations/model/Race.php';
 
-class EmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class CachingEmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	protected function createServices()

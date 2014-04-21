@@ -1,6 +1,6 @@
 <?php
 
-namespace LazyDataMapper\Tests\Caching;
+namespace LazyDataMapper\Tests\Hierarchy;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
@@ -11,7 +11,7 @@ use LazyDataMapper,
 require_once __DIR__ . '/implementations/model/Driver.php';
 require_once __DIR__ . '/implementations/model/Car.php';
 
-class ChildrenTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class OneOneTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()

@@ -1,6 +1,6 @@
 <?php
 
-namespace LazyDataMapper\Tests\Get;
+namespace LazyDataMapper\Tests\Entity;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests;

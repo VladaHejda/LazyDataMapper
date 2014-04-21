@@ -1,6 +1,6 @@
 <?php
 
-namespace LazyDataMapper\Tests\Restrictor;
+namespace LazyDataMapper\Tests\EntityCollection;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests;
@@ -8,10 +8,7 @@ use LazyDataMapper,
 require_once __DIR__ . '/implementations/model/Car.php';
 require_once __DIR__ . '/implementations/model/Driver.php';
 
-/**
- * @internal changed name convention because of conflict with Restrictor unit test
- */
-class AcceptanceTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class ByRestrictionsTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	/** @var Tests\CarFacade */

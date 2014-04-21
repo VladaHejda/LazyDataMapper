@@ -1,13 +1,13 @@
 <?php
 
-namespace LazyDataMapper\Tests\Remove;
+namespace LazyDataMapper\Tests\Entity;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests;
 
 require_once __DIR__ . '/implementations/model/Car.php';
 
-class Test extends LazyDataMapper\Tests\AcceptanceTestCase
+class RemoveTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	/** @var Tests\CarFacade */

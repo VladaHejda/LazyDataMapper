@@ -1,13 +1,13 @@
 <?php
 
-namespace LazyDataMapper\Tests\Create;
+namespace LazyDataMapper\Tests\Entity;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
 	LazyDataMapper\Tests\CarMapper;
 
 
-class Test extends LazyDataMapper\Tests\AcceptanceTestCase
+class CreateTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	protected function createServices()

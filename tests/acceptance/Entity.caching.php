@@ -1,6 +1,6 @@
 <?php
 
-namespace LazyDataMapper\Tests\Caching;
+namespace LazyDataMapper\Tests\Entity;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
@@ -9,7 +9,7 @@ use LazyDataMapper,
 
 require_once __DIR__ . '/implementations/model/Car.php';
 
-class Test extends LazyDataMapper\Tests\AcceptanceTestCase
+class CachingTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	/** @var Tests\CarFacade */

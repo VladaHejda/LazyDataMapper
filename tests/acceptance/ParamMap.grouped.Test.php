@@ -1,6 +1,6 @@
 <?php
 
-namespace LazyDataMapper\Tests\Get;
+namespace LazyDataMapper\Tests\ParamMap;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
@@ -8,7 +8,7 @@ use LazyDataMapper,
 
 require_once __DIR__ . '/implementations/model/Driver.php';
 
-class GroupedParamMapTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class GroupedTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	public function testGet()

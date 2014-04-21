@@ -1,17 +1,17 @@
 <?php
 
-namespace LazyDataMapper\Tests\Caching;
+namespace LazyDataMapper\Tests\Hierarchy;
 
 use LazyDataMapper,
 	LazyDataMapper\Tests,
 	LazyDataMapper\Tests\SuggestorCache,
-	LazyDataMapper\Tests\RaceMapper,
-	LazyDataMapper\Tests\CarMapper;
+	LazyDataMapper\Tests\CarMapper,
+	LazyDataMapper\Tests\DriverMapper;
 
-require_once __DIR__ . '/implementations/model/Race.php';
 require_once __DIR__ . '/implementations/model/Car.php';
+require_once __DIR__ . '/implementations/model/Driver.php';
 
-class LoadWithChildTest extends LazyDataMapper\Tests\AcceptanceTestCase
+class OneManyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 {
 
 	public function testFirstGet()
@@ -21,39 +21,39 @@ class LoadWithChildTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$serviceAccessor = new Tests\ServiceAccessor;
 		$suggestorCache = new SuggestorCache($cache, $requestKey, $serviceAccessor);
 		$accessor = new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
-		$facade = new Tests\RaceFacade($accessor, $serviceAccessor);
+		$facade = new Tests\DriverFacade($accessor, $serviceAccessor);
 
-		$race = $facade->getById(5);
+		$driver = $facade->getById(2);
 
-		$this->assertEquals('Oregon', $race->country);
-		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $race->car);
-		$this->assertEquals(10500, $race->car->price);
+		$this->assertEquals(9, $driver->wins);
+		$this->assertEquals('FORD Mustang', $driver->cars[1]->title);
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(3, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
 
-		return $facade;
+		return [$cache, $facade];
 	}
 
 
 	/**
 	 * @depends testFirstGet
 	 */
-	public function testCaching(Tests\RaceFacade $facade)
+	public function testCaching(array $services)
 	{
-		$race = $facade->getById(4);
+		list($cache, $facade) = $services;
 
-		$this->assertEquals('Texas', $race->country);
-		$this->assertInstanceOf('LazyDataMapper\Tests\Car', $race->car);
-		$this->assertEquals(184000, $race->car->price);
+		$driver = $facade->getById(5);
 
-		// CarMapper cannot be called, everything solves RaceMapper
-		$this->assertEquals(1, RaceMapper::$calledGetById);
+		$this->assertEquals('SKODA Yeti', $driver->cars[1]->title);
+
+		$this->assertEquals(1, DriverMapper::$calledGetById);
 		$this->assertEquals(0, CarMapper::$calledGetById);
 
 		$this->assertEquals(2, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
 		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
+
+		$this->assertCount(2, $cache->cache);
 	}
 }
