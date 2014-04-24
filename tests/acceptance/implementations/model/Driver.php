@@ -178,9 +178,8 @@ class DriverMapper extends defaultMapper
 			foreach ($ids as $driverId) {
 				$carIds = explode('|', static::$data[$driverId]['famous_cars']);
 				sort($carIds);
-				//todo $holder->famousCars->setChildIds([$driverId => $carIds]);
+				$holder->famousCars->setChildrenIds([$driverId => $carIds]);
 				foreach ($carIds as $carId) {
-					$holder->famousCars->setRelation($carId, $driverId);
 					if (!isset($cars[$carId])) {
 						$cars[$carId] = array_intersect_key(CarMapper::$data[$carId] ,$suggestions);
 					}

@@ -126,6 +126,14 @@ class DataHolder implements \Iterator
 	public function setParentIds(array $idsVsIds)
 	{
 		foreach ($idsVsIds as $childId => $parentId) {
+			if (is_array($parentId)) {
+				foreach ($parentId as $parentSubId) {
+					// todo maybe solve this another way - current iterates a lot
+					$this->setRelation($childId, $parentSubId);
+				}
+			} else {
+				$this->setRelation($childId, $parentId);
+			}
 			$this->setRelation($childId, $parentId);
 		}
 		return $this;
@@ -136,10 +144,16 @@ class DataHolder implements \Iterator
 	 * @param array $idsVsIds parent_id => child_id
 	 * @return self
 	 */
-	public function setChildIds(array $idsVsIds)
+	public function setChildrenIds(array $idsVsIds)
 	{
 		foreach ($idsVsIds as $parentId => $childId) {
-			$this->setRelation($childId, $parentId);
+			if (is_array($childId)) {
+				foreach ($childId as $childSubId) {
+					$this->setRelation($childSubId, $parentId);
+				}
+			} else {
+				$this->setRelation($childId, $parentId);
+			}
 		}
 		return $this;
 	}
