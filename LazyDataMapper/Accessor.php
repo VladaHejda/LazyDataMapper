@@ -424,6 +424,9 @@ final class Accessor
 				$data = array_intersect_key($this->loadedData[$key], array_flip($childrenIds));
 				if (!$isCollection) {
 					$data = reset($data);
+				} else {
+				// todo should be data sorted already in array operations (intersect...)
+					$data = $this->sortData($childrenIds, $data);
 				}
 				// todo uklidit (ale jedno child může mít víc rodičů - na to bacha)
 			} else {

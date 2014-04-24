@@ -288,7 +288,6 @@ class CarMapper extends defaultMapper
 
 	/** @var LazyDataMapper\Suggestor */
 	public static $lastSuggestor;
-
 	/** @var LazyDataMapper\DataHolder */
 	public static $lastHolder;
 
@@ -297,7 +296,6 @@ class CarMapper extends defaultMapper
 		'brand' => '', 'name' => '', 'engine' => '0|0', 'price' => '0',
 		'driver' => NULL, 'chassis_id' => '0', 'repairs' => '0',
 	];
-
 	public static $staticData = [
 		1 => [
 			'brand' => 'BMW', 'name' => 'Z4', 'engine' => '6|2979', 'price' => '16250',

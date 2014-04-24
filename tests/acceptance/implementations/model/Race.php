@@ -54,7 +54,6 @@ class RaceMapper extends defaultMapper
 	public static $lastSuggestor;
 
 	public static $data;
-
 	public static $staticData = [
 		1 => ['car' => '3', 'country' => 'Montana'],
 		2 => ['car' => '3', 'country' => 'Iowa'],

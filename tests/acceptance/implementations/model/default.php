@@ -53,6 +53,7 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 		// analytics
 		++static::$calledGetById;
 		static::$lastSuggestor = $suggestor;
+		static::$lastHolder = $holder;
 
 		$data = array_intersect_key(static::$data[$id], array_flip($suggestor->getSuggestions()));
 		$holder->setParams($data);
@@ -64,6 +65,7 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	{
 		++static::$calledGetByRestrictions;
 		static::$lastSuggestor = $suggestor;
+		static::$lastHolder = $holder;
 
 		$suggestions = array_flip($suggestor->getSuggestions());
 		foreach ($ids as $id) {

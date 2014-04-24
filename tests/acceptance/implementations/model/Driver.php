@@ -106,9 +106,10 @@ class DriverMapper extends defaultMapper
 
 	/** @var LazyDataMapper\Suggestor */
 	public static $lastSuggestor;
+	/** @var LazyDataMapper\DataHolder */
+	public static $lastHolder;
 
 	public static $data;
-
 	public static $staticData = [
 		1 => [
 			'first_name' => 'George', 'last_name' => 'Pooh', 'colleague' => '3',
@@ -116,11 +117,11 @@ class DriverMapper extends defaultMapper
 		],
 		2 => [
 			'first_name' => 'John', 'last_name' => 'Gilbert', 'colleague' => '0',
-			'wins' => '9', 'accidents' => '0', 'famous_cars' => '1'
+			'wins' => '9', 'accidents' => '0', 'famous_cars' => '1|2'
 		],
 		3 => [
 			'first_name' => 'Mike', 'last_name' => 'Norbert', 'colleague' => '1',
-			'wins' => '24', 'accidents' => '31', 'famous_cars' => '1|4|5|7'
+			'wins' => '24', 'accidents' => '31', 'famous_cars' => '1|5|7'
 		],
 		4 => [
 			'first_name' => 'Billy', 'last_name' => 'Dilan', 'colleague' => '5',
@@ -161,6 +162,31 @@ class DriverMapper extends defaultMapper
 				}
 				$holder->cars->races->setParams($races);
 			}
+		}
+
+		return $holder;
+	}
+
+
+	public function getByIdsRange(array $ids, LazyDataMapper\Suggestor $suggestor, LazyDataMapper\DataHolder $holder = NULL)
+	{
+		$holder = parent::getByIdsRange($ids, $suggestor, $holder);
+
+		if ($suggestor->famousCars) {
+			$suggestions = array_flip($suggestor->famousCars->getSuggestions());
+			$cars = [];
+			foreach ($ids as $driverId) {
+				$carIds = explode('|', static::$data[$driverId]['famous_cars']);
+				sort($carIds);
+				//todo $holder->famousCars->setChildIds([$driverId => $carIds]);
+				foreach ($carIds as $carId) {
+					$holder->famousCars->setRelation($carId, $driverId);
+					if (!isset($cars[$carId])) {
+						$cars[$carId] = array_intersect_key(CarMapper::$data[$carId] ,$suggestions);
+					}
+				}
+			}
+			$holder->famousCars->setParams($cars);
 		}
 
 		return $holder;

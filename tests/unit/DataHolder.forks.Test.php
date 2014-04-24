@@ -47,6 +47,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 	private $dataHolder;
 
 
+	// todo test with grouped param map
 	protected function setUp()
 	{
 		parent::setUp();
