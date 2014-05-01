@@ -64,15 +64,7 @@ final class Accessor
 
 		} else {
 			if ($id instanceof IRestrictor) {
-				$mapper = $this->serviceAccessor->getMapper($entityClass);
-				$id = $mapper->getIdsByRestrictions($id);
-				if ($id === NULL) {
-					return NULL;
-
-				} elseif (!is_array($id)) {
-					// todo aggregate with loadIdsByRestrictions() method
-					throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
-				}
+				$id = $this->loadIdsByRestrictions($id, $entityClass);
 				$count = count($id);
 				if (!$count) {
 					return NULL;
@@ -89,18 +81,7 @@ final class Accessor
 			}
 
 			if ($suggestor = $this->cache->getCached($identifier, $entityClass, FALSE, $childrenIdentifierList)) {
-				// when no suggestions, even children are ignored, they will be loaded later
-				$suggestions = $suggestor->getSuggestions();
-				if (empty($suggestions)) {
-					$data = array();
-
-				} else {
-					$dataHolder = $this->loadDataHolderByMapper($entityClass, $id, $suggestor);
-					if ($dataHolder->hasLoadedChildren()) {
-						$this->saveChildren($dataHolder);
-					}
-					$data = $dataHolder->getParams();
-				}
+				$data = $this->loadData($entityClass, $id, $suggestor);
 
 			} else {
 				if ($parent && !isset($this->childrenIdentifierList[$identifier->getKey()])) {
@@ -155,25 +136,13 @@ final class Accessor
 			// else $data set
 
 		} else {
-			$ids = $this->loadIdsByRestrictions($entityClass, $restrictions, $maxCount);
+			$ids = $this->loadIds($restrictions, $entityClass, $maxCount);
 
 			if (empty($ids)) {
 				$data = array();
 
-			} elseif ($suggestor = $this->cache->getCached($identifier, $entityClass, TRUE)) {
-				// when no suggestions, even children are ignored, they will be loaded later
-				$suggestions = $suggestor->getSuggestions();
-				if (empty($suggestions)) {
-					$data = array_fill_keys($ids, array());
-
-				} else {
-					$dataHolder = $this->loadDataHolderByMapper($entityClass, $ids, $suggestor);
-					if ($dataHolder->hasLoadedChildren()) {
-						$this->saveChildren($dataHolder);
-					}
-					$data = $dataHolder->getParams();
-					$this->sortData($ids, $data);
-				}
+			} elseif ($suggestor = $this->cache->getCached($identifier, $entityClass, TRUE, $childrenIdentifierList)) {
+				$data = $this->loadData($entityClass, $ids, $suggestor);
 
 			} else {
 				// todo $mapper->siftIds() (sift = protřídit) místo exists() ? - ale potom možná spouštět sortIds, mapper je může zamíchat
@@ -193,6 +162,10 @@ final class Accessor
 			}
 
 			unset($this->childrenIdentifierList[$identifier->getKey()]);
+
+			if (!empty($childrenIdentifierList)) {
+				$this->childrenIdentifierList += array_fill_keys($childrenIdentifierList, TRUE);
+			}
 		}
 
 		if (empty($data)) {
@@ -282,7 +255,7 @@ final class Accessor
 	{
 		$entityClass = reset($entityClass);
 
-		$ids = $this->loadIdsByRestrictions($entityClass, $restrictions);
+		$ids = $this->loadIds($restrictions, $entityClass);
 
 		if (!empty($ids)) {
 			$this->serviceAccessor->getMapper($entityClass)->removeByIdsRange($ids);
@@ -352,24 +325,44 @@ final class Accessor
 
 
 	/**
-	 * @param string $entityClass
 	 * @param IRestrictor|int[] $restrictions
+	 * @param string $entityClass
 	 * @param int $maxCount
 	 * @return int[]
 	 * @throws Exception
 	 * @throws TooManyItemsException
 	 * @todo podívat se na $maxCount jestli je to s nim vpořádku
 	 */
-	private function loadIdsByRestrictions($entityClass, $restrictions, $maxCount = NULL)
+	private function loadIds($restrictions, $entityClass, $maxCount = NULL)
 	{
 		if (is_array($restrictions)) {
 			return $restrictions;
-		}
 
-		if (!$restrictions instanceof IRestrictor) {
+		} elseif ($restrictions instanceof IRestrictor) {
+			$ids = $this->loadIdsByRestrictions($restrictions, $entityClass, $maxCount);
+
+			if (NULL !== $maxCount && count($ids) > $maxCount) {
+				throw new TooManyItemsException("Trying to get more than $maxCount pieces of $entityClass."
+					. " Increase the \$maxCount limit or restrict result more.");
+			}
+
+			return $ids;
+
+		} else {
 			throw new Exception('Expected instance of IRestrictor or an array.');
 		}
+	}
 
+
+	/**
+	 * @param IRestrictor $restrictions
+	 * @param $entityClass
+	 * @param int $maxCount
+	 * @return int[]
+	 * @throws Exception
+	 */
+	private function loadIdsByRestrictions(IRestrictor $restrictions, $entityClass, $maxCount = NULL)
+	{
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		$ids = $mapper->getIdsByRestrictions($restrictions, NULL === $maxCount ? NULL : ++$maxCount);
 		if (NULL === $ids) {
@@ -379,11 +372,34 @@ final class Accessor
 			throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
 		}
 
-		if (NULL !== $maxCount && count($ids) > $maxCount) {
-			throw new TooManyItemsException("Trying to get more than $maxCount pieces of $entityClass. Increase the \$maxCount limit or restrict result more.");
-		}
-
 		return $ids;
+	}
+
+
+	/**
+	 * @param string $entityClass
+	 * @param int|int[] $id
+	 * @param Suggestor $suggestor
+	 * @return array
+	 */
+	private function loadData($entityClass, $id, Suggestor $suggestor)
+	{
+		$isCollection = is_array($id);
+
+		// when no suggestions, even children are ignored, they will be loaded later
+		$suggestions = $suggestor->getSuggestions();
+		if (empty($suggestions)) {
+			return $isCollection ? array_fill_keys($id, array()) : array();
+		}
+		$dataHolder = $this->loadDataHolderByMapper($entityClass, $id, $suggestor);
+		if ($dataHolder->hasLoadedChildren()) {
+			$this->saveChildren($dataHolder);
+		}
+		$data = $dataHolder->getParams();
+		if ($isCollection) {
+			$this->sortData($id, $data);
+		}
+		return $data;
 	}
 
 

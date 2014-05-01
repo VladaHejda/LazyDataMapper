@@ -54,7 +54,7 @@ class GetByRestrictionsTest extends LazyDataMapper\Tests\TestCase
 		$cache = \Mockery::mock('LazyDataMapper\SuggestorCache')
 			->shouldReceive('getCached')
 			->once()
-			->with($identifier, 'Some\Entity', TRUE)
+			->with($identifier, 'Some\Entity', TRUE, NULL)
 			->andReturn($suggestor)
 		->getMock();
 
