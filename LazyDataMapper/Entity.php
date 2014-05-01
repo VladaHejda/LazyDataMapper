@@ -422,7 +422,7 @@ abstract class Entity implements IEntity
 			$arg = end($this->getting);
 		}
 
-		return $this->accessor->getOne(array($entityClass), $id, $this, $arg);
+		return $this->accessor->getEntity($entityClass, $id, $this, $arg);
 	}
 
 

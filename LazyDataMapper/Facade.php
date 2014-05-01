@@ -63,7 +63,7 @@ abstract class Facade
 	 */
 	public function getById($id)
 	{
-		return $this->accessor->getOne($this->entityClass, $id);
+		return $this->accessor->getEntity(reset($this->entityClass), $id);
 	}
 
 
@@ -94,7 +94,7 @@ abstract class Facade
 	 */
 	public function getOneByRestrictions(IRestrictor $restrictor)
 	{
-		return $this->accessor->getOne($this->entityClass, $restrictor);
+		return $this->accessor->getEntity(reset($this->entityClass), $restrictor);
 	}
 
 

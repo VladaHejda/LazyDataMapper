@@ -38,17 +38,15 @@ final class Accessor
 
 
 	/**
-	 * @param array $entityClass
+	 * @param string $entityClass
 	 * @param int|IRestrictor $id
 	 * @param IEntity $parent
 	 * @param string $sourceParam
 	 * @return IEntity
 	 * @throws Exception
 	 */
-	public function getOne(array $entityClass, $id, IEntity $parent = NULL, $sourceParam = NULL)
+	public function getEntity($entityClass, $id, IEntity $parent = NULL, $sourceParam = NULL)
 	{
-		$entityClass = reset($entityClass);
-
 		if (($parent && NULL === $sourceParam) || (NULL !== $sourceParam && !$parent)) {
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
