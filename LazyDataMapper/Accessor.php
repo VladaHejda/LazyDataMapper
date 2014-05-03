@@ -10,6 +10,8 @@ namespace LazyDataMapper;
 final class Accessor
 {
 
+	const ALL = '*';
+
 	/** @var SuggestorCache */
 	protected $cache;
 
@@ -124,7 +126,13 @@ final class Accessor
 			throw new Exception('Both $parent and $sourceParam must be set or omitted.');
 		}
 
-		$origin = $restrictions instanceof IRestrictor ? IIdentifier::BY_RESTRICTIONS : IIdentifier::BY_IDS_RANGE;
+		if ($restrictions === self::ALL) {
+			$origin = IIdentifier::ALL;
+		} elseif ($restrictions instanceof IRestrictor) {
+			$origin = IIdentifier::BY_RESTRICTIONS;
+		} else {
+			$origin = IIdentifier::BY_IDS_RANGE;
+		}
 		$parentIdentifier = $parent ? $parent->getIdentifier() : NULL;
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, $origin, $parentIdentifier, $sourceParam);
 
@@ -338,7 +346,7 @@ final class Accessor
 		if (is_array($restrictions)) {
 			return $restrictions;
 
-		} elseif ($restrictions instanceof IRestrictor) {
+		} elseif ($restrictions instanceof IRestrictor || $restrictions === self::ALL) {
 			$ids = $this->loadIdsByRestrictions($restrictions, $entityClass, $maxCount);
 
 			if (NULL !== $maxCount && count($ids) > $maxCount) {
@@ -361,15 +369,24 @@ final class Accessor
 	 * @return int[]
 	 * @throws Exception
 	 */
-	private function loadIdsByRestrictions(IRestrictor $restrictions, $entityClass, $maxCount = NULL)
+	private function loadIdsByRestrictions($restrictions, $entityClass, $maxCount = NULL)
 	{
+		if ($maxCount !== NULL) {
+			++$maxCount;
+		}
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
-		$ids = $mapper->getIdsByRestrictions($restrictions, NULL === $maxCount ? NULL : ++$maxCount);
+		if ($restrictions === self::ALL) {
+			$m = 'getAllIds';
+			$ids = $mapper->getAllIds($maxCount);
+		} else {
+			$m = 'getIdsByRestrictions';
+			$ids = $mapper->getIdsByRestrictions($restrictions, $maxCount);
+		}
 		if (NULL === $ids) {
 			return array();
 
 		} elseif (!is_array($ids)) {
-			throw new Exception(get_class($mapper) . '::getIdsByRestrictions() must return array or null.');
+			throw new Exception(get_class($mapper) . "::$m() must return array or null.");
 		}
 
 		return $ids;

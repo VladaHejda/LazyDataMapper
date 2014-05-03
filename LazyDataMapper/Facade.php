@@ -99,6 +99,16 @@ abstract class Facade
 
 
 	/**
+	 * @param int $maxCount
+	 * @return IEntityCollection
+	 */
+	public function getAll($maxCount = 100)
+	{
+		return $this->accessor->getCollection($this->entityClass, Accessor::ALL, NULL, NULL, $maxCount);
+	}
+
+
+	/**
 	 * @param int $id
 	 */
 	public function remove($id)

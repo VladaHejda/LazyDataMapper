@@ -10,7 +10,8 @@ interface IIdentifier
 		BY_RESTRICTIONS = '*',
 		BY_IDS_RANGE = '@',
 		ONE_BY_RESTRICTIONS = '^',
-		CREATE = '+'
+		CREATE = '+',
+		ALL = '~'
 	;
 
 

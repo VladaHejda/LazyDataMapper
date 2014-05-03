@@ -48,6 +48,13 @@ interface IMapper
 
 
 	/**
+	 * @param int $limit @see getIdsByRestrictions()
+	 * @return mixed
+	 */
+	function getAllIds($limit = NULL);
+
+
+	/**
 	 * Saves modifications of entity.
 	 * @param int $id
 	 * @param DataHolder $holder

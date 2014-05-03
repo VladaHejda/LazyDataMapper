@@ -91,6 +91,12 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	}
 
 
+	public function getAllIds($maxCount = NULL)
+	{
+		return array_keys(static::$data);
+	}
+
+
 	public function save($id, LazyDataMapper\DataHolder $holder)
 	{
 		static::$lastHolder = $holder;
