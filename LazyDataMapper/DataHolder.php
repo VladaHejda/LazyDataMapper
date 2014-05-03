@@ -172,6 +172,7 @@ class DataHolder implements \Iterator
 	 * @param array|array[] $data when no id source, id is expected in index
 	 * @return self
 	 * @throws Exception
+	 * @todo vyřešit situaci, kdy je potomek prázdný (parent id je NULL) !!!
 	 */
 	public function setParams(array $data)
 	{
@@ -197,7 +198,11 @@ class DataHolder implements \Iterator
 
 			foreach ($data as $id => $subdata) {
 				if (!is_array($subdata)) {
-					throw new Exception('Only array of data arrays can be given to collective DataHolder.');
+					if ($this->idSource !== NULL) {
+						$subdata = array($subdata);
+					} else {
+						throw new Exception('Only array of data arrays can be given to collective DataHolder.');
+					}
 				}
 
 				// id
@@ -269,6 +274,15 @@ class DataHolder implements \Iterator
 			return $collectionMap;
 		}
 		return $this->fillMap($map, $this->data);
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isDataLoaded()
+	{
+		return (bool) $this->data;
 	}
 
 
