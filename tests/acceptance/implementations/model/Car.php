@@ -168,7 +168,7 @@ class Cars extends LazyDataMapper\EntityCollection
 	protected function getPrice()
 	{
 		$total = 0;
-		foreach ($this->getParams('price') as $price) {
+		foreach ($this->getData('price') as $price) {
 			$total += $price;
 		}
 		return $total;

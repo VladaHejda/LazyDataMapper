@@ -218,7 +218,7 @@ final class Accessor
 		$dataHolder = $this->serviceAccessor->createDataHolder(
 			$this->serviceAccessor->createSuggestor($entityClass, $this->cache, array_keys($data))
 		);
-		$dataHolder->setParams($data);
+		$dataHolder->setData($data);
 
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		$id = $mapper->create($dataHolder);
@@ -228,7 +228,7 @@ final class Accessor
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, IIdentifier::CREATE);
 
 		if ($suggestorCached = $this->cache->getCached($identifier, $entityClass)) {
-			$data = $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached)->getParams() + $data;
+			$data = $this->loadDataHolderByMapper($entityClass, $id, $suggestorCached)->getData() + $data;
 		}
 
 		return $this->serviceAccessor->createEntity($this, $entityClass, $id, $data, $identifier);
@@ -283,7 +283,7 @@ final class Accessor
 		$entityClass = get_class($entity);
 		$suggestor = $this->cache->cacheSuggestion($entity->getIdentifier(), $paramName, $entityClass);
 		$dataHolder = $this->loadDataHolderByMapper($entityClass, $entity->getId(), $suggestor);
-		$params = $dataHolder->getParams();
+		$params = $dataHolder->getData();
 		return array_shift($params);
 	}
 
@@ -315,7 +315,7 @@ final class Accessor
 		$dataHolder = $this->serviceAccessor->createDataHolder(
 			$this->serviceAccessor->createSuggestor($entityClass, $this->cache, array_keys($data))
 		);
-		$dataHolder->setParams($data);
+		$dataHolder->setData($data);
 
 		$this->serviceAccessor->getMapper($entityClass)->save($entity->getId(), $dataHolder);
 	}
@@ -395,7 +395,7 @@ final class Accessor
 		if ($dataHolder->hasLoadedChildren()) {
 			$this->saveChildren($dataHolder);
 		}
-		$data = $dataHolder->getParams();
+		$data = $dataHolder->getData();
 		if ($isCollection) {
 			$this->sortData($id, $data);
 		}
@@ -472,7 +472,7 @@ final class Accessor
 			// potom je zde vráceno prázné array a nic neuloženo
 			// ovšem nyní nerozezná od neloadnutých holdrů a prázdných holdrů - kdyby se implementovalo to todo nad tim
 			// mohlo by to klidně kešovat i prázná data - ušetřilo by se dvojí tahání (při prázdnym výsledku)
-			$data = $child->getParams();
+			$data = $child->getData();
 			if (empty($data)) {
 				continue;
 			}

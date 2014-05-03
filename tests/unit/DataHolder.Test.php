@@ -40,18 +40,18 @@ class Test extends LazyDataMapper\Tests\TestCase
 		$this->assertSame($suggestor, $dataHolder->getSuggestor());
 
 		$data = ['name' => 'George', 'age' => 25];
-		$dataHolder->setParams($data);
-		$this->assertEquals($data, $dataHolder->getParams());
+		$dataHolder->setData($data);
+		$this->assertEquals($data, $dataHolder->getData());
 
-		$dataHolder->setParams($data + ['extra' => 'whatever']);
-		$this->assertEquals($data, $dataHolder->getParams());
+		$dataHolder->setData($data + ['extra' => 'whatever']);
+		$this->assertEquals($data, $dataHolder->getData());
 
 		$this->assertException(function () use ($dataHolder){
 			$dataHolder->isDataInGroup('whatever');
 		}, 'LazyDataMapper\Exception');
 
 		$this->assertException(function () use ($dataHolder){
-			$dataHolder->getParams('whatever');
+			$dataHolder->getData('whatever');
 		}, 'LazyDataMapper\Exception');
 	}
 
@@ -75,16 +75,16 @@ class Test extends LazyDataMapper\Tests\TestCase
 			7 => ['name' => 'John', 'age' => 17],
 		];
 
-		$dataHolder->setParams($data);
-		$this->assertEquals($data, $dataHolder->getParams());
+		$dataHolder->setData($data);
+		$this->assertEquals($data, $dataHolder->getData());
 
-		$dataHolder->setParams([3 => $data[3]]);
-		$this->assertEquals($data, $dataHolder->getParams());
+		$dataHolder->setData([3 => $data[3]]);
+		$this->assertEquals($data, $dataHolder->getData());
 
 		$modifiedData = $data;
 		$modifiedData[3]['extra'] = 'whatever';
-		$dataHolder->setParams($modifiedData);
-		$this->assertEquals($data, $dataHolder->getParams());
+		$dataHolder->setData($modifiedData);
+		$this->assertEquals($data, $dataHolder->getData());
 	}
 
 
@@ -139,16 +139,16 @@ class Test extends LazyDataMapper\Tests\TestCase
 
 		$this->assertFalse($dataHolder->isDataInGroup('personal'));
 		$this->assertFalse($dataHolder->isDataInGroup('skill'));
-		$dataHolder->setParams(['power' => 120]);
+		$dataHolder->setData(['power' => 120]);
 		$this->assertFalse($dataHolder->isDataInGroup('personal'));
 		$this->assertTrue($dataHolder->isDataInGroup('skill'));
-		$dataHolder->setParams(['name' => 'John', 'power' => 300]);
+		$dataHolder->setData(['name' => 'John', 'power' => 300]);
 		$this->assertTrue($dataHolder->isDataInGroup('personal'));
 		$this->assertTrue($dataHolder->isDataInGroup('skill'));
 
-		$this->assertEquals(['name' => 'John', 'power' => 300], $dataHolder->getParams());
-		$this->assertEquals(['name' => 'John'], $dataHolder->getParams('personal'));
-		$this->assertEquals(['power' => 300], $dataHolder->getParams('skill'));
+		$this->assertEquals(['name' => 'John', 'power' => 300], $dataHolder->getData());
+		$this->assertEquals(['name' => 'John'], $dataHolder->getData('personal'));
+		$this->assertEquals(['power' => 300], $dataHolder->getData('skill'));
 
 		$this->assertException(function () use ($dataHolder) {
 			$dataHolder->isDataInGroup('unknown');
@@ -209,25 +209,25 @@ class Test extends LazyDataMapper\Tests\TestCase
 		];
 
 		$this->assertException(function () use ($dataHolder, $data) {
-			$dataHolder->setParams($data[2]);
+			$dataHolder->setData($data[2]);
 		}, 'LazyDataMapper\Exception');
 
-		$dataHolder->setParams([2 => ['power' => 225]]);
+		$dataHolder->setData([2 => ['power' => 225]]);
 
 		$this->assertFalse($dataHolder->isDataInGroup('personal'));
 		$this->assertTrue($dataHolder->isDataInGroup('skill'));
 
-		$dataHolder->setParams([2 => $data[2]]);
-		$dataHolder->setParams([9 => $data[9]]);
+		$dataHolder->setData([2 => $data[2]]);
+		$dataHolder->setData([9 => $data[9]]);
 
 		$this->assertTrue($dataHolder->isDataInGroup('personal'));
 		$this->assertTrue($dataHolder->isDataInGroup('skill'));
 
-		$this->assertEquals($data, $dataHolder->getParams());
+		$this->assertEquals($data, $dataHolder->getData());
 		$dataPersonal = $dataSkill = $data;
 		unset($dataPersonal[2]['power'], $dataPersonal[9]['power']);
 		unset($dataSkill[2]['name'], $dataSkill[9]['name']);
-		$this->assertEquals($dataPersonal, $dataHolder->getParams('personal'));
-		$this->assertEquals($dataSkill, $dataHolder->getParams('skill'));
+		$this->assertEquals($dataPersonal, $dataHolder->getData('personal'));
+		$this->assertEquals($dataSkill, $dataHolder->getData('skill'));
 	}
 }

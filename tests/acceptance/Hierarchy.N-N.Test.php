@@ -64,7 +64,7 @@ class ManyManyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 			2 => ['name' => 'Gallardo'],
 			7 => ['name' => 'Yeti'],
 		];
-		$this->assertEquals($data, DriverMapper::$lastHolder->famousCars->getParams());
+		$this->assertEquals($data, DriverMapper::$lastHolder->famousCars->getData());
 		$relations = [
 			1 => [4, 5],
 			2 => [1, 2],

@@ -56,7 +56,7 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 		static::$lastHolder = $holder;
 
 		$data = array_intersect_key(static::$data[$id], array_flip($suggestor->getSuggestions()));
-		$holder->setParams($data);
+		$holder->setData($data);
 		return $holder;
 	}
 
@@ -70,7 +70,7 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 		$suggestions = array_flip($suggestor->getSuggestions());
 		foreach ($ids as $id) {
 			$data = array_intersect_key(static::$data[$id], $suggestions);
-			$holder->setParams([$id => $data]);
+			$holder->setData([$id => $data]);
 		}
 
 		return $holder;
@@ -94,13 +94,13 @@ abstract class defaultMapper implements LazyDataMapper\IMapper
 	public function save($id, LazyDataMapper\DataHolder $holder)
 	{
 		static::$lastHolder = $holder;
-		static::$data[$id] = array_merge(static::$data[$id], $holder->getParams());
+		static::$data[$id] = array_merge(static::$data[$id], $holder->getData());
 	}
 
 
 	public function create(LazyDataMapper\DataHolder $holder)
 	{
-		static::$data[] = array_merge(static::$default, $holder->getParams());
+		static::$data[] = array_merge(static::$default, $holder->getData());
 		end(static::$data);
 		return key(static::$data);
 	}

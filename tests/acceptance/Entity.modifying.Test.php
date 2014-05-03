@@ -157,7 +157,7 @@ class ModifyingTest extends LazyDataMapper\Tests\AcceptanceTestCase
 		$car->name = 'Miura';
 		$car->save();
 
-		$this->assertEquals(['name' => 'Miura'], CarMapper::$lastHolder->getParams());
+		$this->assertEquals(['name' => 'Miura'], CarMapper::$lastHolder->getData());
 
 		$this->assertEquals('Miura', $car->name);
 		$this->assertEquals(211100, $car->price);

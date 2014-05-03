@@ -4,7 +4,6 @@ namespace LazyDataMapper;
 
 /**
  * Based on Suggestor gains data from Mapper and gives data to Mapper's method save() and create().
- * @todo rename "params" to "data"
  * @todo asi se zbavit Holderu v Mapperu (stejně už data nekontroluje, jen ořezává, mohl by si ho Accessor nastavovat sám
  */
 class DataHolder implements \Iterator
@@ -174,7 +173,7 @@ class DataHolder implements \Iterator
 	 * @throws Exception
 	 * @todo vyřešit situaci, kdy je potomek prázdný (parent id je NULL) !!!
 	 */
-	public function setParams(array $data)
+	public function setData(array $data)
 	{
 		$suggestions = array_fill_keys($this->suggestor->getSuggestions(), TRUE);
 
@@ -259,7 +258,7 @@ class DataHolder implements \Iterator
 	 * @param string $group
 	 * @return array
 	 */
-	public function getParams($group = NULL)
+	public function getData($group = NULL)
 	{
 		if (NULL === $group) {
 			return $this->data;

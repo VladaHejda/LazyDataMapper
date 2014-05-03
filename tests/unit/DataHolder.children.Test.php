@@ -75,7 +75,7 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 	/**
 	 * @depends testChildren
 	 */
-	public function testSetParams($services)
+	public function testSetData($services)
 	{
 		list($dataHolder, $children) = $services;
 
@@ -83,7 +83,7 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 			->once()
 			->andReturn(['color', 'brand']);
 
-		$dataHolder->car->setParams(['color' => 'blue', 'brand' => 'BMW']);
+		$dataHolder->car->setData(['color' => 'blue', 'brand' => 'BMW']);
 
 		$children['drivers']->shouldReceive('getSuggestions')
 			->once()
@@ -93,6 +93,6 @@ class ChildrenTest extends LazyDataMapper\Tests\TestCase
 			3 => ['name' => 'John', 'team' => 'Storms'],
 			7 => ['name' => 'George', 'team' => 'Eagle'],
 		];
-		$dataHolder->drivers->setParams($data);
+		$dataHolder->drivers->setData($data);
 	}
 }

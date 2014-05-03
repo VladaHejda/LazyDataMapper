@@ -147,7 +147,7 @@ class DriverMapper extends defaultMapper
 					$cars[$carId] = array_intersect_key($car ,$suggestions);
 				}
 			}
-			$holder->cars->setParams($cars);
+			$holder->cars->setData($cars);
 
 			if ($suggestor->cars->races) {
 				$suggestions = array_flip($suggestor->cars->races->getSuggestions());
@@ -160,7 +160,7 @@ class DriverMapper extends defaultMapper
 						}
 					}
 				}
-				$holder->cars->races->setParams($races);
+				$holder->cars->races->setData($races);
 			}
 		}
 
@@ -185,7 +185,7 @@ class DriverMapper extends defaultMapper
 					}
 				}
 			}
-			$holder->famousCars->setParams($cars);
+			$holder->famousCars->setData($cars);
 		}
 
 		return $holder;

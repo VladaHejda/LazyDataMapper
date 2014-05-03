@@ -90,9 +90,9 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 
 	public function testSetAggregated()
 	{
-		$this->dataHolder->setIdSource('car_id')->setParams($this->data)
-			->drivers->setIdSource('driver_id')->setParams($this->data)
-			->teams->setIdSource('team_id')->setParams($this->data);
+		$this->dataHolder->setIdSource('car_id')->setData($this->data)
+			->drivers->setIdSource('driver_id')->setData($this->data)
+			->teams->setIdSource('team_id')->setData($this->data);
 
 		$this->doTests();
 	}
@@ -102,9 +102,9 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 	{
 		list($cars, $drivers, $driversRelations, $teams, $teamsRelations) = $this->sortData();
 
-		$this->dataHolder->setParams($cars)
-			->drivers->setParentIds($driversRelations)->setParams($drivers)
-			->teams->setParentIds($teamsRelations)->setParams($teams);
+		$this->dataHolder->setData($cars)
+			->drivers->setParentIds($driversRelations)->setData($drivers)
+			->teams->setParentIds($teamsRelations)->setData($teams);
 
 		$this->doTests();
 	}
@@ -112,9 +112,9 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 
 	public function testSetAggregatedWithParentId()
 	{
-		$this->dataHolder->drivers->teams->setIdSource('team_id')->setParentIdSource('driver_id')->setParams($this->data)
-			->getParent()->setIdSource('driver_id')->setParentIdSource('car_id')->setParams($this->data)
-			->getParent()->setIdSource('car_id')->setParams($this->data);
+		$this->dataHolder->drivers->teams->setIdSource('team_id')->setParentIdSource('driver_id')->setData($this->data)
+			->getParent()->setIdSource('driver_id')->setParentIdSource('car_id')->setData($this->data)
+			->getParent()->setIdSource('car_id')->setData($this->data);
 
 		$this->doTests();
 	}
@@ -125,7 +125,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 	 */
 	public function testNotSetParentIds()
 	{
-		$this->dataHolder->drivers->setIdSource('driver_id')->setParams($this->data);
+		$this->dataHolder->drivers->setIdSource('driver_id')->setData($this->data);
 	}
 
 
@@ -135,7 +135,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 	public function testEmptyIdSource()
 	{
 		unset($this->data[0]['car_id']);
-		$this->dataHolder->setIdSource('car_id')->setParams($this->data);
+		$this->dataHolder->setIdSource('car_id')->setData($this->data);
 	}
 
 
@@ -145,7 +145,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 	public function testEmptyParentIdSource()
 	{
 		unset($this->data[0]['car_id']);
-		$this->dataHolder->drivers->setIdSource('driver_id')->setParentIdSource('car_id')->setParams($this->data);
+		$this->dataHolder->drivers->setIdSource('driver_id')->setParentIdSource('car_id')->setData($this->data);
 	}
 
 
@@ -155,7 +155,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 	public function testWrongId()
 	{
 		$this->data[1]['car_id'] = 'wrong';
-		$this->dataHolder->setIdSource('car_id')->setParams($this->data);
+		$this->dataHolder->setIdSource('car_id')->setData($this->data);
 	}
 
 
@@ -167,7 +167,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 		list($cars) = $this->sortData();
 		$cars['wrong'] = $cars[1];
 		unset($cars[1]);
-		$this->dataHolder->setParams($cars);
+		$this->dataHolder->setData($cars);
 	}
 
 
@@ -177,7 +177,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 	public function testWrongParentId()
 	{
 		$this->data[1]['car_id'] = 'wrong';
-		$this->dataHolder->drivers->setIdSource('driver_id')->setParentIdSource('car_id')->setParams($this->data);
+		$this->dataHolder->drivers->setIdSource('driver_id')->setParentIdSource('car_id')->setData($this->data);
 	}
 
 
@@ -186,7 +186,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 	 */
 	public function testMalformedData()
 	{
-		$this->dataHolder->setIdSource('car_id')->setParams($this->data[1]);
+		$this->dataHolder->setIdSource('car_id')->setData($this->data[1]);
 	}
 
 
@@ -221,7 +221,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 				2 => ['brand' => 'Ford', 'color' => 'blue'],
 				3 => ['brand' => 'Saab', 'color' => 'gold'],
 			],
-			$this->dataHolder->getParams()
+			$this->dataHolder->getData()
 		);
 		$this->assertEquals(
 			[
@@ -230,7 +230,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 				30 => ['name' => 'Ed', 'wins' => 7],
 				40 => ['name' => 'Hugo', 'wins' => 0],
 			],
-			$this->dataHolder->drivers->getParams()
+			$this->dataHolder->drivers->getData()
 		);
 		$this->assertEquals(
 			[
@@ -241,7 +241,7 @@ class ForksTest extends LazyDataMapper\Tests\TestCase
 				500 => ['title' => 'GOGO!'],
 				600 => ['title' => 'Mordor'],
 			],
-			$this->dataHolder->drivers->teams->getParams()
+			$this->dataHolder->drivers->teams->getData()
 		);
 	}
 }

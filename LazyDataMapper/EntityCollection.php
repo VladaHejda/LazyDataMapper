@@ -31,7 +31,7 @@ abstract class EntityCollection implements IEntityCollection
 
 
 	/**
-	 * @param array[] $data array of params of each Entity, indexed by id, order dependent
+	 * @param array[] $data array of data of each Entity, indexed by id, order dependent
 	 * @param IIdentifier $identifier
 	 * @param Accessor $accessor
 	 * @param string $entityClass
@@ -168,13 +168,13 @@ abstract class EntityCollection implements IEntityCollection
 	/**
 	 * Creates Entity.
 	 * @param int $id
-	 * @param array $params
+	 * @param array $data
 	 * @return IEntity
 	 */
-	protected function createEntity($id, array $params)
+	protected function createEntity($id, array $data)
 	{
 		$entityClass = $this->entityClass;
-		return new $entityClass($id, $params, $this->accessor, $this->identifier);
+		return new $entityClass($id, $data, $this->accessor, $this->identifier);
 	}
 
 
@@ -183,7 +183,7 @@ abstract class EntityCollection implements IEntityCollection
 	 * @param string
 	 * @return array
 	 */
-	protected function getParams($paramName)
+	protected function getData($paramName)
 	{
 		if (!count($this)) {
 			return array();
@@ -197,11 +197,11 @@ abstract class EntityCollection implements IEntityCollection
 		}
 
 		// cause integration of param
-		$params = array();
+		$data = array();
 		foreach ($this as $index => $entity) {
-			$params[] = $this->data[$index][$paramName] = $entity->$paramName;
+			$data[] = $this->data[$index][$paramName] = $entity->$paramName;
 		}
-		return $params;
+		return $data;
 	}
 
 
