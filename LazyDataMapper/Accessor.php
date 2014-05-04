@@ -185,17 +185,15 @@ final class Accessor
 
 
 	/**
-	 * @param array $entityClass
+	 * @param string $entityClass
 	 * @param array $publicData
 	 * @param array $privateData
 	 * @param bool $throwFirst
 	 * @return IEntity
 	 * @throws Exception
 	 */
-	public function create(array $entityClass, array $publicData, array $privateData = array(), $throwFirst = TRUE)
+	public function create($entityClass, array $publicData, array $privateData = array(), $throwFirst = TRUE)
 	{
-		$entityClass = reset($entityClass);
-
 		$entity = $this->serviceAccessor->createEntity($this, $entityClass, NULL, $privateData);
 
 		$cachedException = NULL;
@@ -231,7 +229,7 @@ final class Accessor
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		$id = $mapper->create($dataHolder);
 		if (!is_int($id)) {
-			throw new Exception(get_class($mapper) . '::create() must return integer id.');
+			throw new Exception(get_class($mapper) . '::create() must return integer ID.');
 		}
 		$identifier = $this->serviceAccessor->composeIdentifier($entityClass, IIdentifier::CREATE);
 
@@ -244,25 +242,22 @@ final class Accessor
 
 
 	/**
-	 * @param array $entityClass
+	 * @param string $entityClass
 	 * @param int $id
 	 */
-	public function remove(array $entityClass, $id)
+	public function remove($entityClass, $id)
 	{
-		$entityClass = reset($entityClass);
 		$this->serviceAccessor->getMapper($entityClass)->remove($id);
 	}
 
 
 	/**
-	 * @param array $entityClass
+	 * @param string $entityClass
 	 * @param IRestrictor|int[] $restrictions
 	 * @throws Exception
 	 */
-	public function removeByRestrictions(array $entityClass, $restrictions)
+	public function removeByRestrictions($entityClass, $restrictions)
 	{
-		$entityClass = reset($entityClass);
-
 		$ids = $this->loadIds($restrictions, $entityClass);
 
 		if (!empty($ids)) {

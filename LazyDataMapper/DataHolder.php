@@ -172,6 +172,7 @@ class DataHolder implements \Iterator
 	 * @return self
 	 * @throws Exception
 	 * @todo vyřešit situaci, kdy je potomek prázdný (parent id je NULL) !!!
+	 * @todo umožnit také nastavení collection dat jako setData(['id' => 5, 'name' => 'Bla']); místo setData([['id' => 5, 'name' => 'Bla']]);
 	 */
 	public function setData(array $data)
 	{

@@ -50,6 +50,7 @@ interface IMapper
 	/**
 	 * @param int $limit @see getIdsByRestrictions()
 	 * @return mixed
+	 * @todo add to DOC
 	 */
 	function getAllIds($limit = NULL);
 

@@ -113,7 +113,7 @@ abstract class Facade
 	 */
 	public function remove($id)
 	{
-		$this->accessor->remove($this->entityClass, $id);
+		$this->accessor->remove(reset($this->entityClass), $id);
 	}
 
 
@@ -122,7 +122,7 @@ abstract class Facade
 	 */
 	public function removeByIdsRange(array $ids)
 	{
-		$this->accessor->removeByRestrictions($this->entityClass, $ids);
+		$this->accessor->removeByRestrictions(reset($this->entityClass), $ids);
 	}
 
 
@@ -131,7 +131,7 @@ abstract class Facade
 	 */
 	public function removeByRestrictions(IRestrictor $restrictor)
 	{
-		$this->accessor->removeByRestrictions($this->entityClass, $restrictor);
+		$this->accessor->removeByRestrictions(reset($this->entityClass), $restrictor);
 	}
 
 
@@ -144,6 +144,6 @@ abstract class Facade
 	 */
 	protected function createEntity(array $publicData, array $privateData = array(), $throwFirst = TRUE)
 	{
-		return $this->accessor->create($this->entityClass, $publicData, $privateData, $throwFirst);
+		return $this->accessor->create(reset($this->entityClass), $publicData, $privateData, $throwFirst);
 	}
 }
