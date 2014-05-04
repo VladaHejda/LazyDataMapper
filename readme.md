@@ -4,6 +4,9 @@ LazyDataMapper
 **LazyDataMapper** is [DataMapper](http://en.wikipedia.org/wiki/Data_mapper_pattern) tool for **PHP**.
 It is tool for making application [data models](http://en.wikipedia.org/wiki/Data_model).
 
+LazyDataMapper does not build or execute SQL queries or anything similar. You are the one who do this.
+LazyDataMapper just gives you the suggestions to make **efficient universal** data queries by yourself.
+
 LazyDataMapper aims to following targets:
 
 - completely cover the Entity from the data source structure
