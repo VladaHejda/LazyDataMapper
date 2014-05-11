@@ -5,7 +5,7 @@ LazyDataMapper
 It is tool for making application [data models](http://en.wikipedia.org/wiki/Data_model).
 
 LazyDataMapper does not build or execute SQL queries or anything similar. You are the one who do this.
-LazyDataMapper just gives you the suggestions to make **efficient universal** data queries by yourself.
+He just gives you the suggestions to make **efficient universal** data queries by yourself.
 
 LazyDataMapper aims to following targets:
 
@@ -13,6 +13,32 @@ LazyDataMapper aims to following targets:
 - the most simplest Entity control API as is possible
 - allow to call efficient data [CRUD](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete) queries (SQL or another)
 at one place
+
+#### Example
+
+After you integrate LazyDataMapper into your app, you'll access data just like following. You won't care about
+SQLs anymore.
+
+```php
+$seller = $sellerFacade->getById(666);
+
+?>
+<p>Name: <?php echo $seller->name; ?></p>
+<p>Profit: <?php echo $seller->profit('EUR'); ?> €</p>
+
+<ul>
+<?php foreach ($seller->sales as $sale) { ?>
+	<li>
+		<?php
+		echo $sale->date->format('d.m.Y');
+		foreach ($sale->products as $product) {
+			echo " $product->name";
+		}
+		?>
+	</li>
+<?php } ?>
+</ul>
+```
 
 #### Recommendations
 
