@@ -1,5 +1,9 @@
+[INSTALLATION](DOC/1.Installation.md) ● [DOCUMENTATION](#documentation)
+
+------------------------------------------------------------------------------------------------------------------------
+
 LazyDataMapper
-===
+==============
 
 **LazyDataMapper** is [DataMapper](http://en.wikipedia.org/wiki/Data_mapper_pattern) tool for **PHP**.
 It is tool for making application [data models](http://en.wikipedia.org/wiki/Data_model).
