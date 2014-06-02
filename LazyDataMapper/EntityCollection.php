@@ -82,12 +82,12 @@ abstract class EntityCollection implements IEntityCollection
 
 
 	/**
-	 * @param $var
+	 * @param $param
 	 * @return bool
 	 */
-	public function __isset($var)
+	public function __isset($param)
 	{
-		return method_exists($this, "get$var){");
+		return method_exists($this, 'get' . ucfirst($param));
 	}
 
 
