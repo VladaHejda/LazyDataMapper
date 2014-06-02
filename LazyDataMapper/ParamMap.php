@@ -8,11 +8,11 @@ namespace LazyDataMapper;
 abstract class ParamMap
 {
 
-	/** @var array set this map in child */
-	protected $map = array();
+	/** @var array parameter map */
+	private $map = array();
 
-	/** @var array optional default values of parameters */
-	protected $default = array();
+	/** @var array default values of parameters */
+	private $defaults;
 
 	/** @var bool */
 	private $grouped;
@@ -20,6 +20,11 @@ abstract class ParamMap
 
 	public function __construct()
 	{
+		$this->map = $this->loadMap();
+		if (!is_array($this->map)) {
+			throw new Exception(get_class() . "::loadMap() must return array, but " . gettype($this->map) . ' returned.');
+		}
+
 		foreach ($this->map as $map) {
 			if (NULL === $this->grouped) {
 				$this->grouped = is_array($map);
@@ -30,6 +35,23 @@ abstract class ParamMap
 				throw new Exception(get_class($this).": map is defective.");
 			}
 		}
+	}
+
+
+	/**
+	 * Loads map of parameter names.
+	 * @return array
+	 */
+	abstract protected function loadMap();
+
+
+	/**
+	 * Optionally loads default values of parameters.
+	 * @return array
+	 */
+	protected function loadDefaults()
+	{
+		return array();
 	}
 
 
@@ -146,9 +168,24 @@ abstract class ParamMap
 			throw new Exception(get_class($this).": unknown parameter name $paramName.");
 		}
 
-		if (array_key_exists($paramName, $this->default)) {
-			return $this->default[$paramName];
+		$defaults = $this->getDefaults();
+		if (array_key_exists($paramName, $defaults)) {
+			return $defaults[$paramName];
 		}
 		return NULL;
+	}
+
+
+	private function getDefaults()
+	{
+		if ($this->defaults === NULL) {
+			$this->defaults = $this->loadDefaults();
+
+			if (!is_array($this->defaults)) {
+				throw new Exception(get_class() . "::loadDefaults() must return array, but " . gettype($this->map) . ' returned.');
+			}
+		}
+
+		return $this->defaults;
 	}
 }

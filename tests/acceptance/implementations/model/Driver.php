@@ -90,11 +90,16 @@ class DriverRestrictor extends LazyDataMapper\FilterRestrictor
 class DriverParamMap extends LazyDataMapper\ParamMap
 {
 
-	protected $map = [
-		'personal' => ['first_name', 'last_name', 'colleague'],
-		'score' => ['wins', 'accidents'],
-		'extra' => ['famous_cars'],
-	];
+	protected function loadMap()
+	{
+		return [
+			'personal' => ['first_name', 'last_name', 'colleague'],
+			'score' => ['wins', 'accidents'],
+			'extra' => ['famous_cars'],
+		];
+	}
+
+
 }
 
 

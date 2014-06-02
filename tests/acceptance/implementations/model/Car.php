@@ -276,7 +276,10 @@ class CarChecker extends LazyDataMapper\Checker
 class CarParamMap extends LazyDataMapper\ParamMap
 {
 
-	protected $map = ['brand', 'name', 'engine', 'price', 'driver', 'chassis_id', 'repairs', ];
+	protected function loadMap()
+	{
+		return ['brand', 'name', 'engine', 'price', 'driver', 'chassis_id', 'repairs', ];
+	}
 }
 
 

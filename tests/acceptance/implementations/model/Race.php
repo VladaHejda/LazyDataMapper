@@ -40,7 +40,10 @@ class RaceRestrictor extends LazyDataMapper\FilterRestrictor
 class RaceParamMap extends LazyDataMapper\ParamMap
 {
 
-	protected $map = ['car', 'country'];
+	protected function loadMap()
+	{
+		return ['car', 'country'];
+	}
 }
 
 
