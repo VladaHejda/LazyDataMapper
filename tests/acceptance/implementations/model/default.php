@@ -4,7 +4,7 @@ namespace LazyDataMapper\Tests;
 
 use LazyDataMapper;
 
-abstract class defaultMapper implements LazyDataMapper\IMapper
+abstract class defaultMapper extends LazyDataMapper\Mapper
 {
 
 	/** Inherit these static vars to get per Mapper results: */

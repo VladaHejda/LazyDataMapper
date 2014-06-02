@@ -95,3 +95,11 @@ class IntegrityException extends Exception
 class TooManyItemsException extends \Exception
 {
 }
+
+
+/**
+ * Thrown when method not implemented yet.
+ */
+class NotImplementedException extends \Exception
+{
+}
