@@ -8,7 +8,7 @@ LazyDataMapper
 **LazyDataMapper** is [DataMapper](http://en.wikipedia.org/wiki/Data_mapper_pattern) tool for **PHP**.
 It is tool for making application [data models](http://en.wikipedia.org/wiki/Data_model).
 
-LazyDataMapper does not build or execute SQL queries or anything similar. You are the one who do this.
+LazyDataMapper does **NOT** build or execute **SQL** queries or anything similar. You are the one who do this.
 He just gives you the suggestions to make **efficient universal** data queries by yourself.
 
 LazyDataMapper aims to following targets:
@@ -20,8 +20,8 @@ at one place
 
 #### Example
 
-After you integrate LazyDataMapper into your app, you'll access data just like following. You won't care about
-SQLs anymore.
+After you integrate LazyDataMapper into your app, you'll access data just like following. You can customize your entities
+as much as you want.
 
 ```php
 $seller = $sellerFacade->getById(666);
