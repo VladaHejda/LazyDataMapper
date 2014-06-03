@@ -170,6 +170,7 @@ abstract class EntityCollection implements IEntityCollection
 	 * @param int $id
 	 * @param array $data
 	 * @return IEntity
+	 * @todo why i'm not using EntityServiceAccessor::createEntity ?
 	 */
 	protected function createEntity($id, array $data)
 	{

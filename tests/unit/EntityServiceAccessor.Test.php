@@ -4,7 +4,7 @@ namespace LazyDataMapper\Tests\EntityServiceAccessor;
 
 use LazyDataMapper;
 
-require_once __DIR__ . '/prepared/Facade.php';
+require_once __DIR__ . '/prepared/Empty.php';
 
 class Test extends LazyDataMapper\Tests\TestCase
 {
@@ -16,21 +16,60 @@ class Test extends LazyDataMapper\Tests\TestCase
 	protected function setUp()
 	{
 		parent::setUp();
-		$this->serviceAccessor = \Mockery::mock('LazyDataMapper\EntityServiceAccessor[]');
+		$this->serviceAccessor = \Mockery::mock('LazyDataMapper\EntityServiceAccessor[createParamMap, createMapper, createChecker]')
+			->shouldAllowMockingProtectedMethods();
+	}
+
+
+	protected function prepareAccessor()
+	{
+		$suggestorCache = \Mockery::mock('LazyDataMapper\SuggestorCache');
+		$serviceAccessor = \Mockery::mock('LazyDataMapper\IEntityServiceAccessor');
+		return new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
 	}
 
 
 	public function testGetEntityCollectionClass()
 	{
-		$this->assertEquals('worlds', $this->serviceAccessor->getEntityCollectionClass('world'));
-		$this->assertEquals('stories', $this->serviceAccessor->getEntityCollectionClass('story'));
+		$this->assertEquals('LazyDataMapper\Tests\Worlds', $this->serviceAccessor->getEntityCollectionClass('LazyDataMapper\Tests\World'));
+		$this->assertEquals('LazyDataMapper\Tests\Stories', $this->serviceAccessor->getEntityCollectionClass('LazyDataMapper\Tests\Story'));
 	}
 
 
 	public function testGetEntityClass()
 	{
-		$accessor = new LazyDataMapper\Accessor(\Mockery::mock('LazyDataMapper\SuggestorCache'), \Mockery::mock('LazyDataMapper\IEntityServiceAccessor'));
-		$facade = new LazyDataMapper\Tests\Facade\EmptyFacade($accessor);
-		$this->assertEquals('LazyDataMapper\Tests\Facade\Empty', $this->serviceAccessor->getEntityClass($facade));
+		$facade = new LazyDataMapper\Tests\SomeFacade($this->prepareAccessor());
+		$this->assertEquals('LazyDataMapper\Tests\Some', $this->serviceAccessor->getEntityClass($facade));
+	}
+
+
+	public function testGetEntityClassNamespaced()
+	{
+		$facade = new LazyDataMapper\Tests\Some\Facade($this->prepareAccessor());
+		$this->assertEquals('LazyDataMapper\Tests\Some', $this->serviceAccessor->getEntityClass($facade));
+	}
+
+
+	public function testGetParamMap()
+	{
+		$this->serviceAccessor->shouldReceive('createParamMap')
+			->with('LazyDataMapper\Tests\Some\ParamMap');
+		$this->serviceAccessor->getParamMap('LazyDataMapper\Tests\Some');
+	}
+
+
+	public function testGetMapper()
+	{
+		$this->serviceAccessor->shouldReceive('createMapper')
+			->with('LazyDataMapper\Tests\Some\Mapper');
+		$this->serviceAccessor->getMapper('LazyDataMapper\Tests\Some');
+	}
+
+
+	public function testGetChecker()
+	{
+		$this->serviceAccessor->shouldReceive('createChecker')
+			->with('LazyDataMapper\Tests\Some\Checker');
+		$this->serviceAccessor->getChecker('LazyDataMapper\Tests\Some');
 	}
 }

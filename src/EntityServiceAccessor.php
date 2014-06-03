@@ -5,14 +5,16 @@ namespace LazyDataMapper;
 class EntityServiceAccessor implements IEntityServiceAccessor
 {
 
+	protected $errorInstructions = 'Check classname, solve loading or change EntityServiceAccessor classnames conventions.';
+
 	/** @var ParamMap[] */
-	protected $paramMaps = array();
+	private $paramMaps = array();
 
 	/** @var IMapper[] */
-	protected $mappers = array();
+	private $mappers = array();
 
 	/** @var IChecker[] */
-	protected $checkers = array();
+	private $checkers = array();
 
 
 	/**
@@ -46,7 +48,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 
 
 	/**
-	 * Tries to create Checker service from classname returned by self::getCheckerClass().
+	 * Creates Checker service from classname returned by self::getCheckerClass(), if class exists.
 	 * When class does not exist, returns NULL.
 	 * @param string $entityClass
 	 * @return IChecker|null
@@ -55,7 +57,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	{
 		$checkerName = $this->getCheckerClass($entityClass);
 		if (!array_key_exists($checkerName, $this->checkers)) {
-			$this->checkers[$checkerName] = class_exists($checkerName) ? $this->createChecker($checkerName) : NULL;
+			$this->checkers[$checkerName] = $checkerName === NULL ? NULL : $this->createChecker($checkerName);
 		}
 		return $this->checkers[$checkerName];
 	}
@@ -66,7 +68,6 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * @param Facade $facade
 	 * @return string
 	 * @throws Exception
-	 * @todo work both EntityFacade and Entity\Facade too
 	 */
 	public function getEntityClass(Facade $facade)
 	{
@@ -74,7 +75,15 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 		if (strcasecmp(substr($facadeClass, -6), 'facade')) {
 			throw new Exception("Expected Facade with classname <EntityName>Facade. $facadeClass given.");
 		}
-		return substr($facadeClass, 0, -6);
+		$class = substr($facadeClass, 0, -6);
+		if (substr($class, -1) === '\\') {
+			$class = substr($class, 0, -1);
+		}
+
+		if (!class_exists($class)) {
+			throw new Exception("Entity class '$class' does not exist. " . $this->errorInstructions);
+		}
+		return $class;
 	}
 
 
@@ -83,6 +92,7 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * For improved solution see for example @link https://gist.github.com/VladaHejda/8775965
 	 * @param string $entityClass
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getEntityCollectionClass($entityClass)
 	{
@@ -91,7 +101,12 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 			$entityClass[$len-1] = 'i';
 			return $entityClass . 'es';
 		}
-		return $entityClass . 's';
+		$class = $entityClass . 's';
+
+		if (!class_exists($class)) {
+			throw new Exception("EntityCollection class '$class' does not exist. " . $this->errorInstructions);
+		}
+		return $class;
 	}
 
 
@@ -162,10 +177,17 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * Adds "ParamMap" at the end of Entity classname.
 	 * @param string $entityClass
 	 * @return string
+	 * @throws Exception
 	 */
 	protected function getParamMapClass($entityClass)
 	{
-		return $entityClass . 'ParamMap';
+		if (class_exists($class = $entityClass . 'ParamMap')) {
+			return $class;
+		}
+		if (class_exists($class2 = $entityClass . '\ParamMap')) {
+			return $class2;
+		}
+		throw new Exception("ParamMap classes '$class' or '$class2' do not exist. " . $this->errorInstructions);
 	}
 
 
@@ -173,10 +195,17 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 * Adds "Mapper" at the end of Entity classname.
 	 * @param string $entityClass
 	 * @return string
+	 * @throws Exception
 	 */
 	protected function getMapperClass($entityClass)
 	{
-		return $entityClass . 'Mapper';
+		if (class_exists($class = $entityClass . 'Mapper')) {
+			return $class;
+		}
+		if (class_exists($class2 = $entityClass . '\Mapper')) {
+			return $class2;
+		}
+		throw new Exception("Mapper classes '$class' or '$class2' do not exist. " . $this->errorInstructions);
 	}
 
 
@@ -187,7 +216,13 @@ class EntityServiceAccessor implements IEntityServiceAccessor
 	 */
 	protected function getCheckerClass($entityClass)
 	{
-		return $entityClass . 'Checker';
+		if (class_exists($class = $entityClass . 'Checker')) {
+			return $class;
+		}
+		if (class_exists($class2 = $entityClass . '\Checker')) {
+			return $class2;
+		}
+		return NULL;
 	}
 
 
