@@ -5,20 +5,21 @@ namespace LazyDataMapper;
 /**
  * Outer cover for getting operands (Entity or EntityCollection).
  * There are two ways of determining Entity / EntityCollection classname:
- * - override property $entityClass in the child of this class due to the pattern:
- *   either string <EntityClassname>
- *   or array [<EntityClassname>, <EntityCollectionClassname>]
+ * - override methods loadEntityClass() and loadEntityCollectionClass() in the child of this class.
  * - apply solution in IEntityServiceAccessor method getEntityClass() and getEntityCollectionClass().
- *   There is some default solution.
+ *   There is some default solution, see DOCs.
  */
 abstract class Facade
 {
 
-	/** @var array|string */
-	protected $entityClass;
-
 	/** @var Accessor */
-	private $accessor;
+	protected $accessor;
+
+	/** @var EntityServiceAccessor */
+	protected $serviceAccessor;
+
+	/** @var string */
+	private $entityClass, $entityCollectionClass;
 
 
 	/**
@@ -26,34 +27,28 @@ abstract class Facade
 	 * @param IEntityServiceAccessor $serviceAccessor
 	 * @throws Exception
 	 */
-	public function __construct(Accessor $accessor, IEntityServiceAccessor $serviceAccessor = NULL)
+	public function __construct(Accessor $accessor, IEntityServiceAccessor $serviceAccessor)
 	{
 		$this->accessor = $accessor;
+		$this->serviceAccessor = $serviceAccessor;
+	}
 
-		$this->entityClass = (array) $this->entityClass;
 
-		$predefinedCount = count($this->entityClass);
-		if (!$predefinedCount || ($serviceAccessor && $predefinedCount == 1)) {
-			if (!$serviceAccessor) {
-				$class = get_class($this);
-				throw new Exception($class . ": inject IEntityServiceAccessor or fill the $class::\$entityClass property.");
-			}
+	/**
+	 * @return string
+	 */
+	protected function loadEntityClass()
+	{
+		return $this->serviceAccessor->getEntityClass($this);
+	}
 
-			if (!$predefinedCount) {
-				$entityClass = $serviceAccessor->getEntityClass($this);
-				// todo check this globally - even if classnames set by Facade descendant
-				if (!is_string($entityClass) || empty($entityClass)) {
-					throw new Exception(get_class($this) . ": IEntityServiceAccessor::getEntityClass() does not return classname.");
-				}
-				$this->entityClass[] = $entityClass;
-			}
 
-			$entityCollectionClass = $serviceAccessor->getEntityCollectionClass(reset($this->entityClass));
-			if (!is_string($entityCollectionClass) || empty($entityCollectionClass)) {
-				throw new Exception(get_class($this) . ": IEntityServiceAccessor::getEntityCollectionClass() does not return classname.");
-			}
-			$this->entityClass[] = $entityCollectionClass;
-		}
+	/**
+	 * @return string
+	 */
+	protected function loadEntityCollectionClass()
+	{
+		return $this->serviceAccessor->getEntityCollectionClass($this->getEntityClass());
 	}
 
 
@@ -63,7 +58,7 @@ abstract class Facade
 	 */
 	public function getById($id)
 	{
-		return $this->accessor->getEntity(reset($this->entityClass), $id);
+		return $this->accessor->getEntity($this->getEntityClass(), $id);
 	}
 
 
@@ -73,7 +68,7 @@ abstract class Facade
 	 */
 	public function getByIdsRange(array $ids)
 	{
-		return $this->accessor->getCollection($this->entityClass, $ids);
+		return $this->accessor->getCollection(array($this->getEntityClass(), $this->getEntityCollectionClass()), $ids);
 	}
 
 
@@ -84,7 +79,10 @@ abstract class Facade
 	 */
 	public function getByRestrictions(IRestrictor $restrictor, $maxCount = 100)
 	{
-		return $this->accessor->getCollection($this->entityClass, $restrictor, NULL, NULL, $maxCount);
+		return $this->accessor->getCollection(
+			array($this->getEntityClass(), $this->getEntityCollectionClass()),
+			$restrictor, NULL, NULL, $maxCount
+		);
 	}
 
 
@@ -94,7 +92,7 @@ abstract class Facade
 	 */
 	public function getOneByRestrictions(IRestrictor $restrictor)
 	{
-		return $this->accessor->getEntity(reset($this->entityClass), $restrictor);
+		return $this->accessor->getEntity($this->getEntityClass(), $restrictor);
 	}
 
 
@@ -104,7 +102,10 @@ abstract class Facade
 	 */
 	public function getAll($maxCount = 100)
 	{
-		return $this->accessor->getCollection($this->entityClass, Accessor::ALL, NULL, NULL, $maxCount);
+		return $this->accessor->getCollection(
+			array($this->getEntityClass(), $this->getEntityCollectionClass()),
+			Accessor::ALL, NULL, NULL, $maxCount
+		);
 	}
 
 
@@ -113,7 +114,7 @@ abstract class Facade
 	 */
 	public function remove($id)
 	{
-		$this->accessor->remove(reset($this->entityClass), $id);
+		$this->accessor->remove($this->getEntityClass(), $id);
 	}
 
 
@@ -122,7 +123,7 @@ abstract class Facade
 	 */
 	public function removeByIdsRange(array $ids)
 	{
-		$this->accessor->removeByRestrictions(reset($this->entityClass), $ids);
+		$this->accessor->removeByRestrictions($this->getEntityClass(), $ids);
 	}
 
 
@@ -131,7 +132,7 @@ abstract class Facade
 	 */
 	public function removeByRestrictions(IRestrictor $restrictor)
 	{
-		$this->accessor->removeByRestrictions(reset($this->entityClass), $restrictor);
+		$this->accessor->removeByRestrictions($this->getEntityClass(), $restrictor);
 	}
 
 
@@ -144,6 +145,30 @@ abstract class Facade
 	 */
 	protected function createEntity(array $publicData, array $privateData = array(), $throwFirst = TRUE)
 	{
-		return $this->accessor->create(reset($this->entityClass), $publicData, $privateData, $throwFirst);
+		return $this->accessor->create($this->getEntityClass(), $publicData, $privateData, $throwFirst);
+	}
+
+
+	/**
+	 * @return string
+	 */
+	final protected function getEntityClass()
+	{
+		if ($this->entityClass === NULL) {
+			$this->entityClass = $this->loadEntityClass();
+		}
+		return $this->entityClass;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	final protected function getEntityCollectionClass()
+	{
+		if ($this->entityCollectionClass === NULL) {
+			$this->entityCollectionClass = $this->loadEntityCollectionClass();
+		}
+		return $this->entityCollectionClass;
 	}
 }

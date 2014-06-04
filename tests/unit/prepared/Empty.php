@@ -7,7 +7,6 @@ namespace LazyDataMapper\Tests {
 
 	class SomeFacade extends \LazyDataMapper\Facade
 	{
-		protected $entityClass = '';
 	}
 
 	class World extends Entity {}
@@ -21,7 +20,6 @@ namespace LazyDataMapper\Tests\Some {
 
 	class Facade extends \LazyDataMapper\Facade
 	{
-		protected $entityClass = '';
 	}
 
 

@@ -24,8 +24,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	protected function prepareAccessor()
 	{
 		$suggestorCache = \Mockery::mock('LazyDataMapper\SuggestorCache');
-		$serviceAccessor = \Mockery::mock('LazyDataMapper\IEntityServiceAccessor');
-		return new LazyDataMapper\Accessor($suggestorCache, $serviceAccessor);
+		return new LazyDataMapper\Accessor($suggestorCache, $this->serviceAccessor);
 	}
 
 
@@ -38,14 +37,14 @@ class Test extends LazyDataMapper\Tests\TestCase
 
 	public function testGetEntityClass()
 	{
-		$facade = new LazyDataMapper\Tests\SomeFacade($this->prepareAccessor());
+		$facade = new LazyDataMapper\Tests\SomeFacade($this->prepareAccessor(), $this->serviceAccessor);
 		$this->assertEquals('LazyDataMapper\Tests\Some', $this->serviceAccessor->getEntityClass($facade));
 	}
 
 
 	public function testGetEntityClassNamespaced()
 	{
-		$facade = new LazyDataMapper\Tests\Some\Facade($this->prepareAccessor());
+		$facade = new LazyDataMapper\Tests\Some\Facade($this->prepareAccessor(), $this->serviceAccessor);
 		$this->assertEquals('LazyDataMapper\Tests\Some', $this->serviceAccessor->getEntityClass($facade));
 	}
 
