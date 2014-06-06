@@ -11,10 +11,11 @@ abstract class Mapper implements IMapper
 	/**
 	 * @param IRestrictor $restrictor
 	 * @param int $limit
+	 * @param int $offset
 	 * @return int[]|NULL
 	 * @throws NotImplementedException
 	 */
-	public function getIdsByRestrictions(IRestrictor $restrictor, $limit = NULL)
+	public function getIdsByRestrictions(IRestrictor $restrictor, $limit = NULL, $offset = NULL)
 	{
 		throw new NotImplementedException('Method ' . __METHOD__ . ' is not implemented yet.');
 	}
@@ -35,10 +36,11 @@ abstract class Mapper implements IMapper
 
 	/**
 	 * @param int $limit
+	 * @param int $offset
 	 * @return mixed
 	 * @throws NotImplementedException
 	 */
-	public function getAllIds($limit = NULL)
+	public function getAllIds($limit = NULL, $offset = NULL)
 	{
 		throw new NotImplementedException('Method ' . __METHOD__ . ' is not implemented yet.');
 	}

@@ -110,10 +110,12 @@ final class Accessor
 	 * @param IEntity $parent
 	 * @param string $sourceParam
 	 * @param int $maxCount
+	 * @param int $page
+	 * @param bool &$exceeded
 	 * @return IEntityCollection
 	 * @throws Exception on wrong restrictions
 	 */
-	public function getCollection(array $entityClasses, $restrictions, IEntity $parent = NULL, $sourceParam = NULL, $maxCount = NULL)
+	public function getCollection(array $entityClasses, $restrictions, IEntity $parent = NULL, $sourceParam = NULL, $maxCount = NULL, $page = NULL, &$exceeded = NULL)
 	{
 		$entityClass = array_shift($entityClasses);
 		if (!count($entityClasses)) {
@@ -144,7 +146,7 @@ final class Accessor
 			// else $data set
 
 		} else {
-			$ids = $this->loadIds($restrictions, $entityClass, $maxCount);
+			$ids = $this->loadIds($restrictions, $entityClass, $maxCount, $page, $exceeded);
 
 			if (empty($ids)) {
 				$data = array();
@@ -331,26 +333,46 @@ final class Accessor
 	 * @param IRestrictor|int[] $restrictions
 	 * @param string $entityClass
 	 * @param int $maxCount
+	 * @param int $page
+	 * @param bool &$exceeded
 	 * @return int[]
 	 * @throws Exception
 	 * @throws TooManyItemsException
-	 * @todo podívat se na $maxCount jestli je to s nim vpořádku
 	 */
-	private function loadIds($restrictions, $entityClass, $maxCount = NULL)
+	private function loadIds($restrictions, $entityClass, $maxCount = NULL, $page = NULL, &$exceeded = NULL)
 	{
+		$cannotExceed = $exceeded = FALSE;
+
 		if ($maxCount !== NULL) {
 			$maxCount = (int) $maxCount;
+
+			if ($page !== NULL) {
+				$page = (int) $page;
+				if ($page < 1) {
+					$page = 1;
+				}
+			} else {
+				// if $page is NULL, result row count cannot exceed $maxCount
+				$cannotExceed = TRUE;
+			}
+		} else {
+			$page = NULL;
 		}
 
 		if (is_array($restrictions)) {
 			return $restrictions;
 
 		} elseif ($restrictions instanceof IRestrictor || $restrictions === self::ALL) {
-			$ids = $this->loadIdsByRestrictions($restrictions, $entityClass, $maxCount);
+			$ids = $this->loadIdsByRestrictions($restrictions, $entityClass, $maxCount, $page);
 
-			if (NULL !== $maxCount && count($ids) > $maxCount) {
-				throw new TooManyItemsException("Trying to get more than $maxCount pieces of $entityClass."
-					. " Increase the \$maxCount limit or restrict result more.");
+			$exceeded = $maxCount !== NULL && count($ids) > $maxCount;
+
+			if ($exceeded) {
+				if ($cannotExceed) {
+					throw new TooManyItemsException("Trying to get more than $maxCount pieces of $entityClass."
+						. " Increase the \$maxCount limit or restrict result more.");
+				}
+				array_pop($ids);
 			}
 
 			return $ids;
@@ -365,21 +387,27 @@ final class Accessor
 	 * @param IRestrictor $restrictions
 	 * @param $entityClass
 	 * @param int $maxCount
+	 * @param int $page
 	 * @return int[]
 	 * @throws Exception
 	 */
-	private function loadIdsByRestrictions($restrictions, $entityClass, $maxCount = NULL)
+	private function loadIdsByRestrictions($restrictions, $entityClass, $maxCount = NULL, $page = NULL)
 	{
+		$offset = 0;
 		if ($maxCount !== NULL) {
+			if ($page !== NULL) {
+				--$page;
+				$offset = $page * $maxCount;
+			}
 			++$maxCount;
 		}
 		$mapper = $this->serviceAccessor->getMapper($entityClass);
 		if ($restrictions === self::ALL) {
 			$m = 'getAllIds';
-			$ids = $mapper->getAllIds($maxCount);
+			$ids = $mapper->getAllIds($maxCount, $offset);
 		} else {
 			$m = 'getIdsByRestrictions';
-			$ids = $mapper->getIdsByRestrictions($restrictions, $maxCount);
+			$ids = $mapper->getIdsByRestrictions($restrictions, $maxCount, $offset);
 		}
 		if (NULL === $ids) {
 			return array();

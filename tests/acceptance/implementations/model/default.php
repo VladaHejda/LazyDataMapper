@@ -77,23 +77,36 @@ abstract class defaultMapper extends LazyDataMapper\Mapper
 	}
 
 
-	public function getIdsByRestrictions(LazyDataMapper\IRestrictor $restrictor, $maxCount = NULL)
+	public function getIdsByRestrictions(LazyDataMapper\IRestrictor $restrictor, $limit = NULL, $offset = NULL)
 	{
 		$restrictions = $restrictor->getRestrictions();
 
 		$ids = [];
+		$current = $n = 0;
 		foreach (static::$data as $id => $data) {
 			if ($restrictions($data)) {
+				if ($current < $offset) {
+					++$current;
+					continue;
+				}
 				$ids[] = $id;
+				++$n;
+				if ($limit !== NULL && $n === $limit) {
+					break;
+				}
 			}
 		}
 		return $ids;
 	}
 
 
-	public function getAllIds($maxCount = NULL)
+	public function getAllIds($limit = NULL, $offset = NULL)
 	{
-		return array_keys(static::$data);
+		$ids = array_keys(static::$data);
+		if ($limit !== NULL) {
+			$ids = array_slice($ids, $offset, $limit);
+		}
+		return $ids;
 	}
 
 

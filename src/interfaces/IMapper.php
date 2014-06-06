@@ -30,11 +30,11 @@ interface IMapper
 	/**
 	 * Get ids of matching entities.
 	 * @param IRestrictor $restrictor
-	 * @param int $limit ids count or NULL as unlimited (ignoring this argument does not affect the functionality
-	 *        but if is used it can improve performance)
+	 * @param int $limit ids count or NULL as unlimited
+	 * @param int $offset
 	 * @return int[]|NULL array of ids passing restrictions, when nothing pass, return NULL or empty array
 	 */
-	function getIdsByRestrictions(IRestrictor $restrictor, $limit = NULL);
+	function getIdsByRestrictions(IRestrictor $restrictor, $limit = NULL, $offset = NULL);
 
 
 	/**
@@ -48,11 +48,12 @@ interface IMapper
 
 
 	/**
-	 * @param int $limit @see getIdsByRestrictions()
+	 * @param int $limit ids count or NULL as unlimited
+	 * @param int $offset
 	 * @return mixed
 	 * @todo add to DOC
 	 */
-	function getAllIds($limit = NULL);
+	function getAllIds($limit = NULL, $offset = NULL);
 
 
 	/**

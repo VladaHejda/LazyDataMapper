@@ -12,6 +12,9 @@ namespace LazyDataMapper;
 abstract class Facade
 {
 
+	/** result cannot exceed max count directive */
+	const CANNOT_EXCEED = NULL;
+
 	/** @var Accessor */
 	protected $accessor;
 
@@ -75,13 +78,16 @@ abstract class Facade
 	/**
 	 * @param IRestrictor $restrictor
 	 * @param int $maxCount
+	 * @param int $page when self::CANNOT_EXCEED given and $maxCount is not null, result CANNOT exceed given $maxCount,
+	 *        otherwise an Exception is thrown
+	 * @param bool &$exceeded says whether result exceeded given $maxCount
 	 * @return IEntityCollection
 	 */
-	public function getByRestrictions(IRestrictor $restrictor, $maxCount = 100)
+	public function getByRestrictions(IRestrictor $restrictor, $maxCount = 100, $page = 1, &$exceeded = NULL)
 	{
 		return $this->accessor->getCollection(
 			array($this->getEntityClass(), $this->getEntityCollectionClass()),
-			$restrictor, NULL, NULL, $maxCount
+			$restrictor, NULL, NULL, $maxCount, $page, $exceeded
 		);
 	}
 
@@ -98,13 +104,16 @@ abstract class Facade
 
 	/**
 	 * @param int $maxCount
+	 * @param int $page when self::CANNOT_EXCEED given and $maxCount is not null, result CANNOT exceed given $maxCount,
+	 *        otherwise an Exception is thrown
+	 * @param bool &$exceeded says whether result exceeded given $maxCount
 	 * @return IEntityCollection
 	 */
-	public function getAll($maxCount = 100)
+	public function getAll($maxCount = 100, $page = 1, &$exceeded = NULL)
 	{
 		return $this->accessor->getCollection(
 			array($this->getEntityClass(), $this->getEntityCollectionClass()),
-			Accessor::ALL, NULL, NULL, $maxCount
+			Accessor::ALL, NULL, NULL, $maxCount, $page, $exceeded
 		);
 	}
 
