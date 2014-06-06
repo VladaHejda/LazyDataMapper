@@ -338,6 +338,10 @@ final class Accessor
 	 */
 	private function loadIds($restrictions, $entityClass, $maxCount = NULL)
 	{
+		if ($maxCount !== NULL) {
+			$maxCount = (int) $maxCount;
+		}
+
 		if (is_array($restrictions)) {
 			return $restrictions;
 
