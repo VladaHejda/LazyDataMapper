@@ -168,14 +168,21 @@ class DataHolder implements \Iterator
 
 
 	/**
-	 * @param array|array[] $data when no id source, id is expected in index
+	 * @param array|array[]|\Traversable $data when no id source, id is expected in index
 	 * @return self
 	 * @throws Exception
 	 * @todo vyřešit situaci, kdy je potomek prázdný (parent id je NULL) !!!
 	 * @todo umožnit také nastavení collection dat jako setData(['id' => 5, 'name' => 'Bla']); místo setData([['id' => 5, 'name' => 'Bla']]);
 	 */
-	public function setData(array $data)
+	public function setData($data)
 	{
+		if ($data instanceof \Traversable) {
+			$data = iterator_to_array($data);
+		}
+		if (!is_array($data)) {
+			throw new Exception(__CLASS__ . ': Expected array or instance of Traversable, ' . gettype($data) . ' given.');
+		}
+
 		$suggestions = array_fill_keys($this->suggestor->getSuggestions(), TRUE);
 
 		// collective
@@ -197,6 +204,10 @@ class DataHolder implements \Iterator
 			}
 
 			foreach ($data as $id => $subdata) {
+				if ($subdata instanceof \Traversable) {
+					$subdata = iterator_to_array($subdata);
+				}
+
 				if (!is_array($subdata)) {
 					if ($this->idSource !== NULL) {
 						$subdata = array($subdata);
