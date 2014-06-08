@@ -15,11 +15,14 @@ class SuggestorCache
 	/** @var IExternalCache */
 	protected $externalCache;
 
-	/** @var string */
-	protected $key;
+	/** @var RequestKey */
+	protected $requestKey;
 
 	/** @var IEntityServiceAccessor */
 	protected $serviceAccessor;
+
+	/** @var string */
+	private $key;
 
 
 	/**
@@ -30,7 +33,7 @@ class SuggestorCache
 	public function __construct(IExternalCache $cache, IRequestKey $requestKey, IEntityServiceAccessor $serviceAccessor)
 	{
 		$this->externalCache = $cache;
-		$this->key = $requestKey->getKey() . ':';
+		$this->requestKey = $requestKey;
 		$this->serviceAccessor = $serviceAccessor;
 	}
 
@@ -44,7 +47,7 @@ class SuggestorCache
 	 */
 	public function cacheSuggestion(IIdentifier $identifier, $paramName, $entityClass)
 	{
-		$key = $this->key . $identifier->getKey();
+		$key = $this->getBaseKey() . $identifier->getKey();
 		$cached = $this->externalCache->load($key);
 		if (NULL === $cached) {
 			$cached = array();
@@ -78,7 +81,7 @@ class SuggestorCache
 	 */
 	public function cacheChild(IIdentifier $identifier, $childEntityClass, $sourceParam, $origin = IIdentifier::BY_ID)
 	{
-		$key = $this->key . $identifier->getKey();
+		$key = $this->getBaseKey() . $identifier->getKey();
 		$cached = $this->externalCache->load($key);
 
 		if (NULL === $cached) {
@@ -118,7 +121,7 @@ class SuggestorCache
 	{
 		$childrenIdentifierList = array();
 
-		$cached = $this->externalCache->load($this->key . $identifier->getKey());
+		$cached = $this->externalCache->load($this->getBaseKey() . $identifier->getKey());
 		if (NULL === $cached) {
 			return NULL;
 		} else {
@@ -151,6 +154,20 @@ class SuggestorCache
 
 
 	/**
+	 * @param $suggestions, ...
+	 */
+	public function forceSuggestions($suggestions)
+	{
+		$args = func_get_args();
+		if (count($args) === 1) {
+			$args = $args[0];
+		}
+		$this->requestKey->addAdditionalInput(is_string($args) ? $args : serialize($args));
+		$this->key = NULL;
+	}
+
+
+	/**
 	 * @param ParamMap $paramMap
 	 * @param IIdentifier $identifier
 	 * @param array $suggestions
@@ -161,6 +178,18 @@ class SuggestorCache
 	protected function createSuggestor(ParamMap $paramMap, IIdentifier $identifier, array $suggestions, array $children = array(), $isCollection = FALSE)
 	{
 		return new Suggestor($paramMap, $this, $suggestions, $isCollection, $identifier, $children);
+	}
+
+
+	/**
+	 * @return string
+	 */
+	protected function getBaseKey()
+	{
+		if ($this->key === NULL) {
+			$this->key = $this->requestKey->getKey() . ':';
+		}
+		return $this->key;
 	}
 
 

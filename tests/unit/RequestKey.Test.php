@@ -101,4 +101,24 @@ class Test extends LazyDataMapper\Tests\TestCase
 		$newKey = $this->requestKey->getKey();
 		$this->assertNotEquals($newKey, $key);
 	}
+
+
+	/**
+	 * @depends testGetKey
+	 */
+	public function testForceKey($key)
+	{
+		$this->requestKey->forceKey('forced-key');
+		$this->assertNotEquals($key, $this->requestKey->getKey());
+	}
+
+
+	/**
+	 * @depends testGetKey
+	 */
+	public function testAdditionalInput($key)
+	{
+		$this->requestKey->addAdditionalInput('additional-input');
+		$this->assertNotEquals($key, $this->requestKey->getKey());
+	}
 }

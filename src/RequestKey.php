@@ -5,11 +5,22 @@ namespace LazyDataMapper;
 class RequestKey implements IRequestKey
 {
 
+	/** @var string */
+	protected $forcedKey;
+
+	/** @var string */
+	protected $additionalInput = '';
+
+
 	/**
 	 * @return string
 	 */
 	public function getKey()
 	{
+		if ($this->forcedKey !== NULL) {
+			return $this->forcedKey;
+		}
+
 		$input = $extra = '';
 
 		// CLI
@@ -31,10 +42,22 @@ class RequestKey implements IRequestKey
 		}
 
 		if (!empty($extra)) {
-			$input .= $extra;
+			$input .= ":$extra";
 		}
 
 		// hashing (md5, etc.) is not necessary
-		return $input;
+		return $input . $this->additionalInput;
+	}
+
+
+	public function forceKey($key)
+	{
+		$this->forcedKey = $key;
+	}
+
+
+	public function addAdditionalInput($input)
+	{
+		$this->additionalInput = ":$input";
 	}
 }
