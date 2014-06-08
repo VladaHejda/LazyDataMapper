@@ -110,7 +110,7 @@ class CachingEmptyTest extends LazyDataMapper\Tests\AcceptanceTestCase
 
 		$this->assertEquals(3, SuggestorCache::$calledGetCached);
 		$this->assertEquals(0, SuggestorCache::$calledCacheSuggestion);
-		$this->assertEquals(1, SuggestorCache::$calledCacheChild);
+		$this->assertEquals(0, SuggestorCache::$calledCacheChild);
 	}
 
 
