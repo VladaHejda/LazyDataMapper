@@ -8,12 +8,12 @@ use LazyDataMapper\IIdentifier;
 class ResettableIdentifier extends LazyDataMapper\Identifier
 {
 
-	static protected $counter = array();
+	static protected $counter = [];
 
 
 	public static function resetCounter()
 	{
-		static::$counter = array();
+		static::$counter = [];
 	}
 }
 
