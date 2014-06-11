@@ -60,21 +60,28 @@ class Test extends LazyDataMapper\Tests\TestCase
 	public function testPath()
 	{
 		$helper = new SuggestorSqlHelper($this->suggestor);
-		$this->assertEquals('health, strength', $helper->setPath('warrior')->build());
+		$helper->setPath('warrior');
+		$this->assertEquals(['health', 'strength'], $helper->getRaw());
+		$this->assertEquals('health, strength', $helper->build());
 	}
 
 
 	public function testStackedPath()
 	{
 		$helper = new SuggestorSqlHelper($this->suggestor);
-		$this->assertEquals('name, damage, wear', $helper->setPath('warrior.weapon')->build());
+		$helper->setPath('warrior.weapon');
+		$this->assertEquals(['name', 'damage', 'wear'], $helper->getRaw());
+		$this->assertEquals('name, damage, wear', $helper->build());
 	}
 
 
 	public function testTableAlias()
 	{
 		$helper = new SuggestorSqlHelper($this->suggestor);
-		$this->assertEquals('w.race, w.land', $helper->setTableAlias('w')->build());
+		$helper->setTableAlias('w');
+		$this->assertEquals(['w.race', 'w.land'], $helper->getRaw());
+		$this->assertEquals('w.race, w.land', $helper->build());
+
 		$this->assertEquals('world.race, world.land', $helper->setTableAlias('world')->build());
 	}
 
@@ -82,7 +89,10 @@ class Test extends LazyDataMapper\Tests\TestCase
 	public function testConflicts()
 	{
 		$helper = new SuggestorSqlHelper($this->suggestor);
-		$this->assertEquals('race, land AS area', $helper->addConflicts(['land' => 'area'])->build());
+		$helper->addConflicts(['land' => 'area']);
+		$this->assertEquals(['race', 'land AS area'], $helper->getRaw());
+		$this->assertEquals('race, land AS area', $helper->build());
+
 		$this->assertEquals('race AS ethnicity, land AS area', $helper->addConflicts(['race' => 'ethnicity'])->build());
 	}
 
@@ -104,6 +114,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 	{
 		$helper = new SuggestorSqlHelper($this->suggestor);
 		$helper->setPath('warrior.weapon')->setTableAlias('ARM')->addConflicts(['damage' => 'harm', 'name' => 'weapon']);
+		$this->assertEquals(['ARM.name AS weapon', 'ARM.damage AS harm', 'ARM.wear'], $helper->getRaw());
 		$this->assertEquals('ARM.name AS weapon, ARM.damage AS harm, ARM.wear', $helper->build());
 	}
 
@@ -116,6 +127,7 @@ class Test extends LazyDataMapper\Tests\TestCase
 
 		SuggestorSqlHelper::$reservedWords[] = 'land';
 		$helper = new SuggestorSqlHelper($this->suggestor);
+		$this->assertEquals(['race', '`land`'], $helper->getRaw());
 		$this->assertEquals('race, `land`', $helper->build());
 
 		SuggestorSqlHelper::setWordWrapper('[]');

@@ -51,6 +51,15 @@ class SuggestorSqlHelper
 	 */
 	public function build()
 	{
+		return implode(', ', $this->getRaw());
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function getRaw()
+	{
 		$suggestions = $this->getSuggestions();
 
 		foreach ($suggestions as &$suggestion) {
@@ -70,16 +79,20 @@ class SuggestorSqlHelper
 			}
 		}
 
-		return implode(', ', $suggestions);
+		return $suggestions;
 	}
 
 
 	/**
 	 * @param string $path
 	 * @return static
+	 * @throws Exception
 	 */
 	public function setPath($path)
 	{
+		if ($this->path !== NULL) {
+			throw new Exception("Path already set to '$this->path'.");
+		}
 		$this->path = $path;
 		return $this;
 	}
@@ -88,9 +101,13 @@ class SuggestorSqlHelper
 	/**
 	 * @param string $group
 	 * @return static
+	 * @throws Exception
 	 */
 	public function setGroup($group)
 	{
+		if ($this->group !== NULL) {
+			throw new Exception("Group already set to '$this->group'.");
+		}
 		$this->group = $group;
 		return $this;
 	}
