@@ -141,10 +141,41 @@ class SuggestorSqlHelper
 
 
 	/**
+	 * @param DataHolder $holder
+	 * @param array|\Traversable $data
+	 * @return DataHolder
+	 * @throws Exception
+	 */
+	public function completeDataHolder(DataHolder $holder, $data)
+	{
+		if ($this->suggestor !== $holder->getSuggestor()) {
+			throw new Exception('Given DataHolder is not related with base Suggestor.');
+		}
+		$holder = $this->getSourceDataHolder($holder);
+
+		// throwing an Exception resolves DataHolder::setData()
+		if (is_array($data) || $data instanceof \Traversable) {
+			if ($holder->getSuggestor()->isCollection()) {
+				foreach ($data as &$subdata) {
+					if (!is_array($subdata) && !$subdata instanceof \Traversable) {
+						continue;
+					}
+					$subdata = $this->resolveConflicts($subdata);
+				}
+			} else {
+				$data = $this->resolveConflicts($data);
+			}
+		}
+
+		return $holder->setData($data);
+	}
+
+
+	/**
 	 * @return Suggestor
 	 * @throws Exception
 	 */
-	final public function getSuggestionsSource()
+	final public function getSourceSuggestor()
 	{
 		$sourceSuggestor = $this->suggestor;
 		if ($this->path !== NULL) {
@@ -191,8 +222,43 @@ class SuggestorSqlHelper
 	final protected function getSuggestions()
 	{
 		if ($this->suggestions === NULL) {
-			$this->suggestions = $this->getSuggestionsSource()->getSuggestions($this->group);
+			$this->suggestions = $this->getSourceSuggestor()->getSuggestions($this->group);
 		}
 		return $this->suggestions;
+	}
+
+
+	/**
+	 * @param DataHolder $holder
+	 * @return DataHolder
+	 */
+	protected function getSourceDataHolder(DataHolder $holder)
+	{
+		if ($this->path !== NULL) {
+			foreach (explode('.', $this->path) as $child) {
+				$holder = $holder->$child;
+			}
+		}
+		return $holder;
+	}
+
+
+	/**
+	 * @param array $data
+	 * @return array|\Traversable
+	 * @throws Exception
+	 */
+	protected function resolveConflicts($data)
+	{
+		foreach ($this->aliases as $conflict => $alias) {
+			if (!array_key_exists($alias, $data)) {
+				throw new Exception("Missing alias parameter '$alias' in data.");
+			}
+			$data[$conflict] = $data[$alias];
+			if ($conflict != $alias) {
+				unset($data[$alias]);
+			}
+		}
+		return $data;
 	}
 }
