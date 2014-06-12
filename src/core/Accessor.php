@@ -441,7 +441,7 @@ final class Accessor
 		}
 		$data = $dataHolder->getData();
 		if ($isCollection) {
-			$this->sortData($id, $data);
+			$data = $this->sortData($id, $data);
 		}
 		return $data;
 	}
