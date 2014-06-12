@@ -61,6 +61,7 @@ class SuggestorSqlHelper
 	public function getRaw()
 	{
 		$suggestions = $this->getSuggestions();
+		$this->checkConflicts();
 
 		foreach ($suggestions as &$suggestion) {
 			// reserved word
@@ -116,14 +117,9 @@ class SuggestorSqlHelper
 	/**
 	 * @param array $conflicts
 	 * @return static
-	 * @throws Exception
 	 */
 	public function addConflicts(array $conflicts)
 	{
-		if ($diff = array_diff(array_keys($conflicts), $this->getSuggestions())) {
-			$diff = implode("', '", $diff);
-			throw new Exception("There is no suggestion '$diff' in Suggestor.");
-		}
 		$this->aliases = $conflicts + $this->aliases;
 		return $this;
 	}
@@ -151,6 +147,8 @@ class SuggestorSqlHelper
 		if ($this->suggestor !== $holder->getSuggestor()) {
 			throw new Exception('Given DataHolder is not related with base Suggestor.');
 		}
+
+		$this->checkConflicts();
 		$holder = $this->getSourceDataHolder($holder);
 
 		// throwing an Exception resolves DataHolder::setData()
@@ -240,6 +238,19 @@ class SuggestorSqlHelper
 			}
 		}
 		return $holder;
+	}
+
+
+	/**
+	 * @throws Exception
+	 */
+	protected function checkConflicts()
+	{
+		// check conflicts
+		if (!empty($this->aliases) && $diff = array_diff(array_keys($this->aliases), $this->getSuggestions())) {
+			$diff = implode("', '", $diff);
+			throw new Exception("There is no suggestions '$diff' in Suggestor.");
+		}
 	}
 
 
