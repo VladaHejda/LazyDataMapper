@@ -218,10 +218,14 @@ class DataHolder implements \Iterator
 
 				// id
 				if ($this->idSource !== NULL) {
-					if (!isset($subdata[$this->idSource])) {
+					if (!array_key_exists($this->idSource, $subdata)) {
 						throw new Exception("One of array members does not have id source column ($this->idSource).");
 					}
 					$id = $subdata[$this->idSource];
+
+					if ($id === NULL) {
+						continue;
+					}
 				}
 
 				if (!is_numeric($id)) {
