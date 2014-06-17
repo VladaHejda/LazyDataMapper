@@ -1,3 +1,6 @@
-<phpunit bootstrap="bootstrap.php"
-         colors="true">
+<phpunit bootstrap="bootstrap.php" colors="true">
+<logging>
+	<log type="coverage-html" target="./../log/codeCoverage" charset="UTF-8" highlight="true" />
+	<log type="testdox-html" target="./../log/testdox.html" />
+</logging>
 </phpunit>
